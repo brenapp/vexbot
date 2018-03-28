@@ -1,7 +1,7 @@
 <div align="center">
   <br />
   <p>
-    <a href="https://discord.gg/bRCvFy9"><img src="https://cdn.discordapp.com/icons/310820885240217600/5c40b50a159efa10dfff51f99e14a2e0.png" width="130" alt="vexbit" /></a>
+    <a href="https://discord.gg/bRCvFy9"><img src="https://cdn.discordapp.com/icons/310820885240217600/5c40b50a159efa10dfff51f99e14a2e0.png" width="130" alt="vexbit" style="border-radius: 100%"/></a>
   </p>
   <br />
   <p>
