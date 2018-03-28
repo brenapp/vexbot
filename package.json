@@ -1,0 +1,14 @@
+{
+  "name": "vexbot",
+  "version": "0.0.0",
+  "description": "Bot to assist, also helps with scout",
+  "main": "main.js",
+  "repository": "https://github.com/MayorMony/vexbot",
+  "author": "MayorMonty <artificalchamber@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "discord.js": "^11.3.2",
+    "vexdb": "^0.5.21"
+  }
+}
