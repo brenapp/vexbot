@@ -6,7 +6,7 @@
   <br />
   <p>
     <a href="https://discord.gg/W9EcfQW"><img src="https://discordapp.com/api/guilds/310820885240217600/embed.png" alt="VEX Teams of South Carolina" /></a>
-    [![Build Status](https://travis-ci.org/MayorMonty/vexbot.svg?branch=master)](https://travis-ci.org/MayorMonty/vexbot)
+    <a href="https://travis-ci.org/MayorMonty/vexbot"><img src="https://travis-ci.org/MayorMonty/vexbot.svg?branch=master" alt="Vexbot on Travis" /></a>
   </p>
 </div>
 
