@@ -1,3 +1,9 @@
+install:
+  - yarn -D
+  - yarn
+  - yarn global add ava
+script:
+  - yarn test
 deploy:
   provider: heroku
   api_key:
