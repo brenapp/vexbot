@@ -1,7 +1,7 @@
 <div align="center">
   <br />
   <p>
-    <a href="https://discord.gg/W9EcfQW"><img src="https://cdn.discordapp.com/icons/310820885240217600/5c40b50a159efa10dfff51f99e14a2e0.png" width="130" alt="vexbit"/></a>
+    <a href="https://vexbot.herokuapp.com/"><img src="https://cdn.discordapp.com/icons/310820885240217600/5c40b50a159efa10dfff51f99e14a2e0.png" width="130" alt="vexbit"/></a>
   </p>
   <br />
   <p>
