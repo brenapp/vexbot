@@ -4,6 +4,7 @@ const { handleMessage } = require("./lib/message");
 const verify = require("./lib/verify");
 
 require("./lib/handlers"); // Add common sense message handlers
+require("./lib/web"); // Web Server
 
 const token = (process.env.token || require("./config").token);
 
