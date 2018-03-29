@@ -4,7 +4,8 @@
   "description": "Bot to assist, also helps with scout",
   "main": "main.js",
   "scripts": {
-    "test": "echo 0"
+    "test": "echo 0",
+    "start": "node main.js"
   },
   "repository": "https://github.com/MayorMony/vexbot",
   "author": "MayorMonty <artificalchamber@gmail.com>",
