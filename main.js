@@ -16,8 +16,3 @@ client.on("guildMemberAdd", verify)
 
 
 client.login(token);
-
-
-require("http")
-    .createServer((req, res) => res.end(`<iframe src="https://discordapp.com/widget?id=310820885240217600&theme=dark" width="350" height="500" allowtransparency="true" frameborder="0"></iframe>`))
-    .listen(process.env.PORT | 5000)
