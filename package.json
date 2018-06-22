@@ -1,0 +1,14 @@
+{
+  "name": "vexbot",
+  "version": "1.0.0",
+  "description": "A simple bot to help with Vex Teams Of South Carolina",
+  "main": "src/main.ts",
+  "repository": "git@github.com:MayorMonty/vexbot.git",
+  "author": "MayorMonty <artificalchamber@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "discord.js": "^11.3.2"
+  },
+  "devDependencies": {}
+}
