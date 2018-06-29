@@ -2,13 +2,26 @@
   "name": "vexbot",
   "version": "1.0.0",
   "description": "A simple bot to help with Vex Teams Of South Carolina",
-  "main": "src/main.ts",
+  "main": "out/main.js",
   "repository": "git@github.com:MayorMonty/vexbot.git",
   "author": "MayorMonty <artificalchamber@gmail.com>",
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "discord.js": "^11.3.2"
+    "@types/express": "^4.16.0",
+    "@types/node": "^10.3.4",
+    "discord.js": "^11.3.2",
+    "express": "^4.16.3",
+    "vexdb": "^1.5.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@types/typescript": "^2.0.0",
+    "nodemon": "^1.17.5",
+    "ts-node": "^7.0.0",
+    "typescript": "^2.9.2"
+  },
+  "scripts": {
+    "start": "tsc && node out/main.js",
+    "dev": "./node_modules/nodemon/bin/nodemon.js"
+  }
 }
