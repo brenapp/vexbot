@@ -43,7 +43,6 @@ function questionValidate(
 ): Promise<string> {
   return askString(question, channel).then(async response => {
     let corrected = await validate(response);
-    console.log("questionValidate", corrected);
     // If the validator explicity returns true, then return the original resposne
     if (corrected === true) {
       return response;
