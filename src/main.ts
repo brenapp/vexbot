@@ -4,7 +4,7 @@ import verify from "./lib/verify";
 import report from "./lib/report";
 
 import "./lib/handlers";
-import "./lib/web";
+import "./lib/command";
 
 const token = process.env.token || require("../config").token;
 const client = new discord.Client();
