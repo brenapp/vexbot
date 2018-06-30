@@ -69,7 +69,7 @@ function verify(
       "Verification: Nickname"
     );
 
-    let team = await vexdb.get("teams", { team: verification.team });
+    let team = (await vexdb.get("teams", { team: verification.team }))[0];
 
     // Add roles
     let roles = ["310902227160137730"]; // Competitors (aka Verified)
@@ -110,7 +110,11 @@ function verify(
     if (welcomeChannel) {
       welcomeChannel.send(`Welcome ${member}!`);
     } else {
-      member.guild.defaultChannel.send(`Welcome ${member}!`);
+      let channel: TextChannel = member.guild.channels.find(
+        "name",
+        "general"
+      ) as TextChannel;
+      channel.send(`Welcome ${member}`)!;
     }
   });
 }
