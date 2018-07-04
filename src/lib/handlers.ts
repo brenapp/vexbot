@@ -8,8 +8,8 @@ addMessageHandler(message => message.author.bot);
 addMessageHandler(message => {
   let channel = message.channel as TextChannel;
   console.log(
-    `${message.author.username}#${message.author.discriminator} in #${
-      channel.name
+    `${message.author.username}#${message.author.discriminator} in ${
+      channel.type === "dm" ? "DM" : `#${channel.name}`
     }: ${message.content}`
   );
   return false;
