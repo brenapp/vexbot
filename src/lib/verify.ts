@@ -26,7 +26,11 @@ function verify(
   welcomeChannel?: TextChannel | DMChannel | GroupDMChannel
 ) {
   member.createDM().then(async channel => {
-    let verification = {
+    let verification: {
+      name: string;
+      team: string;
+      role: string;
+    } = {
       name: "",
       team: "",
       role: ""
@@ -41,14 +45,13 @@ function verify(
       "What should we call you? *(First Name, Nickname, etc.)*",
       channel
     );
-    console.log("Got name", verification.name);
+
     verification.team = await questionValidate(
       "What team are you *primarily* a part of?",
       channel,
       async team => !!(await vexdb.size("teams", { team })),
       "There doesn't appear to be a team with that number."
     );
-    console.log("Got team", verification.team);
     verification.role = await choose(
       "On your team, what role do you serve? *(Member, Alumni, Mentor)*",
       channel,
@@ -58,14 +61,15 @@ function verify(
         ["MENTOR", "COACH", "ADVISOR"]
       ]
     );
-    console.log("Got role", verification.role);
 
     console.log(
       `Verify ${member.user.username}#${member.user.discriminator}`,
       verification
     );
     member.setNickname(
-      `${verification.name} | ${verification.team}`,
+      `${verification.name} | ${verification.team} ${
+        verification.role === "ALUMNI" ? "ALUM" : ""
+      }`,
       "Verification: Nickname"
     );
 
@@ -74,13 +78,15 @@ function verify(
     // Add roles
     let roles = ["310902227160137730"]; // Competitors (aka Verified)
 
-    // Program
-    if (team.program == "VEXU") {
-      roles.push("377219725442154526"); // VEXU
-    } else if (team.grade == "Middle School") {
-      roles.push("376489822598201347"); // Middle School
-    } else {
-      roles.push("376489878700949515"); // High School
+    if (verification.role !== "ALUMNI") {
+      // Program
+      if (team.program == "VEXU") {
+        roles.push("377219725442154526"); // VEXU
+      } else if (team.grade == "Middle School") {
+        roles.push("376489822598201347"); // Middle School
+      } else {
+        roles.push("376489878700949515"); // High School
+      }
     }
 
     // Team
