@@ -54,12 +54,6 @@
     "@types/express-serve-static-core" "*"
     "@types/mime" "*"
 
-"@types/vexdb@^1.7.0":
-  version "1.7.0"
-  resolved "https://registry.yarnpkg.com/@types/vexdb/-/vexdb-1.7.0.tgz#5c094b0d38c94ad5d85203ad78707495d4074d37"
-  dependencies:
-    "@types/events" "*"
-
 abbrev@1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.1.1.tgz#f8f2c887ad10bf67f634f005b6987fed3179aac8"
@@ -1908,9 +1902,9 @@ vary@~1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
 
-vexdb@^1.7.2:
-  version "1.7.3"
-  resolved "https://registry.yarnpkg.com/vexdb/-/vexdb-1.7.3.tgz#4d1c8fe2152d0b48f201277ad4d20f03ab51bb88"
+vexdb@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/vexdb/-/vexdb-2.0.2.tgz#a346f15476a6660fbbf92c188af846f0a4534b2e"
   dependencies:
     isomorphic-fetch "^2.2.1"
     keya latest
