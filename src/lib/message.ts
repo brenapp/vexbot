@@ -48,4 +48,31 @@ async function handleMessage(message: Message) {
   return handlers[i];
 }
 
-export { addMessageHandler, addOneTimeMessageHandler, handleMessage };
+type CommandHandler = (
+  args: string[],
+  message: Message
+) => boolean | Promise<boolean>;
+
+/**
+ * Syntactic Sugar around addMessageHandler() for commands
+ * @param name Name of the command (event, or team, or whatever)
+ * @param handler A function to handle the command innvocation
+ */
+function addCommand(name: string, handler: CommandHandler) {
+  addMessageHandler(async message => {
+    if (message.content.toLowerCase().startsWith(`!${name}`)) {
+      let [, ...args] = message.content.split(" ");
+      console.log("passing command to handler");
+      return handler(args, message);
+    } else {
+      return false;
+    }
+  });
+}
+
+export {
+  addMessageHandler,
+  addOneTimeMessageHandler,
+  handleMessage,
+  addCommand
+};
