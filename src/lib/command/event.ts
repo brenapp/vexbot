@@ -1,9 +1,8 @@
-import { addMessageHandler } from "../message";
+import { addCommand } from "../message";
 import vexdb from "vexdb";
 
-addMessageHandler(async message => {
-  if (!message.content.toLowerCase().startsWith("!event")) return false;
-  let sku = message.content.split(" ")[1];
+addCommand("event", async (args, message) => {
+  let [sku] = args;
 
   if (!sku) {
     message.reply("No event SKU specified (Usage: `!event [sku]`)");
