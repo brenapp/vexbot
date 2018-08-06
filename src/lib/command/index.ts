@@ -1,2 +1,4 @@
 import "./event";
-import "./probate"
+import "./probate";
+import "./team";
+import "./fun";
