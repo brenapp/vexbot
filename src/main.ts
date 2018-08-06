@@ -6,13 +6,25 @@ import report from "./lib/report";
 import "./lib/handlers";
 import "./lib/command";
 
+// import "./lib/actions/eventlog";
+
 const token = process.env.token || require("../config").token;
 const client = new discord.Client();
 
-client.on("ready", () => console.log("vexbot#0599 is online!"));
+client.on("ready", () => {
+  console.log("vexbot#0599 is online!");
+  client.user.setPresence({
+    game: new discord.Game({
+      name: "over the server",
+      type: 3
+    })
+  });
+});
 client.on("message", handleMessage);
 client.on("guildMemberAdd", verify);
 
 client.on("error", report);
 
 client.login(token);
+
+export { client };
