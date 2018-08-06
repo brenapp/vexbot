@@ -11,7 +11,16 @@ require("./lib/handlers");
 require("./lib/command");
 var token = process.env.token || require("../config").token;
 var client = new discord_js_1.default.Client();
-client.on("ready", function () { return console.log("vexbot#0599 is online!"); });
+exports.client = client;
+client.on("ready", function () {
+    console.log("vexbot#0599 is online!");
+    client.user.setPresence({
+        game: new discord_js_1.default.Game({
+            name: "over the server",
+            type: 3
+        })
+    });
+});
 client.on("message", message_1.handleMessage);
 client.on("guildMemberAdd", verify_1.default);
 client.on("error", report_1.default);

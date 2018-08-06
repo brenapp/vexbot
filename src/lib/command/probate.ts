@@ -1,5 +1,9 @@
 import { addMessageHandler } from "../message";
-import { GuildMember } from "discord.js";
+import { GuildMember, DiscordAPIError } from "discord.js";
+import { client } from "../../main";
+import { Game } from "discord.js";
+
+let probated = [];
 
 /**
  * Automatically probates a user for a given time
@@ -26,12 +30,39 @@ async function probate(
     )}`
   );
   user.addRole(probation);
+
+  probated.push(user.displayName.split(" |")[0]);
+
+  setPresence(probated);
+
   setTimeout(() => {
     user.removeRole(probation);
+
+    probated = probated.filter(u => u !== user.displayName.split(" |")[0]);
+    setPresence(probated);
+
     dm.send(
       "Your probation has been lifted! You are now permitted to post again. Please remember, repeat offences will be more likely to lead to a ban"
     );
   }, length.ms);
+}
+
+function setPresence(users) {
+  if (users.length < 1) {
+    client.user.setPresence({
+      game: new Game({
+        name: "over the server",
+        type: 3
+      })
+    });
+    return;
+  }
+  client.user.setPresence({
+    game: new Game({
+      name: users.join(", "),
+      type: 3
+    })
+  });
 }
 
 /**
