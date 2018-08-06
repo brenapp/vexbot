@@ -79,3 +79,21 @@ function handleMessage(message) {
     });
 }
 exports.handleMessage = handleMessage;
+function addCommand(name, handler) {
+    var _this = this;
+    addMessageHandler(function (message) { return __awaiter(_this, void 0, void 0, function () {
+        var _a, args;
+        return __generator(this, function (_b) {
+            if (message.content.toLowerCase().startsWith("!" + name)) {
+                _a = message.content.split(" "), args = _a.slice(1);
+                console.log("passing command to handler");
+                return [2, handler(args, message)];
+            }
+            else {
+                return [2, false];
+            }
+            return [2];
+        });
+    }); });
+}
+exports.addCommand = addCommand;

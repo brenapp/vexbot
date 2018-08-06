@@ -37,6 +37,9 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var _this = this;
 Object.defineProperty(exports, "__esModule", { value: true });
 var message_1 = require("../message");
+var main_1 = require("../../main");
+var discord_js_1 = require("discord.js");
+var probated = [];
 function probate(user, length, by, reason) {
     return __awaiter(this, void 0, void 0, function () {
         var probation, dm;
@@ -50,13 +53,34 @@ function probate(user, length, by, reason) {
                     dm.send("You've been put on probation by " + by + " for " + length.time + " for the reason: " + reason);
                     dm.send("While you are in probation, you cannot post messages in any channel, or speak in any voice channel. If you believe this was in error, you can appeal this in " + user.guild.channels.find("name", "appeals"));
                     user.addRole(probation);
+                    probated.push(user.displayName.split(" |")[0]);
+                    setPresence(probated);
                     setTimeout(function () {
                         user.removeRole(probation);
+                        probated = probated.filter(function (u) { return u !== user.displayName.split(" |")[0]; });
+                        setPresence(probated);
                         dm.send("Your probation has been lifted! You are now permitted to post again. Please remember, repeat offences will be more likely to lead to a ban");
                     }, length.ms);
                     return [2];
             }
         });
+    });
+}
+function setPresence(users) {
+    if (users.length < 1) {
+        main_1.client.user.setPresence({
+            game: new discord_js_1.Game({
+                name: "over the server",
+                type: 3
+            })
+        });
+        return;
+    }
+    main_1.client.user.setPresence({
+        game: new discord_js_1.Game({
+            name: users.join(", "),
+            type: 3
+        })
     });
 }
 function parseTime(time) {

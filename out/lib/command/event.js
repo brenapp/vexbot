@@ -41,15 +41,13 @@ var _this = this;
 Object.defineProperty(exports, "__esModule", { value: true });
 var message_1 = require("../message");
 var vexdb_1 = __importDefault(require("vexdb"));
-message_1.addMessageHandler(function (message) { return __awaiter(_this, void 0, void 0, function () {
+message_1.addCommand("event", function (args, message) { return __awaiter(_this, void 0, void 0, function () {
     var sku, event, divisionReport, awards, excellence, champions, _a, _b, _c, _d;
     var _this = this;
     return __generator(this, function (_e) {
         switch (_e.label) {
             case 0:
-                if (!message.content.toLowerCase().startsWith("!event"))
-                    return [2, false];
-                sku = message.content.split(" ")[1];
+                sku = args[0];
                 if (!sku) {
                     message.reply("No event SKU specified (Usage: `!event [sku]`)");
                     return [2, true];
