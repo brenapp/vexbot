@@ -62,7 +62,6 @@ function addCommand(name: string, handler: CommandHandler) {
   addMessageHandler(async message => {
     if (message.content.toLowerCase().startsWith(`!${name}`)) {
       let [, ...args] = message.content.split(" ");
-      console.log("passing command to handler");
       return handler(args, message);
     } else {
       return false;

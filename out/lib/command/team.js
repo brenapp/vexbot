@@ -83,20 +83,21 @@ message_1.addCommand("team", function (args, message) { return __awaiter(_this, 
                     }); })])];
             case 3:
                 events = _c.sent();
-                console.log("Responding...", events);
                 message.channel.send({
                     embed: {
                         color: 3447003,
                         title: record.team_name + " (" + record.number + ")",
-                        url: "https://io/teams/view/" + record.number,
-                        description: (record.program == "VEXU" ? "VEXU" : record.grade) + " team @ " + record.organisation + " (" + record.city + ", " + record.region + ")",
-                        fields: events.map(function (event) {
-                            [
-                                "" + event.name,
-                                "Ranked " + event.ranking.rank,
-                                event.awards.map(function (award) { return award.name; })
-                            ].join("\n");
-                        })
+                        url: "https://vexdb.io/teams/view/" + record.number,
+                        description: (record.program == "VEXU" ? "VEXU" : record.grade) + " Team @ " + record.organisation + " (" + record.city + ", " + record.region + ")",
+                        fields: events.map(function (event) { return ({
+                            name: event.name,
+                            value: (event.ranking ? "Ranked #" + event.ranking.rank : "Unranked") + ". " + event.awards.map(function (award) { return award.name.split(" (")[0]; }).join(", ")
+                        }); }),
+                        timestamp: new Date(),
+                        footer: {
+                            icon_url: message.author.avatarURL,
+                            text: "Invoked by " + message.member.displayName
+                        }
                     }
                 });
                 return [2];

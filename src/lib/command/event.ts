@@ -9,6 +9,7 @@ addCommand("event", async (args, message) => {
     return true;
   }
 
+  // @ts-ignore
   let event = (await vexdb.get("events", { sku }))[0];
   let divisionReport = await Promise.all(
     event.divisions.map(async name => {

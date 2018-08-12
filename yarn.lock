@@ -1903,8 +1903,8 @@ vary@~1.1.2:
   resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
 
 vexdb@^2.0.2:
-  version "2.0.2"
-  resolved "https://registry.yarnpkg.com/vexdb/-/vexdb-2.0.2.tgz#a346f15476a6660fbbf92c188af846f0a4534b2e"
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/vexdb/-/vexdb-2.0.3.tgz#bf0779442ef2bf41a84ecc650c3a43060fec6076"
   dependencies:
     isomorphic-fetch "^2.2.1"
     keya latest

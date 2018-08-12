@@ -86,7 +86,6 @@ function addCommand(name, handler) {
         return __generator(this, function (_b) {
             if (message.content.toLowerCase().startsWith("!" + name)) {
                 _a = message.content.split(" "), args = _a.slice(1);
-                console.log("passing command to handler");
                 return [2, handler(args, message)];
             }
             else {
