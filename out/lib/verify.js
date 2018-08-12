@@ -34,24 +34,32 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
+    result["default"] = mod;
+    return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var prompt_1 = require("./prompt");
 var message_1 = require("./message");
-var vexdb_1 = __importDefault(require("vexdb"));
+var vexdb = __importStar(require("vexdb"));
 var discord_js_1 = require("discord.js");
+var main_1 = require("../main");
 function findOrMakeRole(name, guild) {
     var role = guild.roles.find("name", name);
     return role
         ? Promise.resolve(role)
         : guild.createRole({ name: name, mentionable: true });
 }
-function verify(member, welcomeChannel) {
+function verify(member, welcomeChannel, approveChannel) {
     var _this = this;
+    if (!approveChannel) {
+        approveChannel = member.guild.channels.get("478064021136998401");
+    }
     member.createDM().then(function (channel) { return __awaiter(_this, void 0, void 0, function () {
-        var verification, _a, _b, _c, team, roles, teamRole, channel_1;
+        var verification, _a, _b, _c, team, roles, teamRole, embed;
         var _this = this;
         return __generator(this, function (_d) {
             switch (_d.label) {
@@ -71,7 +79,7 @@ function verify(member, welcomeChannel) {
                     _b = verification;
                     return [4, prompt_1.questionValidate("What team are you *primarily* a part of?", channel, function (team) { return __awaiter(_this, void 0, void 0, function () { return __generator(this, function (_a) {
                             switch (_a.label) {
-                                case 0: return [4, vexdb_1.default.size("teams", { team: team })];
+                                case 0: return [4, vexdb.size("teams", { team: team })];
                                 case 1: return [2, !!(_a.sent())];
                             }
                         }); }); }, "There doesn't appear to be a team with that number.")];
@@ -87,7 +95,7 @@ function verify(member, welcomeChannel) {
                     _c.role = _d.sent();
                     console.log("Verify " + member.user.username + "#" + member.user.discriminator, verification);
                     member.setNickname(verification.name + " | " + verification.team + " " + (verification.role === "ALUMNI" ? "ALUM" : ""), "Verification: Nickname");
-                    return [4, vexdb_1.default.get("teams", { team: verification.team })];
+                    return [4, vexdb.get("teams", { team: verification.team })];
                 case 4:
                     team = (_d.sent())[0];
                     roles = ["310902227160137730"];
@@ -122,15 +130,61 @@ function verify(member, welcomeChannel) {
                             roles.push("329760518334054402");
                             break;
                     }
-                    member.addRoles(roles, "Verification: Roles");
-                    channel.send("You're all set up! Note that you can change your nickname at any time, but please keep it in the correct format");
-                    if (welcomeChannel) {
-                        welcomeChannel.send("Welcome " + member + "!");
-                    }
-                    else {
-                        channel_1 = member.guild.channels.find("name", "general");
-                        channel_1.send("Welcome " + member);
-                    }
+                    embed = new discord_js_1.RichEmbed()
+                        .setAuthor(member.user.username, member.user.avatarURL)
+                        .setTitle("Member Verification")
+                        .setDescription(member + " \n Requested Roles: " + roles
+                        .map(function (role) { return member.guild.roles.get(role).toString(); })
+                        .join(", "))
+                        .addField("Verification Process", [
+                        "This member is seeking verification",
+                        "You can interact with them in " + member.guild.channels.find("name", "verification")
+                    ])
+                        .addField("Approving Members", "React with :thumbsup: to approve the member")
+                        .addField("Deny and Kick", "If the member's verification violates rules or guidelines set by Admins, react with :thumbsdown:")
+                        .setTimestamp();
+                    approveChannel.send(embed).then(function (approval) { return __awaiter(_this, void 0, void 0, function () {
+                        var collector, handleReaction;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0:
+                                    channel.send("You're all set! Your information is awaiting approval. Hang tight!");
+                                    return [4, Promise.all([approval.react("👍"), approval.react("👎")])];
+                                case 1:
+                                    _a.sent();
+                                    collector = approval.createReactionCollector(function (vote, usr) {
+                                        return (vote.emoji.name === "👎" || vote.emoji.name === "👍") &&
+                                            usr !== main_1.client.user;
+                                    });
+                                    collector.on("collect", (handleReaction = function (vote) {
+                                        var approver = vote.users.last();
+                                        if (vote.emoji.name === "👍") {
+                                            member.addRoles(roles, "Verification: Roles");
+                                            channel.send("You're all set up! Note that you can change your nickname at any time, but please keep it in the correct format");
+                                            approval.edit(embed.addField("Outcome", "Approved by " + approver.toString()));
+                                            if (welcomeChannel) {
+                                                welcomeChannel.send("Welcome " + member + "!");
+                                            }
+                                            else {
+                                                var channel_1 = member.guild.channels.find("name", "general");
+                                                channel_1.send("Welcome " + member);
+                                            }
+                                            if (collector.off) {
+                                                collector.off("collect", handleReaction);
+                                            }
+                                        }
+                                        else {
+                                            approval.edit(embed.addField("Outcome", "Denied and kicked by " + approver.toString()));
+                                            member.kick("Verification Denied. Rejoin to try again!");
+                                        }
+                                        collector.emit("end");
+                                        approval.clearReactions();
+                                    }));
+                                    collector.on("end", function () { });
+                                    return [2];
+                            }
+                        });
+                    }); });
                     return [2];
             }
         });
@@ -146,3 +200,29 @@ message_1.addMessageHandler(function (message) {
     }
 });
 exports.default = verify;
+message_1.addCommand("approve", function (args, message) {
+    var awaiting = message.channel.send({
+        embed: {
+            author: {
+                name: message.author.username,
+                icon_url: message.author.avatarURL
+            },
+            title: message.member.displayName,
+            description: message.member.roles
+                .filter(function (role) { return role.name !== "@everyone"; })
+                .map(function (role) { return role.toString(); })
+                .join("\n"),
+            fields: [
+                {
+                    name: "Team",
+                    value: "3796B"
+                },
+                {
+                    name: "Region",
+                    value: "South Carolina"
+                }
+            ]
+        }
+    });
+    return true;
+});

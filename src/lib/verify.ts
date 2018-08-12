@@ -3,16 +3,21 @@
  */
 
 import { question, choose, questionValidate } from "./prompt";
-import { addMessageHandler } from "./message";
-import vexdb from "vexdb";
+import { addMessageHandler, addCommand } from "./message";
+import * as vexdb from "vexdb";
 import {
   Guild,
   GuildMember,
   TextChannel,
   DMChannel,
   GroupDMChannel,
-  GuildChannel
+  GuildChannel,
+  Message,
+  MessageReaction,
+  RichEmbed
 } from "discord.js";
+import { ADDRGETNETWORKPARAMS } from "dns";
+import { client } from "../main";
 
 function findOrMakeRole(name: string, guild: Guild) {
   let role = guild.roles.find("name", name);
@@ -23,8 +28,15 @@ function findOrMakeRole(name: string, guild: Guild) {
 
 function verify(
   member: GuildMember,
-  welcomeChannel?: TextChannel | DMChannel | GroupDMChannel
+  welcomeChannel?: TextChannel | DMChannel | GroupDMChannel,
+  approveChannel?: TextChannel | DMChannel | GroupDMChannel
 ) {
+  if (!approveChannel) {
+    approveChannel = member.guild.channels.get(
+      "478064021136998401"
+    ) as TextChannel;
+  }
+
   member.createDM().then(async channel => {
     let verification: {
       name: string;
@@ -76,7 +88,7 @@ function verify(
     let team = (await vexdb.get("teams", { team: verification.team }))[0];
 
     // Add roles
-    let roles = ["310902227160137730"]; // Competitors (aka Verified)
+    let roles = ["310902227160137730"]; // Verified
 
     if (verification.role !== "ALUMNI") {
       // Program
@@ -108,20 +120,87 @@ function verify(
         break; // Mentor
     }
 
-    member.addRoles(roles, "Verification: Roles");
-    channel.send(
-      "You're all set up! Note that you can change your nickname at any time, but please keep it in the correct format"
-    );
+    let embed = new RichEmbed()
+      .setAuthor(member.user.username, member.user.avatarURL)
+      .setTitle("Member Verification")
+      .setDescription(
+        `${member} \n Requested Roles: ${roles
+          .map(role => member.guild.roles.get(role).toString())
+          .join(", ")}`
+      )
+      .addField("Verification Process", [
+        "This member is seeking verification",
+        `You can interact with them in ${member.guild.channels.find(
+          "name",
+          "verification"
+        )}`
+      ])
+      .addField(
+        "Approving Members",
+        "React with :thumbsup: to approve the member"
+      )
+      .addField(
+        "Deny and Kick",
+        "If the member's verification violates rules or guidelines set by Admins, react with :thumbsdown:"
+      )
+      .setTimestamp();
 
-    if (welcomeChannel) {
-      welcomeChannel.send(`Welcome ${member}!`);
-    } else {
-      let channel: TextChannel = member.guild.channels.find(
-        "name",
-        "general"
-      ) as TextChannel;
-      channel.send(`Welcome ${member}`)!;
-    }
+    approveChannel.send(embed).then(async (approval: Message) => {
+      channel.send(
+        "You're all set! Your information is awaiting approval. Hang tight!"
+      );
+
+      await Promise.all([approval.react("👍"), approval.react("👎")]);
+
+      let collector = approval.createReactionCollector(
+        (vote, usr) =>
+          (vote.emoji.name === "👎" || vote.emoji.name === "👍") &&
+          usr !== client.user
+      );
+      let handleReaction;
+      collector.on(
+        "collect",
+        (handleReaction = vote => {
+          const approver = vote.users.last();
+
+          if (vote.emoji.name === "👍") {
+            member.addRoles(roles, "Verification: Roles");
+            channel.send(
+              "You're all set up! Note that you can change your nickname at any time, but please keep it in the correct format"
+            );
+
+            approval.edit(
+              embed.addField("Outcome", `Approved by ${approver.toString()}`)
+            );
+
+            if (welcomeChannel) {
+              welcomeChannel.send(`Welcome ${member}!`);
+            } else {
+              let channel: TextChannel = member.guild.channels.find(
+                "name",
+                "general"
+              ) as TextChannel;
+              channel.send(`Welcome ${member}`)!;
+            }
+
+            if (collector.off) {
+              collector.off("collect", handleReaction);
+            }
+          } else {
+            approval.edit(
+              embed.addField(
+                "Outcome",
+                `Denied and kicked by ${approver.toString()}`
+              )
+            );
+            member.kick("Verification Denied. Rejoin to try again!");
+          }
+          collector.emit("end");
+          approval.clearReactions();
+        })
+      );
+      collector.on("end", () => {});
+    });
   });
 }
 
@@ -137,3 +216,31 @@ addMessageHandler(message => {
 });
 
 export default verify;
+
+addCommand("approve", (args, message) => {
+  let awaiting = message.channel.send({
+    embed: {
+      author: {
+        name: message.author.username,
+        icon_url: message.author.avatarURL
+      },
+      title: message.member.displayName,
+      description: message.member.roles
+        .filter(role => role.name !== "@everyone")
+        .map(role => role.toString())
+        .join("\n"),
+      fields: [
+        {
+          name: "Team",
+          value: "3796B"
+        },
+        {
+          name: "Region",
+          value: "South Carolina"
+        }
+      ]
+    }
+  });
+
+  return true;
+});
