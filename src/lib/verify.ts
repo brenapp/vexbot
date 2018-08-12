@@ -166,7 +166,7 @@ function verify(
           if (vote.emoji.name === "👍") {
             member.addRoles(roles, "Verification: Roles");
             channel.send(
-              "You're all set up! Note that you can change your nickname at any time, but please keep it in the correct format"
+              "Your verification has been approved! Note that you can change your nickname at any time, but please keep it in the correct format"
             );
 
             approval.edit(
@@ -193,7 +193,10 @@ function verify(
                 `Denied and kicked by ${approver.toString()}`
               )
             );
-            member.kick("Verification Denied. Rejoin to try again!");
+            member.kick("Verification Denied.");
+            channel.send(
+              "Your verification has been denied. Rejoin the server to try again!"
+            );
           }
           collector.emit("end");
           approval.clearReactions();
