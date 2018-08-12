@@ -80,7 +80,7 @@ function verify(
     );
     member.setNickname(
       `${verification.name} | ${verification.team} ${
-        verification.role === "ALUMNI" ? "ALUM" : ""
+        verification.role === "ALUMNI" ? "Alum" : ""
       }`,
       "Verification: Nickname"
     );
