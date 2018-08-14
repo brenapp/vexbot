@@ -48,9 +48,7 @@ addCommand("event", async (args, message) => {
       )}; Champions: ${champions.join(", ")}`,
       footer: {
         icon_url: message.author.avatarURL,
-        text: `Trigged by ${message.author.username}#${
-          message.author.discriminator
-        }`
+        text: `Trigged by ${message.member.toString()}`
       },
       timestamp: message.createdAt,
       fields: divisionReport
