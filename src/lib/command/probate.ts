@@ -1,6 +1,6 @@
 import { addMessageHandler } from "../message";
 import { GuildMember, DiscordAPIError } from "discord.js";
-import { client } from "../../main";
+import { client } from "../../client";
 import { Game } from "discord.js";
 
 let probated = [];

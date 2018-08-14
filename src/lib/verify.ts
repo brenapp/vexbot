@@ -17,7 +17,7 @@ import {
   RichEmbed
 } from "discord.js";
 import { ADDRGETNETWORKPARAMS } from "dns";
-import { client } from "../main";
+import { client } from "../client";
 
 function findOrMakeRole(name: string, guild: Guild) {
   let role = guild.roles.find("name", name);
