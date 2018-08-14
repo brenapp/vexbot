@@ -1,19 +1,38 @@
 import { addMessageHandler } from "./message";
 import { TextChannel } from "discord.js";
-import { client } from "../main";
+import { client } from "../client";
 
 // Dismiss messages from a bot, we don't take their kind around here!
 addMessageHandler(message => message.author.bot);
 
 // Message Logging
 addMessageHandler(message => {
-  let channel = message.channel as TextChannel;
-  console.log(
-    `${message.author.username}#${message.author.discriminator} in ${
-      channel.type === "dm" ? "DM" : `#${channel.name}`
+  let log;
+  if (message.type === "dm") {
+    return true;
+  } else {
+    log = message.guild.channels.find("name", "server-log") as TextChannel;
+  }
+  log.send(
+    `${message.member.toString()} in ${
+      message.type === "dm" ? "DM" : message.channel.toString()
     }: ${message.content}`
   );
   return false;
+});
+
+client.on("messageUpdate", (old, current) => {
+  let log;
+  if (old.type === "dm") {
+    return true;
+  } else {
+    log = old.guild.channels.find("name", "server-log") as TextChannel;
+  }
+  log.send(
+    `${old.member.toString()} in ${
+      old.type === "dm" ? "DM" : old.channel.toString()
+    }: ${old.content} => ${current.content}`
+  );
 });
 
 addMessageHandler(message => {
