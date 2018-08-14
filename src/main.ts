@@ -2,14 +2,12 @@ import discord from "discord.js";
 import { handleMessage } from "./lib/message";
 import verify from "./lib/verify";
 import report from "./lib/report";
+import { client } from "./client";
 
 import "./lib/handlers";
 import "./lib/command";
 
 // import "./lib/actions/eventlog";
-
-const token = process.env.token || require("../config").token;
-const client = new discord.Client();
 
 client.on("ready", () => {
   console.log("vexbot#0599 is online!");
@@ -24,7 +22,3 @@ client.on("message", handleMessage);
 client.on("guildMemberAdd", verify);
 
 client.on("error", report);
-
-client.login(token);
-
-export { client };
