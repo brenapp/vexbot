@@ -21,7 +21,7 @@ addCommand("motion", async (args, message) => {
     embed
       .addField(
         "Procedure",
-        "This is a standard resolution, and can be passed via a simple majority. React to this message with :thumbsup: to approve the measure, or with :thumbsdown: to deny the measure. *Note: vexbot reacts with both so you can select them easier*"
+        "This is a standard resolution, and can be passed via a simple majority. React to this message with :thumbsup: to approve the measure, or with :thumbsdown: to deny the measure. *Note: vexbot reacts with both so you can select them easier, these do not count as votes*"
       )
       .setColor("BLUE");
   } else if (type === "recall") {
@@ -30,13 +30,14 @@ addCommand("motion", async (args, message) => {
       message.channel.send("Recall proposals MUST mention the user (with @)");
       return;
     }
-    requiredVotes = Math.floor(((votingRole.members.size - 1) * 2) / 3);
+    requiredVotes = Math.ceil(((votingRole.members.size - 1) * 2) / 3);
     embed
       .addField(
         "Procedure",
-        "Officer Recall requires two-thirds approval of the council. The named officer is not permitted to vote. React to this message with :thumbsup: to approve the measure, or with :thumbsdown: to deny the measure. *Note: vexbot reacts with both so you can select them easier*"
+        "Officer Recall requires two-thirds approval of the council. The named officer is not permitted to vote. React to this message with :thumbsup: to approve the measure, or with :thumbsdown: to deny the measure. *Note: vexbot reacts with both so you can select them easier, these do not count as votes*"
       )
-      .setColor("RED");
+      .setColor("RED")
+      .setDescription(`Recall ${embed.description}`);
   } else {
     message.channel.send(
       "Unknown Proposal Type. Valid types are `prop` (used in most cases), and `recall` (to remove an officer)"
