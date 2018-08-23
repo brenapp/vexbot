@@ -4,7 +4,7 @@
 
 import { addCommand } from "../message";
 import vexdb, { get } from "vexdb";
-import { EventsResponseObject } from "../../../node_modules/vexdb/out/constants/ResponseObjects";
+import { EventsResponseObject } from "vexdb/out/constants/ResponseObjects";
 
 addCommand("team", async (args, message) => {
   let [team] = args;

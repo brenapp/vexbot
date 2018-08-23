@@ -7,7 +7,7 @@ import { RichEmbed } from "discord.js";
 import {
   MatchesResponseObject,
   EventsResponseObject
-} from "../../../node_modules/vexdb/out/constants/ResponseObjects";
+} from "vexdb/out/constants/ResponseObjects";
 import { addCommand } from "../message";
 
 async function matchEmbed(match: MatchesResponseObject) {
