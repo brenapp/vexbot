@@ -4,7 +4,8 @@ import {
   Message,
   User,
   GuildMember,
-  MessageReaction
+  MessageReaction,
+  Collection
 } from "discord.js";
 
 // Syntax: !motion [type] ...[Motion Proposal]
@@ -74,21 +75,35 @@ addCommand("motion", async (args, message) => {
       user.lastMessage.member.roles.has(votingRole.id)
   );
 
-  let approval = 0;
-  let votes = 0;
-
   let status: "pending" | "passed" | "failed" = "pending";
+
+  let approve: Collection<string, User>,
+    abstain: Collection<string, User>,
+    deny: Collection<string, User>,
+    votes: Collection<string, User>;
 
   collector.on("collect", reaction => {
     if (collector.ended) return;
-    if (reaction.emoji.name === "👍") {
-      approval++;
+
+    switch (reaction.emoji.name) {
+      case "👍":
+        approve = reaction.users.filter(user => !user.bot);
+        break;
+      case "👎":
+        deny = reaction.users.filter(user => !user.bot);
+        break;
+      case "🆎":
+        abstain = reaction.users.filter(user => !user.bot);
+        break;
     }
 
     // Motion Carries
-    if (approval >= requiredVotes) {
+    if (approve.size >= requiredVotes) {
       status = "passed";
-    } else if (votingRole.members.size - votes <= requiredVotes - votes) {
+    } else if (
+      votingRole.members.size - votes.size <=
+      requiredVotes - votes.size
+    ) {
       status = "failed";
     }
 
