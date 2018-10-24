@@ -122,3 +122,5 @@ addMessageHandler(async message => {
   }
   return true;
 });
+
+export { probate, parseTime };
