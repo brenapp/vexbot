@@ -62,7 +62,7 @@ function verify(
       "What team are you *primarily* a part of?",
       channel,
       async team => !!(await vexdb.size("teams", { team })),
-      "There doesn't appear to be a team with that number."
+      "There doesn't appear to be a team with that number. Make sure you are listing a registered team that has gone to an event. If you need a manual override, please message one of the admins"
     );
     verification.role = await choose(
       "On your team, what role do you serve? *(Member, Alumni, Mentor)*",
