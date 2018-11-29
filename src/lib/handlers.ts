@@ -8,13 +8,16 @@ addMessageHandler(message => message.author.bot);
 // Message Logging
 addMessageHandler(message => {
   let log;
-  if (message.type === "dm") {
-    return true;
+  if (message.channel.type === "dm") {
+    return false;
   } else {
     log = message.guild.channels.find("name", "server-log") as TextChannel;
   }
+
+  if (!log) return false;
+
   log.send(
-    `${message.member.toString()} in ${
+    `${message.member.user.username}#${message.member.user.discriminator} in ${
       message.type === "dm" ? "DM" : message.channel.toString()
     }: ${message.content}`
   );
@@ -23,13 +26,16 @@ addMessageHandler(message => {
 
 client.on("messageUpdate", (old, current) => {
   let log;
-  if (old.type === "dm") {
-    return true;
+  if (old.channel.type === "dm") {
+    return false;
   } else {
     log = old.guild.channels.find("name", "server-log") as TextChannel;
   }
+
+  if (!log) return false;
+
   log.send(
-    `${old.member.toString()} in ${
+    `${old.member.user.username}#${old.member.user.discriminator} in ${
       old.type === "dm" ? "DM" : old.channel.toString()
     }: ${old.content} => ${current.content}`
   );
