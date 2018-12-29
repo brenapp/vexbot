@@ -29,7 +29,7 @@ async function probate(
       "appeals"
     )}`
   );
-  user.addRole(probation);
+  user.addRole(probation, `By: ${by}; Reason: ${reason}`);
 
   probated.push(user.displayName.split(" |")[0]);
 
