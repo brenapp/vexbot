@@ -47,7 +47,7 @@ async function probate(
   }, length.ms);
 }
 
-function setPresence(users) {
+function setPresence(users: string[]) {
   if (users.length < 1) {
     client.user.setPresence({
       game: new Game({
