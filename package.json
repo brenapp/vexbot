@@ -12,7 +12,7 @@
     "@types/node": "^10.3.4",
     "discord.js": "^11.3.2",
     "express": "^4.16.3",
-    "vexdb": "^2.0.2"
+    "vexdb": "^2.0.3"
   },
   "devDependencies": {
     "nodemon": "^1.17.5",
