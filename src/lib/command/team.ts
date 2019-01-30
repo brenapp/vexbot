@@ -3,7 +3,7 @@
  */
 
 import { addCommand } from "../message";
-import vexdb, { get } from "vexdb";
+import { get } from "vexdb";
 import { EventsResponseObject } from "vexdb/out/constants/ResponseObjects";
 
 addCommand("team", async (args, message) => {
