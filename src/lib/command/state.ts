@@ -28,7 +28,8 @@ addCommand("statequals", async (args, message) => {
   const awards = (await vexdb.get("awards", { sku: events })).filter(
     award =>
       award.name.includes("Excellence") ||
-      award.name.includes("Tournament Champion")
+      award.name.includes("Tournament Champion") ||
+      award.name.includes("Design")
   );
 
   const totals = {};
