@@ -1,5 +1,5 @@
 import { addCommand } from "../message";
-import vexdb from "vexdb";
+import * as vexdb from "vexdb";
 
 addCommand("event", async (args, message) => {
   let [sku] = args;
