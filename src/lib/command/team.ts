@@ -7,11 +7,12 @@ import { get } from "vexdb";
 import { EventsResponseObject } from "vexdb/out/constants/ResponseObjects";
 
 addCommand("team", async (args, message) => {
-  let [team] = args;
+  let team = args[0];
+  let season = args.slice(1).join(" ") || "current";
 
   if (!team) {
     message.reply(
-      "You didn't specify a team! Usage: `!team YNOT` or `!team 3796B`"
+      "You didn't specify a team! Usage: `!team BCUZ` or `!team 3796B`. Optionally list a season after to get records for that seaosn"
     );
     return true;
   }
@@ -24,8 +25,7 @@ addCommand("team", async (args, message) => {
   }
 
   let events = await Promise.all(
-    // @ts-ignore
-    (await get("events", { team })).map(async event => ({
+    (await get("events", { team, season })).map(async event => ({
       ...(event as EventsResponseObject),
       awards: await get("awards", { team, sku: event.sku }),
       ranking: (await get("rankings", { team, sku: event.sku }))[0]
@@ -35,17 +35,29 @@ addCommand("team", async (args, message) => {
   message.channel.send({
     embed: {
       color: 3447003,
-      title: `${record.team_name} (${record.number})`,
+      title: `${record.team_name} (${record.number}) — ${
+        season === "current" ? "Turning Point" : season
+      }`,
       url: `https://vexdb.io/teams/view/${record.number}`,
       description: `${
         record.program == "VEXU" ? "VEXU" : record.grade
       } Team @ ${record.organisation} (${record.city}, ${record.region})`,
-      fields: events.map(event => ({
-        name: event.name,
-        value: `${
-          event.ranking ? `Ranked #${event.ranking.rank}` : `Unranked`
-        }. ${event.awards.map(award => award.name.split(" (")[0]).join(", ")}`
-      })),
+      fields:
+        events.length > 0
+          ? events.map(event => ({
+              name:
+                new Date(event.start).getTime() > Date.now()
+                  ? `(FUTURE EVENT) ${event.name}`
+                  : event.name,
+              value: `${
+                event.ranking ? `Ranked #${event.ranking.rank}` : `Unranked`
+              }. ${event.awards
+                .map(award => award.name.split(" (")[0])
+                .join(", ")}`
+            }))
+          : [
+              { name: "Empty", value: `This team has no records for ${season}` }
+            ],
       timestamp: new Date(),
       footer: {
         icon_url: message.author.avatarURL,
