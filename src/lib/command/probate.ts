@@ -29,7 +29,12 @@ async function probate(
       "appeals"
     )}`
   );
-  user.addRole(probation, `By: ${by}; Reason: ${reason}`);
+  user.addRole(
+    probation,
+    `By: ${by.displayName} (${by.user.username}#${
+      by.user.discriminator
+    }); Reason: ${reason}`
+  );
 
   probated.push(user.displayName.split(" |")[0]);
 
@@ -106,7 +111,11 @@ addMessageHandler(async message => {
       message.reply("Unknown time quantity");
     } else {
       users.forEach(user => {
-        console.log(`Probate ${user.displayName} for ${time.time}`);
+        console.log(
+          `Probate ${user.displayName} for ${time.time} by ${
+            message.member.displayName
+          }`
+        );
         probate(user, time, message.member, message.content.split("for ")[1]);
       });
     }
