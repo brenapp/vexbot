@@ -26,11 +26,22 @@ addCommand("team", async (args, message) => {
 
   let events = await Promise.all(
     (await get("events", { team, season })).map(async event => ({
-      ...(event as EventsResponseObject),
+      ...event,
       awards: await get("awards", { team, sku: event.sku }),
-      ranking: (await get("rankings", { team, sku: event.sku }))[0]
+      ranking: (await get("rankings", { team, sku: event.sku }))[0] || {
+        wins: 0,
+        losses: 0,
+        ties: 0,
+        rank: null
+      }
     }))
   );
+
+  const totalWins = events.map(evt => evt.ranking.wins).reduce((a, b) => a + b);
+  const totalLosses = events
+    .map(evt => evt.ranking.losses)
+    .reduce((a, b) => a + b);
+  const totalTies = events.map(evt => evt.ranking.ties).reduce((a, b) => a + b);
 
   message.channel.send({
     embed: {
@@ -41,7 +52,9 @@ addCommand("team", async (args, message) => {
       url: `https://vexdb.io/teams/view/${record.number}`,
       description: `${
         record.program == "VEXU" ? "VEXU" : record.grade
-      } Team @ ${record.organisation} (${record.city}, ${record.region})`,
+      } Team @ ${record.organisation} (${record.city}, ${
+        record.region
+      })\nSeason Record: ${totalWins}-${totalLosses}-${totalTies}`,
       fields:
         events.length > 0
           ? events.map(event => ({
@@ -50,7 +63,11 @@ addCommand("team", async (args, message) => {
                   ? `(FUTURE EVENT) ${event.name}`
                   : event.name,
               value: `${
-                event.ranking ? `Ranked #${event.ranking.rank}` : `Unranked`
+                event.ranking && new Date(event.start).getTime() < Date.now()
+                  ? `Ranked #${event.ranking.rank} (${event.ranking.wins}-${
+                      event.ranking.losses
+                    }-${event.ranking.ties})`
+                  : `Unranked`
               }. ${event.awards
                 .map(award => award.name.split(" (")[0])
                 .join(", ")}`
