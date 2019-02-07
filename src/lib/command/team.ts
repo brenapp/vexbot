@@ -37,11 +37,15 @@ addCommand("team", async (args, message) => {
     }))
   );
 
-  const totalWins = events.map(evt => evt.ranking.wins).reduce((a, b) => a + b);
+  const totalWins = events
+    .map(evt => evt.ranking.wins)
+    .reduce((a, b) => a + b, 0);
   const totalLosses = events
     .map(evt => evt.ranking.losses)
-    .reduce((a, b) => a + b);
-  const totalTies = events.map(evt => evt.ranking.ties).reduce((a, b) => a + b);
+    .reduce((a, b) => a + b, 0);
+  const totalTies = events
+    .map(evt => evt.ranking.ties)
+    .reduce((a, b) => a + b, 0);
 
   message.channel.send({
     embed: {
@@ -54,7 +58,10 @@ addCommand("team", async (args, message) => {
         record.program == "VEXU" ? "VEXU" : record.grade
       } Team @ ${record.organisation} (${record.city}, ${
         record.region
-      })\nSeason Record: ${totalWins}-${totalLosses}-${totalTies}`,
+      })\nSeason Record: ${totalWins}-${totalLosses}-${totalTies} (${(
+        (totalWins / (totalLosses + totalTies + totalWins)) *
+        100
+      ).toPrecision(4)}% WR)`,
       fields:
         events.length > 0
           ? events.map(event => ({
