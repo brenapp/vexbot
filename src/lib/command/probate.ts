@@ -97,7 +97,7 @@ addMessageHandler(async message => {
   let admin = message.guild.roles.find("name", "Admins"),
     author = message.member;
   // First, test if the user has the permission to probate someone
-  if (admin && author.roles.has(admin.id)) {
+  if (message.member.hasPermission("ADMINISTRATOR")) {
     let users = message.mentions.members;
 
     let time = parseTime(
