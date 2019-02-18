@@ -94,8 +94,6 @@ function parseTime(time: string) {
 addMessageHandler(async message => {
   if (!message.content.toLowerCase().startsWith("!probate")) return false;
 
-  let admin = message.guild.roles.find("name", "Admins"),
-    author = message.member;
   // First, test if the user has the permission to probate someone
   if (message.member.hasPermission("ADMINISTRATOR")) {
     let users = message.mentions.members;
@@ -131,5 +129,6 @@ addMessageHandler(async message => {
   }
   return true;
 });
+
 
 export { probate, parseTime };
