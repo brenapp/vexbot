@@ -48,7 +48,7 @@ addCommand("statequals", async (args, message) => {
   message.channel.send({
     embed: {
       color: 3447003,
-      title: `STATE QUALIFICATIONS LEADERBOARD (${region})`,
+      title: `STATE QUALIFICATIONS LEADERBOARD (${region}) -- Excellence, Champs, Design Only`,
       description: ranked
         .slice(0, 10)
         .map(
