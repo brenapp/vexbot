@@ -11,12 +11,7 @@ import "./lib/command";
 
 client.on("ready", () => {
   console.log("vexbot#0599 is online!");
-  client.user.setPresence({
-    game: new discord.Game({
-      name: "over the server",
-      type: 3
-    })
-  });
+  client.user.setActivity("over the server", { type: "WATCHING" });
 });
 client.on("message", handleMessage);
 client.on("guildMemberAdd", verify);

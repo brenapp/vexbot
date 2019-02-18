@@ -54,20 +54,10 @@ async function probate(
 
 function setPresence(users: string[]) {
   if (users.length < 1) {
-    client.user.setPresence({
-      game: new Game({
-        name: "over the server",
-        type: 3
-      })
-    });
+    client.user.setActivity("over the server", { type: "WATCHING" });
     return;
   }
-  client.user.setPresence({
-    game: new Game({
-      name: users.join(", "),
-      type: 3
-    })
-  });
+  client.user.setActivity(users.join(", "), { type: "WATCHING" });
 }
 
 /**
@@ -129,6 +119,5 @@ addMessageHandler(async message => {
   }
   return true;
 });
-
 
 export { probate, parseTime };
