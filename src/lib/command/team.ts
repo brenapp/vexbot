@@ -4,7 +4,27 @@
 
 import { addCommand } from "../message";
 import { get } from "vexdb";
-import { EventsResponseObject } from "vexdb/out/constants/ResponseObjects";
+import {
+  EventsResponseObject,
+  MatchesResponseObject
+} from "vexdb/out/constants/ResponseObjects";
+
+function outcome(team: string, match: MatchesResponseObject) {
+  if (match.redscore === match.bluescore) {
+    return "tie";
+  }
+
+  if (
+    (match.redscore > match.bluescore &&
+      [match.red1, match.red2, match.red3].includes(team)) ||
+    (match.bluescore > match.redscore &&
+      [match.blue1, match.blue2, match.blue3].includes(team))
+  ) {
+    return "win";
+  }
+
+  return "loss";
+}
 
 addCommand("team", async (args, message) => {
   let team = args[0];
@@ -37,15 +57,25 @@ addCommand("team", async (args, message) => {
     }))
   );
 
-  const totalWins = events
+  let totalWins = events
     .map(evt => evt.ranking.wins)
     .reduce((a, b) => a + b, 0);
-  const totalLosses = events
+  let totalLosses = events
     .map(evt => evt.ranking.losses)
     .reduce((a, b) => a + b, 0);
-  const totalTies = events
+  let totalTies = events
     .map(evt => evt.ranking.ties)
     .reduce((a, b) => a + b, 0);
+
+  // Get eliminations matches
+  const elims = (await get("matches", { season, team })).filter(match =>
+    [16, 3, 4, 5].includes(match.round)
+  );
+
+  // Add wins, losses and ties
+  totalWins += elims.filter(match => outcome(team, match) === "win").length;
+  totalLosses += elims.filter(match => outcome(team, match) === "loss").length;
+  totalTies += elims.filter(match => outcome(team, match) === "tie").length;
 
   message.channel.send({
     embed: {
