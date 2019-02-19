@@ -5,3 +5,4 @@ import "./verify";
 import "./live";
 import "./state";
 import "./matchup";
+import "./predict";
