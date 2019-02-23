@@ -6,8 +6,10 @@ import { addCommand } from "../message";
 import { probate, parseTime } from "./probate";
 
 addCommand("verify", async (args, message) => {
-  let admin = message.guild.roles.find("name", "Admins"),
-    author = message.member;
+  let admin = message.guild.roles.find(role =>
+    role.hasPermission("ADMINISTRATOR")
+  );
+  let author = message.member;
   // First, test if the user has the permission for this command
   if (admin && author.roles.has(admin.id)) {
     let users = message.mentions.members;

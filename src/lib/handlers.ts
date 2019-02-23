@@ -11,7 +11,9 @@ addMessageHandler(message => {
   if (message.channel.type === "dm") {
     return false;
   } else {
-    log = message.guild.channels.find("name", "server-log") as TextChannel;
+    log = message.guild.channels.find(
+      channel => channel.name === "server-log"
+    ) as TextChannel;
   }
 
   if (!log) return false;
@@ -29,7 +31,9 @@ client.on("messageUpdate", (old, current) => {
   if (old.channel.type === "dm") {
     return false;
   } else {
-    log = old.guild.channels.find("name", "server-log") as TextChannel;
+    log = old.guild.channels.find(
+      channel => channel.name === "server-log"
+    ) as TextChannel;
   }
 
   if (!log) return false;

@@ -6,3 +6,5 @@ import "./live";
 import "./state";
 import "./matchup";
 import "./predict";
+import "./debug";
+import "./subscribe";

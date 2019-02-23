@@ -20,7 +20,7 @@ import { ADDRGETNETWORKPARAMS } from "dns";
 import { client } from "../client";
 
 function findOrMakeRole(name: string, guild: Guild) {
-  let role = guild.roles.find("name", name);
+  let role = guild.roles.find(role => role.name === name);
   return role
     ? Promise.resolve(role)
     : guild.createRole({ name, mentionable: true });
@@ -36,6 +36,8 @@ function verify(
       "478064021136998401"
     ) as TextChannel;
   }
+
+  if (!approveChannel) return false;
 
   member.createDM().then(async channel => {
     let verification: {
