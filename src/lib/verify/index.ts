@@ -30,8 +30,18 @@ export default async function verify(
   approveChannel?: TextChannel | DMChannel | GroupDMChannel
 ) {
   if (member.guild.id == "550859364894900225") {
+    console.log(
+      `Verification in WPI [${member.user.username}#${
+        member.user.discriminator
+      }]`
+    );
     verifyWPI(member, welcomeChannel, approveChannel);
   } else if (member.guild.id == "310820885240217600") {
+    console.log(
+      `Verification in SC [${member.user.username}#${
+        member.user.discriminator
+      }]`
+    );
     verifySC(member, welcomeChannel, approveChannel);
   }
 }
