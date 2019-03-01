@@ -16,7 +16,7 @@ async function probate(
   by: GuildMember,
   reason: string
 ) {
-  let probation = user.guild.roles.find("name", "Probation");
+  let probation = user.guild.roles.find(role => role.name === "Probation");
   let dm = await user.createDM();
   dm.send(
     `You've been put on probation by ${by} for ${
