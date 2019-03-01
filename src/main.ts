@@ -1,6 +1,6 @@
 import discord from "discord.js";
 import { handleMessage } from "./lib/message";
-import verify from "./lib/verify";
+import "./lib/verify";
 import report from "./lib/report";
 import { client } from "./client";
 
@@ -14,6 +14,5 @@ client.on("ready", () => {
   client.user.setActivity("over the server", { type: "WATCHING" });
 });
 client.on("message", handleMessage);
-client.on("guildMemberAdd", verify);
 
 client.on("error", report);
