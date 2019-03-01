@@ -1,6 +1,9 @@
 import { addCommand } from "../message";
 import { client } from "../../client";
 
+import * as vexdb from "vexdb";
+import keya from "keya";
+
 const MAYORMONTY = "274004148276690944";
 
 function okay(message) {
@@ -27,6 +30,24 @@ addCommand("debug", (args, message) => {
   DEBUG = !DEBUG;
 
   message.channel.send(`Debug ${DEBUG ? "ENABLED" : "DISABLED"}`);
+});
+
+addCommand("cache", async (args, message) => {
+  if (!okay(message)) {
+    return false;
+  }
+
+  switch (args[0]) {
+    case "clear":
+      vexdb.cache.clear();
+      message.channel.send(`Cache Cleared`);
+      break;
+    case "":
+      let cache = Object.keys(await keya.all()).filter(key =>
+        key.includes("vexdb")
+      );
+      message.channel.send(["VexDB Current Cache", cache].join("\n"));
+  }
 });
 
 process.stderr.on("data", async chunk => {
