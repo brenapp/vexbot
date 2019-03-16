@@ -53,7 +53,7 @@ export async function approve(
   welcomeChannel: TextChannel | DMChannel | GroupDMChannel,
   roles: string[],
   member: GuildMember
-) {
+): Promise<boolean> {
   // Make approval embed
   let embed = new RichEmbed()
     .setAuthor(member.user.username, member.user.avatarURL)
@@ -97,9 +97,6 @@ export async function approve(
 
       if (vote.emoji.name === "👍") {
         member.addRoles(roles, "Verification: Roles");
-        channel.send(
-          "Your verification has been approved! Note that you can change your nickname at any time, but please keep it in the correct format"
-        );
 
         approval.edit(
           embed.addField("Outcome", `Approved by ${approver.toString()}`)
@@ -118,6 +115,8 @@ export async function approve(
         if (collector.off) {
           collector.off("collect", handleReaction);
         }
+
+        return true;
       } else {
         approval.edit(
           embed.addField(
@@ -126,13 +125,13 @@ export async function approve(
           )
         );
         member.kick("Verification Denied.");
-        channel.send(
-          "Your verification has been denied. Rejoin the server to try again!"
-        );
       }
       collector.emit("end");
       approval.clearReactions();
+
+      return false;
     })
   );
   collector.on("end", () => {});
+  return false;
 }

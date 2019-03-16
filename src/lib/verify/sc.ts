@@ -98,5 +98,19 @@ export async function verifySC(
       break; // Mentor
   }
 
-  await approve(approveChannel, welcomeChannel, roles, member);
+  channel.send(
+    "Your verification has been submitted to admins for review. Hang tight!"
+  );
+
+  const approved = await approve(approveChannel, welcomeChannel, roles, member);
+
+  if (approved) {
+    channel.send(
+      "Your verification has been approved! Note that you can change your nickname at any time, but please keep it in the correct format"
+    );
+  } else {
+    channel.send(
+      "Your verification has been denied. If you believe this to be in error, rejoin again with https://discord.gg/SknD77G"
+    );
+  }
 }
