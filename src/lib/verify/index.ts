@@ -84,54 +84,55 @@ export async function approve(
 
   await Promise.all([approval.react("👍"), approval.react("👎")]);
 
-  let collector = approval.createReactionCollector(
-    (vote, usr) =>
-      (vote.emoji.name === "👎" || vote.emoji.name === "👍") &&
-      usr !== client.user
-  );
-  let handleReaction;
-  collector.on(
-    "collect",
-    (handleReaction = vote => {
-      const approver = vote.users.last();
+  return new Promise((resolve, reject) => {
+    let collector = approval.createReactionCollector(
+      (vote, usr) =>
+        (vote.emoji.name === "👎" || vote.emoji.name === "👍") &&
+        usr !== client.user
+    );
+    let handleReaction;
+    collector.on(
+      "collect",
+      (handleReaction = vote => {
+        const approver = vote.users.last();
 
-      if (vote.emoji.name === "👍") {
-        member.addRoles(roles, "Verification: Roles");
+        if (vote.emoji.name === "👍") {
+          member.addRoles(roles, "Verification: Roles");
 
-        approval.edit(
-          embed.addField("Outcome", `Approved by ${approver.toString()}`)
-        );
+          approval.edit(
+            embed.addField("Outcome", `Approved by ${approver.toString()}`)
+          );
 
-        if (welcomeChannel) {
-          welcomeChannel.send(`Welcome ${member}!`);
+          if (welcomeChannel) {
+            welcomeChannel.send(`Welcome ${member}!`);
+          } else {
+            let channel: TextChannel = member.guild.channels.find(
+              "name",
+              "general"
+            ) as TextChannel;
+            channel.send(`Welcome ${member}!`)!;
+          }
+
+          if (collector.off) {
+            collector.off("collect", handleReaction);
+          }
+
+          resolve(true);
         } else {
-          let channel: TextChannel = member.guild.channels.find(
-            "name",
-            "general"
-          ) as TextChannel;
-          channel.send(`Welcome ${member}!`)!;
+          approval.edit(
+            embed.addField(
+              "Outcome",
+              `Denied and kicked by ${approver.toString()}`
+            )
+          );
+          member.kick("Verification Denied.");
         }
+        collector.emit("end");
+        approval.clearReactions();
 
-        if (collector.off) {
-          collector.off("collect", handleReaction);
-        }
-
-        return true;
-      } else {
-        approval.edit(
-          embed.addField(
-            "Outcome",
-            `Denied and kicked by ${approver.toString()}`
-          )
-        );
-        member.kick("Verification Denied.");
-      }
-      collector.emit("end");
-      approval.clearReactions();
-
-      return false;
-    })
-  );
-  collector.on("end", () => {});
-  return false;
+        resolve(false);
+      })
+    );
+    collector.on("end", () => {});
+  });
 }
