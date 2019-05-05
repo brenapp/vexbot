@@ -6,7 +6,7 @@ import keya from "keya";
 
 const MAYORMONTY = "274004148276690944";
 
-function okay(message) {
+export function okay(message) {
   return message.author.id === MAYORMONTY;
 }
 
@@ -20,7 +20,7 @@ addCommand("grant", (args, message) => {
   message.member.addRole(role);
 });
 
-let DEBUG = false;
+export let DEBUG = false;
 
 addCommand("debug", (args, message) => {
   if (!okay(message)) {
@@ -42,11 +42,10 @@ addCommand("cache", async (args, message) => {
       vexdb.cache.clear();
       message.channel.send(`Cache Cleared`);
       break;
-    case "":
-      let cache = Object.keys(await keya.all()).filter(key =>
-        key.includes("vexdb")
-      );
-      message.channel.send(["VexDB Current Cache", cache].join("\n"));
+    default:
+      const store = await keya.store("vexdb");
+      const cache = (await store.all()).map(v => v.value);
+      message.channel.send(["VexDB Current Cache", ...cache].join("\n"));
   }
 });
 

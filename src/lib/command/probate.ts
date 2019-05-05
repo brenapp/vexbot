@@ -1,4 +1,4 @@
-import { addMessageHandler } from "../message";
+import { addMessageHandler, addCommand } from "../message";
 import { GuildMember, DiscordAPIError } from "discord.js";
 import { client } from "../../client";
 import { Game } from "discord.js";
@@ -80,6 +80,25 @@ function parseTime(time: string) {
     return null; // No available unit
   }
 }
+
+addCommand("probate", (args, message) => {
+  // Check for permissions
+  if (!message.member.hasPermission("ADMINISTRATOR")) {
+    message.reply("You're not allowed to do that!");
+    probate(
+      message.member,
+      { time: "30s", ms: 30000 },
+      message.guild.me,
+      "Unauthorized use of probate"
+    );
+  }
+
+  // Get affected users
+  let users = message.mentions.members;
+  let [time, ...reason] = args;
+
+  return true;
+});
 
 addMessageHandler(async message => {
   if (!message.content.toLowerCase().startsWith("!probate")) return false;
