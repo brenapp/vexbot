@@ -5,6 +5,38 @@ import { client } from "../client";
 // Dismiss messages from a bot, we don't take their kind around here!
 addMessageHandler(message => message.author.bot);
 
+// Rename #regret to something random
+addMessageHandler(async message => {
+  if (!message.content.startsWith("!")) return false;
+
+  const ID = "546890655398625286";
+  const names = [
+    "jennas-boyfriend",
+    "regret",
+    "bradleys-gay",
+    "tylerbad",
+    "thanos-cube",
+    "gaytanoman",
+    "zach-for-head-ref",
+    "create-some-ass",
+    "bradley-for-head-ref",
+    "flywheel-gang",
+    "leeanna-for-emcee",
+    "leeanna-for-head-ref",
+    "🦀-grant-is-gone-🦀",
+    "serious-chat"
+  ];
+
+  const channel = await message.guild.channels.find(
+    channel => channel.id === ID
+  );
+
+  const name = names[Math.round(Math.random() * (names.length - 1))];
+  channel.setName(name);
+
+  return false;
+});
+
 // Message Logging
 addMessageHandler(message => {
   let log;
@@ -21,7 +53,7 @@ addMessageHandler(message => {
   log.send(
     `${message.member.user.username}#${message.member.user.discriminator} in ${
       message.type === "dm" ? "DM" : message.channel.toString()
-    }: ${message.content}`
+    }: ${message.content.toString()}`
   );
   return false;
 });
@@ -41,7 +73,7 @@ client.on("messageUpdate", (old, current) => {
   log.send(
     `${old.member.user.username}#${old.member.user.discriminator} in ${
       old.type === "dm" ? "DM" : old.channel.toString()
-    }: ${old.content} => ${current.content}`
+    }: ${old.content.toString()} => ${current.content.toString()}`
   );
 });
 
