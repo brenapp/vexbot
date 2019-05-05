@@ -110,7 +110,12 @@ addCommand("team", async (args, message) => {
                 .join(", ")}`
             }))
           : [
-            { name: "Empty", value: `This team has no records for ${season === "current" ? "Tower Takeover" : season}` }
+              {
+                name: "Empty",
+                value: `This team has no records for ${
+                  season === "current" ? "Tower Takeover" : season
+                }`
+              }
             ],
       timestamp: new Date(),
       footer: {
