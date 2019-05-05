@@ -39,7 +39,7 @@ addMessageHandler(async message => {
 
 // Message Logging
 addMessageHandler(message => {
-  let log;
+  let log: TextChannel;
   if (message.channel.type === "dm") {
     return false;
   } else {
@@ -50,11 +50,17 @@ addMessageHandler(message => {
 
   if (!log) return false;
 
+  console.log(message.attachments);
+
   log.send(
     `${message.member.user.username}#${message.member.user.discriminator} in ${
       message.type === "dm" ? "DM" : message.channel.toString()
-    }: ${message.content.toString()}`
+    }: ${message.content.toString()}`,
+    {
+      files: message.attachments.map(attach => attach.url)
+    }
   );
+
   return false;
 });
 
