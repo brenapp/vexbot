@@ -81,7 +81,7 @@ addCommand("team", async (args, message) => {
     embed: {
       color: 3447003,
       title: `${record.team_name} (${record.number}) — ${
-        season === "current" ? "Turning Point" : season
+        season === "current" ? "Tower Takeover" : season
       }`,
       url: `https://vexdb.io/teams/view/${record.number}`,
       description: `${
@@ -110,7 +110,7 @@ addCommand("team", async (args, message) => {
                 .join(", ")}`
             }))
           : [
-              { name: "Empty", value: `This team has no records for ${season}` }
+            { name: "Empty", value: `This team has no records for ${season === "current" ? "Tower Takeover" : season}` }
             ],
       timestamp: new Date(),
       footer: {

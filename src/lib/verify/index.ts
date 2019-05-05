@@ -53,7 +53,7 @@ export async function approve(
   welcomeChannel: TextChannel | DMChannel | GroupDMChannel,
   roles: string[],
   member: GuildMember
-): Promise<boolean> {
+) {
   // Make approval embed
   let embed = new RichEmbed()
     .setAuthor(member.user.username, member.user.avatarURL)
