@@ -50,8 +50,6 @@ addMessageHandler(message => {
 
   if (!log) return false;
 
-  console.log(message.attachments);
-
   log.send(
     `${message.member.user.username}#${message.member.user.discriminator} in ${
       message.type === "dm" ? "DM" : message.channel.toString()

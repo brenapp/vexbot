@@ -944,9 +944,9 @@ isomorphic-fetch@^2.2.1:
     node-fetch "^1.0.1"
     whatwg-fetch ">=0.10.0"
 
-keya@latest:
-  version "0.0.6"
-  resolved "https://registry.yarnpkg.com/keya/-/keya-0.0.6.tgz#1700b955fb5d58e6fbda26be516354a7e5239211"
+keya@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/keya/-/keya-1.0.0.tgz#1cf08bad270a3f4c96dc28f2ba459f969f73dda8"
 
 kind-of@^3.0.2, kind-of@^3.0.3, kind-of@^3.2.0:
   version "3.2.2"
@@ -1825,11 +1825,11 @@ vary@~1.1.2:
   resolved "https://registry.yarnpkg.com/vary/-/vary-1.1.2.tgz#2299f02c6ded30d4a5961b0b9f74524a18f634fc"
 
 vexdb@^v2.1.5:
-  version "2.1.6"
-  resolved "https://registry.yarnpkg.com/vexdb/-/vexdb-2.1.6.tgz#a482f79908f60d9e274d1955eeb9cf45520995c7"
+  version "2.1.8"
+  resolved "https://registry.yarnpkg.com/vexdb/-/vexdb-2.1.8.tgz#ac13cac9eed99393dc26a099748162e69bb9ee0f"
   dependencies:
     isomorphic-fetch "^2.2.1"
-    keya latest
+    keya "^1.0.0"
 
 whatwg-fetch@>=0.10.0:
   version "3.0.0"
