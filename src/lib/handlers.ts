@@ -9,6 +9,8 @@ addMessageHandler(message => message.author.bot);
 addMessageHandler(async message => {
   if (!message.content.startsWith("!")) return false;
 
+  if (message.guild.id != "310820885240217600") return false;
+
   const ID = "546890655398625286";
   const names = [
     "jennas-boyfriend",
@@ -20,11 +22,13 @@ addMessageHandler(async message => {
     "zach-for-head-ref",
     "create-some-ass",
     "bradley-for-head-ref",
-    "flywheel-gang",
     "leeanna-for-emcee",
     "leeanna-for-head-ref",
-    "🦀-grant-is-gone-🦀",
-    "serious-chat"
+    "serious-chat",
+    "feet-pics",
+    "drow-for-gdc",
+    "sadie",
+    "bradleys-snoring"
   ];
 
   const channel = await message.guild.channels.find(
@@ -49,6 +53,7 @@ addMessageHandler(message => {
   }
 
   if (!log) return false;
+  if (process.env["DEV"]) return false;
 
   log.send(
     `${message.member.user.username}#${message.member.user.discriminator} in ${
