@@ -7,3 +7,4 @@ import "./matchup";
 import "./predict";
 import "./debug";
 import "./subscribe";
+import "./leaderboard";
