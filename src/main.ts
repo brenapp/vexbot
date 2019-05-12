@@ -11,7 +11,12 @@ import "./lib/command";
 
 client.on("ready", () => {
   console.log("vexbot#0599 is online!");
-  client.user.setActivity("over the server", { type: "WATCHING" });
+
+  if (process.env["DEV"]) {
+    client.user.setActivity("with VSCode", { type: "PLAYING" });
+  } else {
+    client.user.setActivity("over the server", { type: "WATCHING" });
+  }
 });
 client.on("message", handleMessage);
 
