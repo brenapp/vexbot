@@ -25,10 +25,13 @@ addMessageHandler(async message => {
     "leeanna-for-emcee",
     "leeanna-for-head-ref",
     "serious-chat",
-    "feet-pics",
     "drow-for-gdc",
     "sadie",
-    "bradleys-snoring"
+    "bradleys-snoring",
+    "dog-leeks",
+    "admin-chat",
+    "zach-for-gdc",
+    "important-studying-char"
   ];
 
   const channel = await message.guild.channels.find(
