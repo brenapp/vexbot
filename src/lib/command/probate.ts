@@ -16,6 +16,8 @@ async function probate(
   by: GuildMember,
   reason: string
 ) {
+  console.log(`Probate ${user.nickname} for ${length.time}`);
+
   let probation = user.guild.roles.find(role => role.name === "Probation");
   let dm = await user.createDM();
   dm.send(
@@ -25,8 +27,7 @@ async function probate(
   );
   dm.send(
     `While you are in probation, you cannot post messages in any channel, or speak in any voice channel. If you believe this was in error, you can appeal this in ${user.guild.channels.find(
-      "name",
-      "appeals"
+      channel => channel.name === "appeals"
     )}`
   );
   user.addRole(
@@ -95,47 +96,12 @@ addCommand("probate", (args, message) => {
 
   // Get affected users
   let users = message.mentions.members;
-  let [time, ...reason] = args;
+  let [time, ...reason] = args.slice(users.size);
 
-  return true;
-});
+  users.forEach(user =>
+    probate(user, parseTime(time), message.member, reason.join(" "))
+  );
 
-addMessageHandler(async message => {
-  if (!message.content.toLowerCase().startsWith("!probate")) return false;
-
-  // First, test if the user has the permission to probate someone
-  if (message.member.hasPermission("ADMINISTRATOR")) {
-    let users = message.mentions.members;
-
-    let time = parseTime(
-      message.content
-        .split("for")[0]
-        .split(" ")
-        .slice(-2)[0]
-    );
-
-    if (!time) {
-      message.reply("Unknown time quantity");
-    } else {
-      users.forEach(user => {
-        console.log(
-          `Probate ${user.displayName} for ${time.time} by ${
-            message.member.displayName
-          }`
-        );
-        probate(user, time, message.member, message.content.split("for ")[1]);
-      });
-    }
-  } else {
-    // Probate the offender for a short period of time
-    message.reply("You're not permitted to do that!");
-    probate(
-      message.member,
-      parseTime("30s"),
-      message.guild.me,
-      "Unauthorized use of !probate"
-    );
-  }
   return true;
 });
 
