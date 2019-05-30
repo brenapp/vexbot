@@ -16,6 +16,14 @@ import { client } from "../../client";
 import { askString, choose, questionValidate } from "../../lib/prompt";
 
 import * as vexdb from "vexdb";
+import approve from "./approve";
+
+export function findOrMakeRole(name: string, guild: Guild) {
+  let role = guild.roles.find(role => role.name === name);
+  return role
+    ? Promise.resolve(role)
+    : guild.createRole({ name, mentionable: true });
+}
 
 export default async function verify(member: GuildMember) {
   // Slide into DMs
@@ -64,5 +72,53 @@ export default async function verify(member: GuildMember) {
   let teams = additional;
   if (additional === "YES") {
     teams = await askString("Please list all of these below", dm);
+  }
+
+  await dm.send(
+    "You're all set! Your verification is currently being reviewed by Admins. You can communicate with us in <#478086282111614977>"
+  );
+
+  // Actual verification process
+  let teaminfo = (await vexdb.get("teams", { team }))[0];
+  const roles = ["310902227160137730"]; // Verified
+
+  if (role !== "ALUMNI") {
+    // Program
+    if (teaminfo.program == "VEXU") {
+      roles.push("377219725442154526"); // VEXU
+    } else if (teaminfo.grade == "Middle School") {
+      roles.push("376489822598201347"); // Middle School
+    } else {
+      roles.push("376489878700949515"); // High School
+    }
+  }
+
+  if (teaminfo.region === "South Carolina") {
+    let teamRole = await findOrMakeRole(team.toUpperCase(), member.guild);
+    roles.push(teamRole.id); // Team Role
+  } else {
+    roles.push("387074517408808970"); // Not SC Team
+  }
+
+  switch (role) {
+    case "MEMBER":
+      break;
+    case "ALUMNI":
+      roles.push("329760448020873229");
+      break; // Alumnus
+    case "MENTOR":
+      roles.push("329760518334054402");
+      break; // Mentor
+  }
+
+  const approved = await approve(member, name, team, teams, roles);
+  if (approved) {
+    dm.send("Your verification has been approved!");
+    member.setNickname(`${name} | ${team}`);
+    member.addRoles(roles);
+  } else {
+    dm.send(
+      "Your verification was denied. If you believe this to be incorrect, you can rejoin below. https://discord.gg/Jnqry6b"
+    );
   }
 }
