@@ -4,7 +4,10 @@ import Command from "../lib/command";
 
 export class VerifyCommand extends Command("verify") {
   check(message: Message) {
-    return message.member.hasPermission("ADMINISTRATOR");
+    return (
+      message.channel.type === "text" &&
+      message.member.hasPermission("ADMINISTRATOR")
+    );
   }
 
   exec(message: Message) {
