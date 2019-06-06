@@ -3,7 +3,7 @@ import { TextChannel } from "discord.js";
 import { client } from "../client";
 import { addListener } from "cluster";
 
-import "./akario";
+import "./command";
 
 // Dismiss messages from a bot, we don't take their kind around here!
 addMessageHandler(message => message.author.bot);
@@ -103,34 +103,4 @@ addMessageHandler(message => {
     return true;
   }
   return false;
-});
-
-// Ping!
-addMessageHandler(message => {
-  if (message.content.toLowerCase() == "!ping") {
-    message.reply("Pong!");
-    return true;
-  } else {
-    return false;
-  }
-});
-
-addMessageHandler(async message => {
-  if (message.content.includes("lame")) {
-    message.channel.send("yeet");
-    return true;
-  } else {
-    return false;
-  }
-});
-
-addMessageHandler(async message => {
-  if (!message.mentions.members.has(client.user.id)) {
-    return false;
-  }
-
-  const ping = client.emojis.get("519739133678190599");
-  message.react(ping);
-
-  return true;
 });
