@@ -1,4 +1,4 @@
-import { addMessageHandler, addCommand } from "../../lib/message";
+import { addMessageHandler } from "../../lib/message";
 
 import {
   Guild,
@@ -39,7 +39,7 @@ export default async function verify(member: GuildMember) {
     dm,
     async team =>
       team === "OVERRIDE" || !!(await vexdb.size("teams", { team })),
-    "There doesn't appear to be a team with that number. Make sure you are listing a registered team that has gone to an event. If you need a manual override, please enter OVERRIDE"
+    "There doesn't appear to be a team with that number. Make sure you are listing a registered team that has gone to an event. If you need a manual override, please enter `OVERRIDE`"
   );
 
   let override = false;

@@ -67,5 +67,5 @@ export default async function approve(
       })
     );
     collector.on("end", () => {});
-  });
+  }) as Promise<boolean>;
 }
