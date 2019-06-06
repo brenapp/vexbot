@@ -1,4 +1,4 @@
-import { GuildMember, RichEmbed, TextChannel, Message } from "discord.js";
+import { GuildMember, RichEmbed, TextChannel, Message, User } from "discord.js";
 import { client } from "../../client";
 
 export default async function approve(
@@ -30,8 +30,8 @@ export default async function approve(
 
   return new Promise((resolve, reject) => {
     let collector = approval.createReactionCollector(
-      (vote, usr) =>
-        (vote.emoji.name === "👎" || vote.emoji.name === "👍") && usr !== client
+      (vote, usr: User) =>
+        (vote.emoji.name === "👎" || vote.emoji.name === "👍") && !usr.bot
     );
     let handleReaction;
     collector.on(

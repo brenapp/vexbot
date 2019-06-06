@@ -34,7 +34,7 @@ export default async function verify(member: GuildMember) {
     dm
   );
 
-  const team = await questionValidate(
+  let team = await questionValidate(
     "What team are you *primarily* a part of?",
     dm,
     async team =>
@@ -43,10 +43,9 @@ export default async function verify(member: GuildMember) {
   );
 
   let override = false;
-  let reason;
   if (team === "OVERRIDE") {
     override = true;
-    reason = await askString(
+    team = await askString(
       "Please specify why you are overriding. This will be visible to admins.",
       dm
     );
@@ -79,25 +78,27 @@ export default async function verify(member: GuildMember) {
   );
 
   // Actual verification process
-  let teaminfo = (await vexdb.get("teams", { team }))[0];
   const roles = ["310902227160137730"]; // Verified
 
-  if (role !== "ALUMNI") {
-    // Program
-    if (teaminfo.program == "VEXU") {
-      roles.push("377219725442154526"); // VEXU
-    } else if (teaminfo.grade == "Middle School") {
-      roles.push("376489822598201347"); // Middle School
-    } else {
-      roles.push("376489878700949515"); // High School
+  if (!override) {
+    const teaminfo = (await vexdb.get("teams", { team }))[0];
+    if (role !== "ALUMNI") {
+      // Program
+      if (teaminfo.program == "VEXU") {
+        roles.push("377219725442154526"); // VEXU
+      } else if (teaminfo.grade == "Middle School") {
+        roles.push("376489822598201347"); // Middle School
+      } else {
+        roles.push("376489878700949515"); // High School
+      }
     }
-  }
 
-  if (teaminfo.region === "South Carolina") {
-    let teamRole = await findOrMakeRole(team.toUpperCase(), member.guild);
-    roles.push(teamRole.id); // Team Role
-  } else {
-    roles.push("387074517408808970"); // Not SC Team
+    if (teaminfo.region === "South Carolina") {
+      let teamRole = await findOrMakeRole(team.toUpperCase(), member.guild);
+      roles.push(teamRole.id); // Team Role
+    } else {
+      roles.push("387074517408808970"); // Not SC Team
+    }
   }
 
   switch (role) {
