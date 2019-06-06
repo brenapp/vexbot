@@ -53,4 +53,9 @@ type CommandHandler = (
   message: Message
 ) => boolean | Promise<boolean>;
 
-export { addMessageHandler, addOneTimeMessageHandler, handleMessage };
+export {
+  removeMessageHandler,
+  addMessageHandler,
+  addOneTimeMessageHandler,
+  handleMessage
+};
