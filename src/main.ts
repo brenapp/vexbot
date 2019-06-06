@@ -6,6 +6,9 @@ import { client } from "./client";
 import "./lib/handlers";
 import "./commands";
 
+// Behaviors
+import "./behaviors/log";
+
 client.on("ready", () => {
   console.log("vexbot#0599 is online!");
 
