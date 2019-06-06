@@ -1,4 +1,4 @@
-import { Message } from "discord.js";
+import { Message, Guild } from "discord.js";
 import { addMessageHandler, removeMessageHandler } from "./message";
 
 export const PREFIX = process.env["DEV"] ? ["."] : ["/", "!"];
@@ -62,3 +62,20 @@ export default (name: string) =>
      */
     exec(message: Message, args: string[]) {}
   };
+
+export const Permissions = {
+  admin(message: Message) {
+    return (
+      message.channel.type === "text" &&
+      message.member.hasPermission("ADMINISTRATOR")
+    );
+  },
+
+  owner(message: Message) {
+    return message.author.id === "274004148276690944";
+  },
+
+  guild(message: Message) {
+    return message.channel.type == "text";
+  }
+};
