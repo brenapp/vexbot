@@ -1,7 +1,9 @@
-import { addMessageHandler, addCommand } from "./message";
+import { addMessageHandler } from "./message";
 import { TextChannel } from "discord.js";
 import { client } from "../client";
 import { addListener } from "cluster";
+
+import "./akario";
 
 // Dismiss messages from a bot, we don't take their kind around here!
 addMessageHandler(message => message.author.bot);
