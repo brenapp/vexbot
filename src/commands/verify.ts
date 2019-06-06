@@ -1,14 +1,9 @@
 import { Message } from "discord.js";
 import verify from "../behaviors/verify";
-import Command from "../lib/command";
+import Command, { Permissions } from "../lib/command";
 
 export class VerifyCommand extends Command("verify") {
-  check(message: Message) {
-    return (
-      message.channel.type === "text" &&
-      message.member.hasPermission("ADMINISTRATOR")
-    );
-  }
+  check = Permissions.admin;
 
   exec(message: Message) {
     message.mentions.members.forEach(member => {
