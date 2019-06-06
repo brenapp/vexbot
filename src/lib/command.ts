@@ -3,6 +3,13 @@ import { addMessageHandler, removeMessageHandler } from "./message";
 
 export const PREFIX = process.env["DEV"] ? ["."] : ["/", "!"];
 
+export function matchCommand(message: Message, name: string) {
+  return (
+    PREFIX.includes(message.content[0]) &&
+    message.content.slice(1, name.length + 1) === name
+  );
+}
+
 export default (name: string) =>
   class Command {
     handler: number;
@@ -12,10 +19,7 @@ export default (name: string) =>
       this.name = name;
 
       this.handler = addMessageHandler(async message => {
-        if (
-          !PREFIX.includes(message.content[0]) ||
-          message.content.slice(1, name.length + 1) !== name
-        ) {
+        if (!matchCommand(message, name)) {
           return false;
         }
 
