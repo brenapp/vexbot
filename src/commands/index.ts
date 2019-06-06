@@ -1,1 +1,2 @@
 import "./verify";
+import "./debug";
