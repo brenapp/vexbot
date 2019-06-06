@@ -13,12 +13,13 @@
     "discord.js": "^11.3.2",
     "express": "^4.16.3",
     "keya": "^1.0.1",
+    "sqlite": "^3.0.3",
     "vexdb": "^v2.1.5"
   },
   "devDependencies": {
     "nodemon": "^1.17.5",
     "ts-node": "^7.0.0",
-    "typescript": "^2.9.2"
+    "typescript": "3.4.5"
   },
   "scripts": {
     "start": "tsc && node out/main.js",
