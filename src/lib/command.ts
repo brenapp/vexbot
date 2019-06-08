@@ -42,7 +42,7 @@ export default (name: string) =>
 
         if (response) {
           let message = response instanceof Array ? response[0] : response;
-          message.edit(message.content + `(took ${Date.now() - start}ms)`);
+          message.edit(message.content + ` *(took ${Date.now() - start}ms)*`);
         }
         return true;
       });
