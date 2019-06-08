@@ -8,6 +8,9 @@ import "./commands";
 
 // Behaviors
 import "./behaviors/log";
+import * as probation from "./behaviors/probation";
+
+probation.initalize();
 
 client.on("ready", () => {
   console.log("vexbot#0599 is online!");
