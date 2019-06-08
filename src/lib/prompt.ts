@@ -28,7 +28,7 @@ function ask(question: string, channel: DMChannel) {
  * @param question Question to ask
  * @param channel Channel to ask in ()
  */
-function askString(question: string, channel: DMChannel) {
+export function askString(question: string, channel: DMChannel) {
   return ask(question, channel).then(message => message.content);
 }
 

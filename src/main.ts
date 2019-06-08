@@ -1,13 +1,14 @@
 import discord from "discord.js";
 import { handleMessage } from "./lib/message";
-import "./lib/verify";
 import report from "./lib/report";
 import { client } from "./client";
 
 import "./lib/handlers";
-import "./lib/command";
+import "./commands";
 
-// import "./lib/actions/eventlog";
+// Behaviors
+import "./behaviors/log";
+import * as probation from "./behaviors/probation";
 
 client.on("ready", () => {
   console.log("vexbot#0599 is online!");
@@ -17,7 +18,13 @@ client.on("ready", () => {
   } else {
     client.user.setActivity("over the server", { type: "WATCHING" });
   }
-});
-client.on("message", handleMessage);
 
+  probation.initalize();
+});
+
+const reporter = report(client);
+process.on("uncaughtException", reporter);
+process.on("unhandledRejection", reporter);
+
+client.on("message", handleMessage);
 client.on("error", report);
