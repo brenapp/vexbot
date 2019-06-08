@@ -1,7 +1,13 @@
-import { Message, Guild } from "discord.js";
+import { Message, Guild, RichEmbed } from "discord.js";
 import { addMessageHandler, removeMessageHandler } from "./message";
 
 export const PREFIX = process.env["DEV"] ? ["."] : ["/", "!"];
+
+export function makeEmbed(message: Message) {
+  return new RichEmbed().setFooter(
+    `Invoked by ${message.member.nickname} on ${new Date().toLocaleString()}`
+  );
+}
 
 export function matchCommand(message: Message, name: string) {
   return (
