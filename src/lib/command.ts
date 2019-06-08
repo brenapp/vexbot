@@ -30,7 +30,7 @@ export default (name: string) =>
         }
 
         if (!(await this.check(message))) {
-          await this.fail();
+          await this.fail(message);
           return false;
         }
 
@@ -57,7 +57,7 @@ export default (name: string) =>
     /**
      * Runs when check() evaluates to false
      */
-    fail(): void | Promise<void> {
+    fail(message: Message): void | Promise<void> {
       return;
     }
 
