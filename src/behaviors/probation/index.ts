@@ -15,7 +15,11 @@ export function updateActivity() {
     return member.nickname.split(" |")[0];
   });
 
-  client.user.setActivity(names.join(", "), { type: "WATCHING" });
+  if (names.length == 0) {
+    client.user.setActivity("over the server", { type: "WATCHING" });
+  } else {
+    client.user.setActivity(names.join(", "), { type: "WATCHING" });
+  }
 }
 
 export async function initalize() {
