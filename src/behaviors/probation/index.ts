@@ -19,7 +19,7 @@ export function updateActivity() {
 }
 
 export async function initalize() {
-  const store = await keya.store("probations");
+  const store = await keya.store("vexbotprobations");
 
   // Get all active probations (covers for bot shutdowns), note shutdown parameters looks like { start: timestamp, end: timestamp, reason: string }
   const probations = await store.all();
@@ -50,7 +50,7 @@ export const free = (memberid: string, guildid: string) => async () => {
 
   console.log(`Free ${member}`);
 
-  const store = await keya.store("probations");
+  const store = await keya.store("vexbotprobations");
 
   await member.removeRole(probation);
   const dm = await member.createDM();
@@ -78,7 +78,7 @@ export default async function probate(
   );
 
   // Create record in keya
-  const store = await keya.store("probations");
+  const store = await keya.store("vexbotprobations");
   const end = Date.now() + parse(time);
 
   await store.set(member.id, {
