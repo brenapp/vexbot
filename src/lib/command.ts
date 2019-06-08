@@ -5,14 +5,14 @@ export const PREFIX = process.env["DEV"] ? ["."] : ["/", "!"];
 
 export function makeEmbed(message: Message) {
   return new RichEmbed().setFooter(
-    `Invoked by ${message.member.nickname} on ${new Date().toLocaleString()}`
+    `Invoked by ${message.member.displayName} on ${new Date().toLocaleString()}`
   );
 }
 
 export function matchCommand(message: Message, name: string) {
   return (
     PREFIX.includes(message.content[0]) &&
-    message.content.slice(1, name.length + 1) === name
+    message.content.split(" ")[0].slice(1) === name
   );
 }
 
