@@ -4,9 +4,9 @@ import { addMessageHandler, removeMessageHandler } from "./message";
 export const PREFIX = process.env["DEV"] ? ["."] : ["/", "!"];
 
 export function makeEmbed(message: Message) {
-  return new RichEmbed().setFooter(
-    `Invoked by ${message.member.displayName} on ${new Date().toLocaleString()}`
-  );
+  return new RichEmbed()
+    .setFooter(`Invoked by ${message.member.displayName}`)
+    .setTimestamp();
 }
 
 export function matchCommand(message: Message, name: string) {
@@ -42,7 +42,31 @@ export default (name: string) =>
 
         if (response) {
           let message = response instanceof Array ? response[0] : response;
-          message.edit(message.content + ` *(took ${Date.now() - start}ms)*`);
+          if (message.embeds.length > 0) {
+            let embed = message.embeds[0];
+            embed.footer.text += ` (took ${Date.now() - start}ms)`;
+
+            // Copy over embed
+            const replacement = makeEmbed(message)
+              .setFooter(embed.footer.text)
+              .setTitle(embed.title)
+              .setColor(embed.color)
+              .setDescription(embed.description)
+              .setImage((embed.image || { url: undefined }).url)
+              .setThumbnail((embed.thumbnail || { url: undefined }).url)
+              .setTimestamp(new Date(embed.timestamp))
+              .setURL(embed.url);
+
+            if (embed.author) {
+              replacement.setAuthor(embed.author);
+            }
+
+            replacement.fields = embed.fields;
+
+            message.edit({ embed: replacement });
+          } else {
+            message.edit(message.content + ` *(took ${Date.now() - start}ms)*`);
+          }
         }
         return true;
       });
