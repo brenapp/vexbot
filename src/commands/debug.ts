@@ -55,3 +55,13 @@ export class CacheCommand extends Command("cache") {
 }
 
 new CacheCommand();
+
+export class PingCommand extends Command("ping") {
+  check = () => true;
+
+  async exec(message: Message, args: string[]) {
+    return message.reply("Pong!");
+  }
+}
+
+new PingCommand();
