@@ -2,15 +2,29 @@ import * as keya from "keya";
 import { client } from "../../client";
 import { GuildMember, Guild } from "discord.js";
 
-import * as parse from "parse-duration";
+import parse from "parse-duration";
 
 export let TIMEOUTS = {};
 
+export function updateActivity() {
+  const names = Object.keys(TIMEOUTS).map(ids => {
+    const [guildid, memberid] = ids.split(":");
+    const guild = client.guilds.get(guildid);
+    const member = guild.members.get(memberid);
+
+    return member.nickname.split(" |")[0];
+  });
+
+  client.user.setActivity(names.join(", "), { type: "WATCHING" });
+}
+
 export async function initalize() {
-  const store = await keya.store("vexbot-probations");
+  const store = await keya.store("probations");
 
   // Get all active probations (covers for bot shutdowns), note shutdown parameters looks like { start: timestamp, end: timestamp, reason: string }
   const probations = await store.all();
+
+  console.log(`Restoring probations...`);
 
   for (let probation of probations) {
     const { start, end, reason, guild } = probation.value as {
@@ -20,11 +34,13 @@ export async function initalize() {
       guild: string;
     };
 
-    TIMEOUTS[probation.key] = setTimeout(
+    TIMEOUTS[`${guild}:${probation.key}`] = setTimeout(
       free(probation.key, guild),
-      Date.now() - end
+      end - Date.now()
     );
   }
+
+  updateActivity();
 }
 
 export const free = (memberid: string, guildid: string) => async () => {
@@ -32,19 +48,23 @@ export const free = (memberid: string, guildid: string) => async () => {
   const member = guild.members.get(memberid);
   const probation = guild.roles.find(role => role.name === "Probation");
 
-  const store = await keya.store("vexbot-probations");
+  console.log(`Free ${member}`);
 
-  member.removeRole(probation);
+  const store = await keya.store("probations");
+
+  await member.removeRole(probation);
   const dm = await member.createDM();
 
   dm.send(
-    "Your probation has been lifted! You are now permitted to post again. Please remember, repeat offences will be more likely to lead to a ban"
+    "Your probation has been lifted! You are now permitted to post again. Please remember, repeat offences will be more likely to lead to a ban."
   );
 
   store.delete(member.id);
 
-  clearTimeout(TIMEOUTS[member.id]);
-  delete TIMEOUTS[member.id];
+  clearTimeout(TIMEOUTS[`${guild.id}:${member.id}`]);
+  delete TIMEOUTS[`${guild.id}:${member.id}`];
+
+  updateActivity();
 };
 
 export default async function probate(
@@ -53,8 +73,12 @@ export default async function probate(
   time: string,
   reason: string
 ) {
+  console.log(
+    `Probate ${member} by ${by} for ${parse(time)}ms with reason ${reason}`
+  );
+
   // Create record in keya
-  const store = await keya.store("vexbot-probations");
+  const store = await keya.store("probations");
   const end = Date.now() + parse(time);
 
   await store.set(member.id, {
@@ -65,9 +89,9 @@ export default async function probate(
   });
 
   // Set up timeout
-  TIMEOUTS[member.id] = setTimeout(
+  TIMEOUTS[`${member.guild.id}:${member.id}`] = setTimeout(
     free(member.id, member.guild.id),
-    Date.now() - end
+    parse(time)
   );
 
   // Actually do the probation
@@ -84,6 +108,8 @@ export default async function probate(
     channel => channel.name === "appeals"
   );
   dm.send(
-    `You've been put on probation by ${member} for \`${time}\` with the following reason: \`${reason}\`. While you are on probation, you cannot post or speak in any channel. If you believe this is in error, you can communicate with Admins in ${appeals}`
+    `You've been put on probation by ${by} for ${time} with the following reason: ${reason}. While you are on probation, you cannot post or speak in any channel. If you believe this is in error, you can communicate with Admins in ${appeals}`
   );
+
+  updateActivity();
 }

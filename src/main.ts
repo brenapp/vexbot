@@ -10,8 +10,6 @@ import "./commands";
 import "./behaviors/log";
 import * as probation from "./behaviors/probation";
 
-probation.initalize();
-
 client.on("ready", () => {
   console.log("vexbot#0599 is online!");
 
@@ -20,6 +18,8 @@ client.on("ready", () => {
   } else {
     client.user.setActivity("over the server", { type: "WATCHING" });
   }
+
+  probation.initalize();
 });
 
 const reporter = report(client);
