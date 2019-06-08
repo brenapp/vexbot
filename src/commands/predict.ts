@@ -100,7 +100,7 @@ export class PredictCommand extends Command("predict") {
         )
       );
 
-    message.channel.send(embed);
+    return message.channel.send(embed);
   }
 }
 

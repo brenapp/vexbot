@@ -21,7 +21,7 @@ export class EventCommand extends Command("events") {
       )
     ].join("\n");
 
-    message.channel.send(body);
+    return message.channel.send(body);
   }
 }
 

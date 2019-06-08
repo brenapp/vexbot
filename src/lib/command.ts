@@ -36,8 +36,14 @@ export default (name: string) =>
 
         // Parse args
         const args = message.content.split(" ").slice(1);
+        const start = Date.now();
 
-        await this.exec(message, args);
+        const response = await this.exec(message, args);
+
+        if (response) {
+          let message = response instanceof Array ? response[0] : response;
+          message.edit(message.content + `(took ${Date.now() - start}ms)`);
+        }
         return true;
       });
     }
@@ -66,7 +72,12 @@ export default (name: string) =>
      * @param message
      * @param args
      */
-    exec(message: Message, args: string[]) {}
+    exec(
+      message: Message,
+      args: string[]
+    ): Promise<Message | Message[]> | void {
+      return;
+    }
   };
 
 export const Permissions = {

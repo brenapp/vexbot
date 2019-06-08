@@ -99,7 +99,7 @@ async function getTotals(store: SQLiteStore, guild: Guild) {
             .join("\n")
         );
 
-      message.channel.send(embed);
+      return message.channel.send(embed);
     }
   }
 
@@ -114,6 +114,8 @@ async function getTotals(store: SQLiteStore, guild: Guild) {
 
       const reply = (await message.reply("Done!")) as Message;
       leaderboard.exec(reply, ["10"]);
+
+      return reply;
     }
   }
 

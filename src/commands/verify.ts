@@ -9,7 +9,7 @@ export class VerifyCommand extends Command("verify") {
     message.mentions.members.forEach(member => {
       verify(member);
     });
-    message.channel.send("Manually started verification");
+    return message.channel.send("Manually started verification");
   }
 }
 

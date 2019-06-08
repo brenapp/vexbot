@@ -38,14 +38,14 @@ export class TeamCommand extends Command("team") {
       message.reply(
         "You didn't specify a team! Usage: `!team BCUZ` or `!team 3796B`. Optionally list a season after to get records for that seaosn"
       );
-      return true;
+      return;
     }
 
     let record = await vexdb.get("teams", { team }).then(res => res[0]);
 
     if (!record) {
       message.reply("There doesn't appear to be a team with that number!");
-      return true;
+      return;
     }
 
     let events = await vexdb.get("events", { team, season });
@@ -133,7 +133,7 @@ export class TeamCommand extends Command("team") {
       message.author.avatarURL
     );
 
-    message.channel.send(embed);
+    return message.channel.send(embed);
   }
 }
 

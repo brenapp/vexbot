@@ -41,12 +41,14 @@ export class CacheCommand extends Command("cache") {
     switch (args[0]) {
       case "clear":
         vexdb.cache.clear();
-        message.channel.send("Cache Cleared");
+        return message.channel.send("Cache Cleared");
         break;
       case "list":
         const store = await keya.store("vexdb");
         const cache = (await store.all()).map(v => v.value);
-        message.channel.send(["VexDB Current Cache", ...cache].join("\n"));
+        return message.channel.send(
+          ["VexDB Current Cache", ...cache].join("\n")
+        );
         break;
     }
   }
