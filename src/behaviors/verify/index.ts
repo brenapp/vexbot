@@ -123,3 +123,6 @@ export default async function verify(member: GuildMember) {
     );
   }
 }
+
+// Start verification process on member join
+client.on("guildMemberAdd", verify);
