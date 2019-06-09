@@ -9,23 +9,23 @@ export function makeEmbed(message: Message) {
     .setTimestamp();
 }
 
-export function matchCommand(message: Message, name: string) {
+export function matchCommand(message: Message, names: string[]) {
   return (
     PREFIX.includes(message.content[0]) &&
-    message.content.split(" ")[0].slice(1) === name
+    names.includes(message.content.split(" ")[0].slice(1))
   );
 }
 
-export default (name: string) =>
+export default (...names: string[]) =>
   class Command {
     handler: number;
     name: string;
 
     constructor() {
-      this.name = name;
+      this.name = names[0];
 
       this.handler = addMessageHandler(async message => {
-        if (!matchCommand(message, name)) {
+        if (!matchCommand(message, names)) {
           return false;
         }
 
