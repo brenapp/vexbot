@@ -28,7 +28,7 @@ export async function initalize() {
   // Get all active probations (covers for bot shutdowns), note shutdown parameters looks like { start: timestamp, end: timestamp, reason: string }
   const probations = await store.all();
 
-  console.log(`Restoring probations...`);
+  console.log(`Restoring ${probations.length} probations...`);
 
   for (let probation of probations) {
     const { start, end, reason, guild } = probation.value as {
