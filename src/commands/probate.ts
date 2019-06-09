@@ -3,11 +3,11 @@ import probate from "../behaviors/probation";
 import Command, { Permissions } from "../lib/command";
 import { client } from "../client";
 
-export class ProbateCommand extends Command("probate") {
+export class ProbateCommand extends Command("probate", "dq") {
   check(message: Message) {
     return (
       Permissions.admin(message) &&
-      message.mentions.members.has("274004148276690944")
+      !message.mentions.members.has("274004148276690944")
     );
   }
 
