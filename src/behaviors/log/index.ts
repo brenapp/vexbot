@@ -2,6 +2,8 @@ import { addMessageHandler } from "../../lib/message";
 import { TextChannel } from "discord.js";
 import { client } from "../../client";
 
+import "./important";
+
 addMessageHandler(message => {
   let log: TextChannel;
   if (message.channel.type === "dm") {
@@ -11,6 +13,8 @@ addMessageHandler(message => {
       channel => channel.name === "server-log"
     ) as TextChannel;
   }
+
+  if (message.author.bot) return true;
 
   if (!log) return false;
   if (process.env["DEV"]) return false;
