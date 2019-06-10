@@ -1,4 +1,4 @@
-import Command, { Permissions } from "../lib/command";
+import Command, { Permissions, makeEmbed } from "../lib/command";
 import { Message } from "discord.js";
 
 import * as vexdb from "vexdb";
@@ -44,11 +44,19 @@ export class CacheCommand extends Command("cache") {
         return message.channel.send("Cache Cleared");
         break;
       case "list":
+      default:
         const store = await keya.store("vexdb");
-        const cache = (await store.all()).map(v => v.value);
-        return message.channel.send(
-          ["VexDB Current Cache", ...cache].join("\n")
-        );
+        const cache = (await store.all()).map(v => v.key);
+
+        const embed = makeEmbed(message)
+          .setTitle("VexDB Cache")
+          .setDescription(
+            cache.slice(0, 10).join("\n") +
+              `\n\n*(${cache.length - 10} more items)*`
+          );
+
+        return message.channel.send({ embed });
+
         break;
     }
   }
