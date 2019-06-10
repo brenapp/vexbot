@@ -42,6 +42,7 @@ client.on("messageUpdate", (old, current) => {
   }
 
   if (!log) return false;
+  if (old.author.bot) return false;
 
   log.send(
     `${old.member.user.username}#${old.member.user.discriminator} in ${
