@@ -3,11 +3,13 @@ import { handleMessage } from "./lib/message";
 import report from "./lib/report";
 import { client } from "./client";
 
+// Commands and message handlers
 import "./lib/handlers";
 import "./commands";
 
 // Behaviors
 import "./behaviors/log";
+import "./behaviors/random";
 import * as probation from "./behaviors/probation";
 
 client.on("ready", () => {
