@@ -1,5 +1,6 @@
 import { client } from "../../client";
 import { Guild, TextChannel, Collection, Role } from "discord.js";
+import { makeEmbed } from "../../lib/command";
 
 // Notify #event-log about important events
 function serverlog(guild: Guild): TextChannel {
@@ -41,22 +42,34 @@ client.on("guildMemberRemove", (guild, user) => {
 client.on("guildMemberUpdate", (old, current) => {
   const log = serverlog(old.guild);
 
+  const embed = makeEmbed();
+
+  embed
+    .setAuthor(old.user.username, old.user.avatarURL)
+    .setTitle("Member Updated");
+
   if (old.nickname !== current.nickname) {
-    log.send(
-      `:exclamation:  ${old} changed nickname. ${old.nickname} => ${
-        current.nickname
-      }`
+    embed.addField(
+      "Changed Nicknames",
+      `\`${old.nickname}\` => \`${current.nickname}\``
     );
   }
 
   const { added, removed } = changedRoles(old.roles, current.roles);
-  if (added.size > 0 || removed.size > 0) {
-    log.send(
-      `:exclamation: ${current} changed roles. New roles: ${added
-        .map(role => `${role}`)
-        .join(", ")}; Removed roles: ${removed
-        .map(role => `${role}`)
-        .join(", ")}`
+
+  if (added.size > 0) {
+    embed.addField(
+      "Added Roles",
+      `${added.map(role => role.toString()).join(" ")}`
     );
   }
+
+  if (removed.size > 0) {
+    embed.addField(
+      "Removed Roles",
+      `${removed.map(role => role.toString()).join(" ")}`
+    );
+  }
+
+  log.send({ embed });
 });
