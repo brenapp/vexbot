@@ -3,10 +3,11 @@ import { addMessageHandler, removeMessageHandler } from "./message";
 
 export const PREFIX = process.env["DEV"] ? ["."] : ["/", "!"];
 
-export function makeEmbed(message: Message) {
-  return new RichEmbed()
-    .setFooter(`Invoked by ${message.member.displayName}`)
-    .setTimestamp();
+export function makeEmbed(message?: Message) {
+  const embed = new RichEmbed().setTimestamp();
+  if (message) embed.setFooter(`Invoked by ${message.member.displayName}`);
+
+  return embed;
 }
 
 export function matchCommand(message: Message, names: string[]) {
