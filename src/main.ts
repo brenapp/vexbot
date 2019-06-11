@@ -10,6 +10,7 @@ import "./commands";
 // Behaviors
 import "./behaviors/log";
 import "./behaviors/random";
+import "./behaviors/eliza";
 import * as probation from "./behaviors/probation";
 
 client.on("ready", () => {
