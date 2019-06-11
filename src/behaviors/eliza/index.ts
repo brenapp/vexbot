@@ -30,7 +30,8 @@ addMessageHandler(async message => {
   if (
     message.channel.type !== "dm" ||
     !message.content.toLowerCase().includes("talk") ||
-    TALKING.has(message.author.id)
+    TALKING.has(message.author.id) ||
+    process.env["DEV"]
   ) {
     return false;
   }
