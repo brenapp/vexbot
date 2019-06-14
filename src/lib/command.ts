@@ -1,11 +1,17 @@
 import { Message, Guild, RichEmbed } from "discord.js";
 import { addMessageHandler, removeMessageHandler } from "./message";
+import { client } from "../client";
 
 export const PREFIX = process.env["DEV"] ? ["."] : ["/", "!"];
 
 export function makeEmbed(message?: Message) {
   const embed = new RichEmbed().setTimestamp();
-  if (message) embed.setFooter(`Invoked by ${message.member.displayName}`);
+  const invoker =
+    message.channel.type === "text"
+      ? message.member.displayName
+      : message.author.username;
+
+  if (message) embed.setFooter(`Invoked by ${invoker}`);
 
   return embed;
 }
@@ -17,6 +23,10 @@ export function matchCommand(message: Message, names: string[]) {
   );
 }
 
+export function isCommand(message: Message) {
+  return PREFIX.includes(message.content[0]);
+}
+
 export default (...names: string[]) =>
   class Command {
     handler: number;
@@ -24,58 +34,59 @@ export default (...names: string[]) =>
 
     constructor() {
       this.name = names[0];
+      this.handler = addMessageHandler(this.handle);
+    }
 
-      this.handler = addMessageHandler(async message => {
-        if (!matchCommand(message, names)) {
-          return false;
-        }
+    async handle(message: Message) {
+      if (!matchCommand(message, names)) {
+        return false;
+      }
 
-        if (!(await this.check(message))) {
-          await this.fail(message);
-          return false;
-        }
+      if (!(await this.check(message))) {
+        await this.fail(message);
+        return false;
+      }
 
-        // Parse args
-        const args = message.content.split(" ").slice(1);
-        const start = Date.now();
+      // Parse args
+      const args = message.content.split(" ").slice(1);
+      const start = Date.now();
 
-        const response = await this.exec(message, args);
+      const response = await this.exec(message, args);
 
-        if (response) {
-          let message = response instanceof Array ? response[0] : response;
-          if (message.embeds.length > 0) {
-            let embed = message.embeds[0];
-            embed.footer.text += ` (took ${Date.now() - start}ms)`;
+      if (response) {
+        let message = response instanceof Array ? response[0] : response;
+        if (message.embeds.length > 0) {
+          let embed = message.embeds[0];
+          embed.footer.text += ` (took ${Date.now() - start}ms)`;
 
-            // Copy over embed
-            const replacement = makeEmbed(message)
-              .setFooter(embed.footer.text)
-              .setTitle(embed.title)
-              .setColor(embed.color)
-              .setDescription(embed.description)
-              .setImage((embed.image || { url: undefined }).url)
-              .setThumbnail((embed.thumbnail || { url: undefined }).url)
-              .setTimestamp(new Date(embed.timestamp))
-              .setURL(embed.url);
+          // Copy over embed
+          const replacement = makeEmbed(message)
+            .setFooter(embed.footer.text)
+            .setTitle(embed.title)
+            .setColor(embed.color)
+            .setDescription(embed.description)
+            .setImage((embed.image || { url: undefined }).url)
+            .setThumbnail((embed.thumbnail || { url: undefined }).url)
+            .setTimestamp(new Date(embed.timestamp))
+            .setURL(embed.url);
 
-            if (embed.author) {
-              replacement.setAuthor(embed.author);
-            }
-
-            replacement.fields = embed.fields;
-
-            message.edit({ embed: replacement });
-          } else {
-            message.edit(
-              message.content +
-                ` *(took ${Date.now() - start}ms${
-                  process.env["DEV"] ? " — DEV MODE" : ""
-                })*`
-            );
+          if (embed.author) {
+            replacement.setAuthor(embed.author);
           }
+
+          replacement.fields = embed.fields;
+
+          message.edit({ embed: replacement });
+        } else {
+          message.edit(
+            message.content +
+              ` *(took ${Date.now() - start}ms${
+                process.env["DEV"] ? " — DEV MODE" : ""
+              })*`
+          );
         }
-        return true;
-      });
+      }
+      return true;
     }
 
     unregister() {
@@ -123,7 +134,7 @@ export const Permissions = {
   },
 
   guild(message: Message) {
-    return message.channel.type == "text";
+    return message.channel.type == "text" && message.hasOwnProperty("guild");
   },
 
   all() {
