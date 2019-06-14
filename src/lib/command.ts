@@ -66,7 +66,12 @@ export default (...names: string[]) =>
 
             message.edit({ embed: replacement });
           } else {
-            message.edit(message.content + ` *(took ${Date.now() - start}ms)*`);
+            message.edit(
+              message.content +
+                ` *(took ${Date.now() - start}ms${
+                  process.env["DEV"] ? " — DEV MODE" : ""
+                })*`
+            );
           }
         }
         return true;
