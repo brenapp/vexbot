@@ -7,6 +7,10 @@ import { User } from "discord.js";
 import { askString } from "../../lib/prompt";
 import ElizaBot from "./eliza";
 
+async function wait(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 const TALKING = new Set<string>();
 
 async function goEliza(user: User) {
@@ -18,6 +22,10 @@ async function goEliza(user: User) {
 
   while (!eliza.quit) {
     input = await askString(response, dm);
+
+    // Wait a few milliseconds, this will make the conversation feel a little more natural
+    await wait(Math.random() * 2000);
+
     response = eliza.transform(input);
   }
 
