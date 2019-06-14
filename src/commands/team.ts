@@ -128,10 +128,6 @@ export class TeamCommand extends Command("team") {
     }
 
     embed.setTimestamp();
-    embed.setFooter(
-      `Invoked by ${message.member.displayName}`,
-      message.author.avatarURL
-    );
 
     return message.channel.send(embed);
   }
