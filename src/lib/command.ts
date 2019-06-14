@@ -45,6 +45,7 @@ export abstract class Command {
   }
 
   abstract match(message: Message): boolean;
+  abstract documentation(): { description: string; usage: string };
 
   async handle(message: Message) {
     if (!this.match(message)) return false;
@@ -143,6 +144,13 @@ export default (...names: string[]) =>
       }
     }
 
+    documentation() {
+      return {
+        usage: `${this.names[0]}`,
+        description: "Does a thing"
+      };
+    }
+
     match(message: Message) {
       return matchCommand(message, names);
     }
@@ -161,7 +169,7 @@ export const Permissions = {
   },
 
   guild(message: Message) {
-    return message.channel.type == "text" && message.hasOwnProperty("guild");
+    return message.channel.type == "text";
   },
 
   all() {
