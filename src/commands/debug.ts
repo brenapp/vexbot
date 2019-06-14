@@ -21,9 +21,10 @@ export class GrantCommand extends Command("grant") {
 new GrantCommand();
 
 export class DebugCommand extends Command("debug") {
-  check(message) {
-    return Permissions.owner(message) && Permissions.guild(message);
-  }
+  check = Permissions.compose(
+    Permissions.guild,
+    Permissions.owner
+  );
 
   exec(message: Message, args: string[]) {
     DEBUG = !DEBUG;
@@ -34,9 +35,10 @@ export class DebugCommand extends Command("debug") {
 new DebugCommand();
 
 export class CacheCommand extends Command("cache") {
-  check(message) {
-    return Permissions.owner(message) && Permissions.guild(message);
-  }
+  check = Permissions.compose(
+    Permissions.guild,
+    Permissions.owner
+  );
 
   async exec(message: Message, args: string[]) {
     switch (args[0]) {
@@ -66,7 +68,7 @@ export class CacheCommand extends Command("cache") {
 new CacheCommand();
 
 export class PingCommand extends Command("ping") {
-  check = () => true;
+  check = Permissions.all;
 
   async exec(message: Message, args: string[]) {
     return message.reply("Pong!");
