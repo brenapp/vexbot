@@ -6,12 +6,17 @@ import { client } from "../client";
 export class ProbateCommand extends Command("probate", "dq") {
   check = Permissions.compose(
     Permissions.admin,
-    message => !message.mentions.members.has("274004148276690944")
+    message =>
+      message.channel.type === "text" &&
+      !message.mentions.members.has("274004148276690944")
   );
 
   fail(message: Message) {
     // First, chastise for trying to put me on probation
-    if (message.mentions.members.has("274004148276690944")) {
+    if (
+      message.channel.type === "text" &&
+      message.mentions.members.has("274004148276690944")
+    ) {
       message.channel.send("nah fam");
     } else {
       message.channel.send("no u");
