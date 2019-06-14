@@ -27,12 +27,20 @@ export function isCommand(message: Message) {
   return PREFIX.includes(message.content[0]);
 }
 
-export abstract class Command {
-  handler: number;
-  name: string;
+// Command Registry
+export let REGISTRY: { [command: string]: Command } = {};
 
-  constructor() {
-    this.handler = addMessageHandler(this.handle);
+export abstract class Command {
+  names: string[];
+
+  static execute(message: Message) {
+    const command = Object.values(REGISTRY).find(cmd => cmd.match(message));
+
+    if (!command) {
+      return false;
+    }
+
+    return command.handle(message);
   }
 
   abstract match(message: Message): boolean;
@@ -88,7 +96,9 @@ export abstract class Command {
   }
 
   unregister() {
-    return removeMessageHandler(this.handler);
+    for (let name in this.names) {
+      delete REGISTRY[name];
+    }
   }
 
   /**
@@ -120,7 +130,12 @@ export default (...names: string[]) =>
   class NamedCommand extends Command {
     constructor() {
       super();
-      this.name = names[0];
+      this.names = names;
+
+      // Add the instance of myself to the registry
+      for (let name in names) {
+        REGISTRY[name] = this;
+      }
     }
 
     match(message: Message) {

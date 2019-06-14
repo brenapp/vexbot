@@ -64,7 +64,7 @@ async function getTotals(store: SQLiteStore, guild: Guild) {
   class LeaderboardCommand extends Command("leaderboard") {
     check = Permissions.guild;
 
-    names = {
+    titles = {
       "Secret Top Tier": "messages",
       "People With No Lives": "hours on VTOSC",
       "VEX Gods": "world championships",
@@ -85,8 +85,8 @@ async function getTotals(store: SQLiteStore, guild: Guild) {
         .slice(0, +args[0] || 10)
         .map(v => client.users.get(v.key));
 
-      const title = Object.keys(this.names)[
-        Math.round(Object.keys(this.names).length * Math.random())
+      const title = Object.keys(this.titles)[
+        Math.round(Object.keys(this.titles).length * Math.random())
       ];
 
       const embed = makeEmbed(message)
@@ -94,7 +94,7 @@ async function getTotals(store: SQLiteStore, guild: Guild) {
         .setDescription(
           leaderboard
             .map(
-              (k, i) => `${i + 1}. ${k} — ${top[i].value} ${this.names[title]}`
+              (k, i) => `${i + 1}. ${k} — ${top[i].value} ${this.titles[title]}`
             )
             .join("\n")
         );
