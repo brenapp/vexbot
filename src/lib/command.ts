@@ -27,8 +27,9 @@ export function isCommand(message: Message) {
   return PREFIX.includes(message.content[0]);
 }
 
-// Command Registry
+// Command Registry & Responses
 export let REGISTRY: { [command: string]: Command } = {};
+export let RESPONSES: { [id: string]: Message } = {};
 
 export abstract class Command {
   names: string[];
@@ -60,13 +61,17 @@ export abstract class Command {
     const response = await this.exec(message, args);
 
     if (response) {
-      let message = response instanceof Array ? response[0] : response;
-      if (message.embeds.length > 0) {
-        let embed = message.embeds[0];
+      let resp = response instanceof Array ? response[0] : response;
+
+      // Record response
+      RESPONSES[message.id] = resp;
+
+      if (resp.embeds.length > 0) {
+        let embed = resp.embeds[0];
         embed.footer.text += ` (took ${Date.now() - start}ms)`;
 
         // Copy over embed
-        const replacement = makeEmbed(message)
+        const replacement = makeEmbed(resp)
           .setFooter(embed.footer.text)
           .setTitle(embed.title)
           .setColor(embed.color)
@@ -82,10 +87,10 @@ export abstract class Command {
 
         replacement.fields = embed.fields;
 
-        message.edit({ embed: replacement });
+        resp.edit({ embed: replacement });
       } else {
-        message.edit(
-          message.content +
+        resp.edit(
+          resp.content +
             ` *(took ${Date.now() - start}ms${
               process.env["DEV"] ? " — DEV MODE" : ""
             })*`
