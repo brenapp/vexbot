@@ -3,7 +3,7 @@ import {
   EventsResponseObject,
   MatchesResponseObject
 } from "vexdb/out/constants/ResponseObjects";
-import Command, { makeEmbed } from "../lib/command";
+import Command, { makeEmbed, Permissions } from "../lib/command";
 import { Message } from "discord.js";
 
 function outcome(team: string, match: MatchesResponseObject) {
@@ -24,7 +24,7 @@ function outcome(team: string, match: MatchesResponseObject) {
 }
 
 export class TeamCommand extends Command("team") {
-  check = () => true;
+  check = Permissions.all;
 
   constructor() {
     super();

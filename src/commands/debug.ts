@@ -7,9 +7,10 @@ import * as keya from "keya";
 export let DEBUG = false;
 
 export class GrantCommand extends Command("grant") {
-  check(message) {
-    return Permissions.owner(message) && Permissions.guild(message);
-  }
+  check = Permissions.compose(
+    Permissions.guild,
+    Permissions.owner
+  );
 
   exec(message: Message, args: string[]) {
     const role = message.guild.roles.find(role => role.name === args.join(" "));

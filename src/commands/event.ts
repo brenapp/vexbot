@@ -3,7 +3,7 @@ import Command, { Permissions, makeEmbed } from "../lib/command";
 import * as vexdb from "vexdb";
 
 export class EventCommand extends Command("events") {
-  check = () => true;
+  check = Permissions.all;
 
   async exec(message: Message, args: string[]) {
     const [region = "South Carolina", season = "Turning Point"] = args;

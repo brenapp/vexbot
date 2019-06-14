@@ -3,7 +3,7 @@ import {
   MatchesResponseObject,
   EventsResponseObject
 } from "vexdb/out/constants/ResponseObjects";
-import Command, { makeEmbed } from "../lib/command";
+import Command, { makeEmbed, Permissions } from "../lib/command";
 import { Message } from "discord.js";
 
 async function predict(
@@ -56,7 +56,7 @@ function matchWinner(red, blue) {
 }
 
 export class PredictCommand extends Command("predict") {
-  check = () => true;
+  check = Permissions.all;
 
   async exec(message: Message, args: string[]) {
     const teams = args.slice(0, 4);

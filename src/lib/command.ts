@@ -124,5 +124,13 @@ export const Permissions = {
 
   guild(message: Message) {
     return message.channel.type == "text";
+  },
+
+  all() {
+    return true;
+  },
+
+  compose(...checks: ((message: Message) => boolean)[]) {
+    return message => checks.map(check => check(message)).every(resp => resp);
   }
 };
