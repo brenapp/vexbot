@@ -133,7 +133,7 @@ export default (...names: string[]) =>
       this.names = names;
 
       // Add the instance of myself to the registry
-      for (let name in names) {
+      for (let name of names) {
         REGISTRY[name] = this;
       }
     }
