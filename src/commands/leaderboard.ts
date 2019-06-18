@@ -64,6 +64,13 @@ async function getTotals(store: SQLiteStore, guild: Guild) {
   class LeaderboardCommand extends Command("leaderboard") {
     check = Permissions.guild;
 
+    documentation() {
+      return {
+        usage: "leaderboard",
+        description: "Lists people by their number of messages posted"
+      };
+    }
+
     titles = {
       "Secret Top Tier": "messages",
       "People With No Lives": "hours on VTOSC",
@@ -105,8 +112,15 @@ async function getTotals(store: SQLiteStore, guild: Guild) {
 
   const leaderboard = new LeaderboardCommand();
 
-  class LeaderboardTallyCommand extends Command("leaderboard.tally") {
+  class LeaderboardTallyCommand extends Command("tally") {
     check = Permissions.admin;
+
+    documentation() {
+      return {
+        description: "Tallies the leaderboard",
+        usage: "tally"
+      }
+    }
 
     async exec(message: Message) {
       await message.channel.send("Recalculating totals...");

@@ -58,6 +58,14 @@ function matchWinner(red, blue) {
 export class PredictCommand extends Command("predict") {
   check = Permissions.all;
 
+  documentation() {
+    return {
+      usage: "predict 3796B 7432E BCUZ 4478X",
+      description:
+        "Makes a match prediction (first two teams are red, second two are blue)"
+    };
+  }
+
   async exec(message: Message, args: string[]) {
     const teams = args.slice(0, 4);
 

@@ -12,8 +12,20 @@ export class GrantCommand extends Command("grant") {
     Permissions.owner
   );
 
+  documentation() {
+    return {
+      usage: "grant Role",
+      description: "Grants the user a role"
+    };
+  }
+
   exec(message: Message, args: string[]) {
     const role = message.guild.roles.find(role => role.name === args.join(" "));
+
+    if (!role) {
+      return message.channel.send("Can't find that role!");
+    }
+
     message.member.addRole(role);
   }
 }
@@ -25,6 +37,13 @@ export class DebugCommand extends Command("debug") {
     Permissions.guild,
     Permissions.owner
   );
+
+  documentation() {
+    return {
+      description: "Toggles debug mode. Owner Only Command",
+      usage: "debug"
+    };
+  }
 
   exec(message: Message, args: string[]) {
     DEBUG = !DEBUG;
@@ -39,6 +58,13 @@ export class CacheCommand extends Command("cache") {
     Permissions.guild,
     Permissions.owner
   );
+
+  documentation() {
+    return {
+      description: "Cache Management Command. Owner Only Command",
+      usage: "cache [clear|list]"
+    };
+  }
 
   async exec(message: Message, args: string[]) {
     switch (args[0]) {
@@ -69,6 +95,13 @@ new CacheCommand();
 
 export class PingCommand extends Command("ping") {
   check = Permissions.all;
+
+  documentation() {
+    return {
+      description: "Heartbeat",
+      usage: `ping`
+    };
+  }
 
   async exec(message: Message, args: string[]) {
     return message.reply("Pong!");

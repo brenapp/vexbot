@@ -5,12 +5,19 @@ import * as vexdb from "vexdb";
 export class EventCommand extends Command("events") {
   check = Permissions.all;
 
+  documentation() {
+    return {
+      description: "Lists events in a given region",
+      usage: "events South Carolina"
+    };
+  }
+
   async exec(message: Message, args: string[]) {
-    const [region = "South Carolina", season = "Turning Point"] = args;
-    const events = await vexdb.get("events", { region, season });
+    const [region = "South Carolina"] = args;
+    const events = await vexdb.get("events", { region });
 
     let body = [
-      `**${season} Events in ${region}**`,
+      `**Events in ${region}**`,
       ...events.map(
         event =>
           `[${

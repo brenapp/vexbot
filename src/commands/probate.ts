@@ -11,6 +11,13 @@ export class ProbateCommand extends Command("probate", "dq") {
       !message.mentions.members.has("274004148276690944")
   );
 
+  documentation() {
+    return {
+      usage: "[probate|dq] @MayorMonty @bradley 10m I don't like you",
+      description: "Puts listed members on probation"
+    };
+  }
+
   fail(message: Message) {
     // First, chastise for trying to put me on probation
     if (

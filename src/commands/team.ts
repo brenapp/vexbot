@@ -26,8 +26,11 @@ function outcome(team: string, match: MatchesResponseObject) {
 export class TeamCommand extends Command("team") {
   check = Permissions.all;
 
-  constructor() {
-    super();
+  documentation() {
+    return {
+      description: "Lists team record for this season",
+      usage: "team 3796B"
+    };
   }
 
   async exec(message: Message, args: string[]) {
