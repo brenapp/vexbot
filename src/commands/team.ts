@@ -29,7 +29,8 @@ export class TeamCommand extends Command("team") {
   documentation() {
     return {
       description: "Lists team record for this season",
-      usage: "team 3796B"
+      usage: "team 3796B",
+      group: "VEX"
     };
   }
 

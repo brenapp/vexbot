@@ -62,7 +62,8 @@ export class PredictCommand extends Command("predict") {
     return {
       usage: "predict 3796B 7432E BCUZ 4478X",
       description:
-        "Makes a match prediction (first two teams are red, second two are blue)"
+        "Makes a match prediction (first two teams are red, second two are blue)",
+      group: "VEX"
     };
   }
 

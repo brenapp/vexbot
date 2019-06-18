@@ -8,7 +8,8 @@ export class VerifyCommand extends Command("verify") {
   documentation() {
     return {
       description: "Manually starts verificatikon",
-      usage: "verify @MayorMonty"
+      usage: "verify @MayorMonty",
+      group: "ADMIN"
     };
   }
 

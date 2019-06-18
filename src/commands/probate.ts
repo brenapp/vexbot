@@ -14,7 +14,8 @@ export class ProbateCommand extends Command("probate", "dq") {
   documentation() {
     return {
       usage: "[probate|dq] @MayorMonty @bradley 10m I don't like you",
-      description: "Puts listed members on probation"
+      description: "Puts listed members on probation",
+      group: "ADMIN"
     };
   }
 

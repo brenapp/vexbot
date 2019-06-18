@@ -7,7 +7,8 @@ export class HelpCommand extends Command("help") {
   documentation() {
     return {
       description: "Lists all commands and usage",
-      usage: "help"
+      usage: "help",
+      group: "META"
     };
   }
 

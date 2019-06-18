@@ -118,8 +118,9 @@ async function getTotals(store: SQLiteStore, guild: Guild) {
     documentation() {
       return {
         description: "Tallies the leaderboard",
-        usage: "tally"
-      }
+        usage: "tally",
+        group: "SERVER"
+      };
     }
 
     async exec(message: Message) {

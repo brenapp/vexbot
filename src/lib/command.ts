@@ -147,7 +147,8 @@ export default (...names: string[]) =>
     documentation() {
       return {
         usage: `${this.names[0]}`,
-        description: "Does a thing"
+        description: "",
+        group: "default"
       };
     }
 

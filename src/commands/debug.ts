@@ -15,7 +15,8 @@ export class GrantCommand extends Command("grant") {
   documentation() {
     return {
       usage: "grant Role",
-      description: "Grants the user a role"
+      description: "Grants the user a role",
+      group: "Owner Only"
     };
   }
 
@@ -41,7 +42,8 @@ export class DebugCommand extends Command("debug") {
   documentation() {
     return {
       description: "Toggles debug mode. Owner Only Command",
-      usage: "debug"
+      usage: "debug",
+      group: "Owner Only"
     };
   }
 
@@ -61,8 +63,9 @@ export class CacheCommand extends Command("cache") {
 
   documentation() {
     return {
-      description: "Cache Management Command. Owner Only Command",
-      usage: "cache [clear|list]"
+      description: "Cache Management",
+      usage: "cache [clear|list]",
+      group: "Owner Only"
     };
   }
 
@@ -99,7 +102,8 @@ export class PingCommand extends Command("ping") {
   documentation() {
     return {
       description: "Heartbeat",
-      usage: `ping`
+      usage: `ping`,
+      group: "Meta"
     };
   }
 

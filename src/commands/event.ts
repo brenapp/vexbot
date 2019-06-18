@@ -8,7 +8,8 @@ export class EventCommand extends Command("events") {
   documentation() {
     return {
       description: "Lists events in a given region",
-      usage: "events South Carolina"
+      usage: "events South Carolina",
+      group: "VEX"
     };
   }
 
