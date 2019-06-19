@@ -38,7 +38,6 @@ addMessageHandler(async message => {
     "drow-for-gdc",
     "sadie",
     "bradleys-snoring",
-    "dog-leeks",
     "admin-chat",
     "zach-for-gdc",
     "important-studying-chat"
