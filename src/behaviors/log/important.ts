@@ -1,5 +1,12 @@
 import { client } from "../../client";
-import { Guild, TextChannel, Collection, Role } from "discord.js";
+import {
+  Guild,
+  TextChannel,
+  Collection,
+  Role,
+  GuildMember,
+  User
+} from "discord.js";
 import { makeEmbed } from "../../lib/command";
 
 // Notify #event-log about important events
@@ -20,22 +27,22 @@ function changedRoles(
 }
 
 // Administrative
-client.on("guildBanAdd", (guild, user) => {
+client.on("guildBanAdd", (guild: Guild, user: User) => {
   const log = serverlog(guild);
 
   log.send(`:banhammer: ${user} was banned!`);
 });
 
-client.on("guildBanRemove", (guild, user) => {
+client.on("guildBanRemove", (guild: Guild, user: User) => {
   const log = serverlog(guild);
 
   log.send(`:banhammer: ${user} was unbanned!`);
 });
 
-client.on("guildMemberRemove", (guild, user) => {
-  const log = serverlog(guild);
+client.on("guildMemberRemove", (member: GuildMember) => {
+  const log = serverlog(member.guild);
 
-  log.send(`:banhammer: ${user} left or was kicked`);
+  log.send(`:banhammer: ${member} left or was kicked`);
 });
 
 // User changes/actions
