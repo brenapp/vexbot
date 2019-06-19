@@ -1,4 +1,9 @@
-import Command, { Permissions, REGISTRY, PREFIX } from "../lib/command";
+import Command, {
+  Permissions,
+  REGISTRY,
+  PREFIX,
+  Command as cmd
+} from "../lib/command";
 import { Message } from "discord.js";
 
 export class HelpCommand extends Command("help") {
@@ -13,6 +18,13 @@ export class HelpCommand extends Command("help") {
   }
 
   async exec(message: Message) {
+    const groups: { [key: string]: cmd[] } = {
+      META: [],
+      VEX: [],
+      OWNER: [],
+      ADMIN: []
+    };
+
     let commands = Object.values(REGISTRY).filter(
       (cmd, i, array) => i === array.findIndex(c => c.names[0] === cmd.names[0])
     );
@@ -21,16 +33,22 @@ export class HelpCommand extends Command("help") {
     let allowedIndex = await Promise.all(
       commands.map(cmd => cmd.check(message))
     );
-    let allowed = commands.filter((cmd, i) => allowedIndex[i]);
-
-    console.log(REGISTRY);
+    commands.map(
+      (cmd, i) => allowedIndex[i] && groups[cmd.documentation().group].push(cmd)
+    );
 
     let body = "Here's what I can do!\n\n";
 
-    allowed.forEach(cmd => {
-      body += cmd.names.map(n => `__${n}__`).join(" or ") + ": ";
-      body += cmd.documentation().description + " ";
-      body += `\`${PREFIX[0]}${cmd.documentation().usage}\`\n`;
+    Object.keys(groups).forEach(name => {
+      const group = groups[name];
+
+      body += `**${name}**\n\n`;
+
+      group.forEach(cmd => {
+        body += cmd.names.map(n => `__${n}__`).join(" or ") + ": ";
+        body += cmd.documentation().description + " ";
+        body += `\`${PREFIX[0]}${cmd.documentation().usage}\`\n`;
+      });
     });
 
     body += "\nRemember to keep most bot usage in the appropriate channel!";

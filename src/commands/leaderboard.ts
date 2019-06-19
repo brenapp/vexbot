@@ -67,7 +67,8 @@ async function getTotals(store: SQLiteStore, guild: Guild) {
     documentation() {
       return {
         usage: "leaderboard",
-        description: "Lists people by their number of messages posted"
+        description: "Lists people by their number of messages posted",
+        group: "META"
       };
     }
 
@@ -119,7 +120,7 @@ async function getTotals(store: SQLiteStore, guild: Guild) {
       return {
         description: "Tallies the leaderboard",
         usage: "tally",
-        group: "SERVER"
+        group: "META"
       };
     }
 

@@ -45,7 +45,11 @@ export abstract class Command {
   }
 
   abstract match(message: Message): boolean;
-  abstract documentation(): { description: string; usage: string };
+  abstract documentation(): {
+    description: string;
+    usage: string;
+    group: string;
+  };
 
   async handle(message: Message) {
     if (!this.match(message)) return false;
