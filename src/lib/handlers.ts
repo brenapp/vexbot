@@ -17,8 +17,6 @@ client.on("messageUpdate", (old, current) => {
     return false;
   }
 
-  console.log(Object.keys(RESPONSES), old.id);
-
   // If the old message was a command, delete the old response
   if (isCommand(old) && RESPONSES[old.id]) {
     RESPONSES[old.id].delete();
