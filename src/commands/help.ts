@@ -33,16 +33,17 @@ export class HelpCommand extends Command("help") {
     let allowedIndex = await Promise.all(
       commands.map(cmd => cmd.check(message))
     );
-    commands.map(
-      (cmd, i) => allowedIndex[i] && groups[cmd.documentation().group].push(cmd)
-    );
+    commands.forEach((cmd, i) => {
+      if (allowedIndex[i])
+        groups[cmd.documentation().group.toUpperCase()].push(cmd);
+    });
 
-    let body = "Here's what I can do!\n\n";
+    let body = "Here's what I can do!";
 
     Object.keys(groups).forEach(name => {
       const group = groups[name];
 
-      body += `**${name}**\n\n`;
+      body += `\n\n**${name}**\n`;
 
       group.forEach(cmd => {
         body += cmd.names.map(n => `__${n}__`).join(" or ") + ": ";
