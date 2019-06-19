@@ -6,12 +6,14 @@ export const PREFIX = process.env["DEV"] ? ["."] : ["/", "!"];
 
 export function makeEmbed(message?: Message) {
   const embed = new RichEmbed().setTimestamp();
-  const invoker =
-    message.channel.type === "text"
-      ? message.member.displayName
-      : message.author.username;
 
-  if (message) embed.setFooter(`Invoked by ${invoker}`);
+  if (message) {
+    const invoker =
+      message.channel.type === "text"
+        ? message.member.displayName
+        : message.author.username;
+    embed.setFooter(`Invoked by ${invoker}`);
+  }
 
   return embed;
 }
