@@ -16,7 +16,7 @@ export class GrantCommand extends Command("grant") {
     return {
       usage: "grant Role",
       description: "Grants the user a role",
-      group: "Owner Only"
+      group: "Owner"
     };
   }
 
@@ -43,7 +43,7 @@ export class DebugCommand extends Command("debug") {
     return {
       description: "Toggles debug mode. Owner Only Command",
       usage: "debug",
-      group: "Owner Only"
+      group: "Owner"
     };
   }
 
@@ -65,7 +65,7 @@ export class CacheCommand extends Command("cache") {
     return {
       description: "Cache Management",
       usage: "cache [clear|list]",
-      group: "Owner Only"
+      group: "Owner"
     };
   }
 
