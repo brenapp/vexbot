@@ -65,7 +65,10 @@ export class EventCommand extends Command("events") {
         params = {};
         break;
       case "Signature":
-        params = { name: name => name.includes("Signature Event") };
+        params = {
+          name: name => name.includes("Signature Event")
+        };
+        break;
       default:
         params = { region };
         break;
@@ -87,7 +90,7 @@ export class EventCommand extends Command("events") {
 
     events.forEach(({ event, open, capacity }) => {
       embed.addField(
-        `[${new Date(Date.parse(event.start)).toLocaleDateString()}] ${
+        `[${new Date(Date.parse(event.end)).toLocaleDateString()}] ${
           event.name
         }`,
         `${open} open / ${capacity} teams @ ${event.loc_venue} (${
