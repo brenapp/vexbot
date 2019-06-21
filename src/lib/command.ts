@@ -36,7 +36,7 @@ export let RESPONSES: { [id: string]: Message } = {};
 export abstract class Command {
   names: string[];
 
-  static execute(message: Message) {
+  static async execute(message: Message) {
     // Ignore commands from not me in DEV Mode
     if (process.env["DEV"] && message.author.id !== "274004148276690944") {
       await message.channel.send("no u");
