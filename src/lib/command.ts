@@ -37,10 +37,9 @@ export abstract class Command {
   names: string[];
 
   static execute(message: Message) {
-
     // Ignore commands from not me in DEV Mode
     if (process.env["DEV"] && message.author.id !== "274004148276690944") {
-      return false;
+      return message.channel.send("no u");
     }
 
     const command = Object.values(REGISTRY).find(cmd => cmd.match(message));
