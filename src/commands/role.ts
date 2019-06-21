@@ -18,7 +18,6 @@ export class GrantCommand extends Command("grant") {
 
   exec(message: Message, args: string[]) {
     let name = args.slice(message.mentions.members.size).join(" ");
-    console.log(name);
     const role = message.guild.roles.find(role => role.name === name);
 
     if (!role) {
