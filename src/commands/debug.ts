@@ -6,32 +6,6 @@ import * as keya from "keya";
 
 export let DEBUG = false;
 
-export class GrantCommand extends Command("grant") {
-  check = Permissions.compose(
-    Permissions.guild,
-    Permissions.owner
-  );
-
-  documentation() {
-    return {
-      usage: "grant Role",
-      description: "Grants the user a role",
-      group: "Owner"
-    };
-  }
-
-  exec(message: Message, args: string[]) {
-    const role = message.guild.roles.find(role => role.name === args.join(" "));
-
-    if (!role) {
-      return message.channel.send("Can't find that role!");
-    }
-
-    message.member.addRole(role);
-  }
-}
-
-new GrantCommand();
 
 export class DebugCommand extends Command("debug") {
   check = Permissions.compose(
