@@ -1,7 +1,7 @@
 import { addMessageHandler } from "../lib/message";
 import { client } from "../client";
 
-import { PREFIX } from "../lib/command";
+import { PREFIX, isCommand } from "../lib/command";
 
 /**
  * Random behaviors
@@ -16,7 +16,7 @@ addMessageHandler(message => {
 
 // Rename #regret to something random
 addMessageHandler(async message => {
-  if (!PREFIX.includes(message.content[0])) return false;
+  if (!isCommand(message)) return false;
 
   if (!message.guild) return false;
   if (message.guild.id != "310820885240217600") return false;
