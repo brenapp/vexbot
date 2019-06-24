@@ -15,6 +15,7 @@
     "cheerio": "^1.0.0-rc.3",
     "discord.js": "^11.3.2",
     "express": "^4.16.3",
+    "googleapis": "^40.0.0",
     "keya": "^1.1.2",
     "parse-duration": "^0.1.1",
     "sqlite": "^3.0.3",
