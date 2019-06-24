@@ -12,6 +12,7 @@ import "./behaviors/log";
 import "./behaviors/random";
 import "./behaviors/eliza";
 import * as probation from "./behaviors/probation";
+import "./behaviors/volunteers";
 
 client.on("ready", () => {
   console.log("vexbot#0599 is online!");
