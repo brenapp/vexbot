@@ -43,6 +43,10 @@ export class HelpCommand extends Command("help") {
     Object.keys(groups).forEach(name => {
       const group = groups[name];
 
+      if (!group.length) {
+        return;
+      }
+
       body += `\n\n**${name}**\n`;
 
       group.forEach(cmd => {
