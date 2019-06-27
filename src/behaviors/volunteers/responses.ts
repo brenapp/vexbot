@@ -57,4 +57,9 @@ export class Response {
     this.volunteers.referees = Number.parseInt(response[10]);
     this.volunteers.management = Number.parseInt(response[11]);
   }
+
+  toJSON() {
+    const { ep, event, volunteers } = this;
+    return { ep, event, volunteers };
+  }
 }
