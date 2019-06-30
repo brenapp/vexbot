@@ -33,7 +33,7 @@ handler.on("push", async event => {
     )}Deploying changes now...`
   );
   const subprocess = execa.command("sh deploy.sh");
-  let body = exec.prompt + "\n";
+  let body = exec.prompt + " sh deploy.sh\n";
   const message = (await report(`\`\`\`${body}\`\`\``)) as Message;
 
   subprocess.stdout.on("data", chunk => {
