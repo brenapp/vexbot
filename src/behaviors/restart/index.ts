@@ -29,9 +29,13 @@ handler.on("push", function(event) {
       commit => `\`\`\`${commit.message}\`\`\``
     )}Deploying changes now...`
   );
-  const subprocess = child_process.spawn("sh", [join(__dirname, "deploy.sh")], {
-    detached: true
-  });
+  const subprocess = child_process.spawn(
+    "sh",
+    [join(__dirname, "../../../deploy.sh")],
+    {
+      detached: true
+    }
+  );
 
   subprocess.stdout.on("data", chunk => report(`\`\`\`${chunk}\`\`\``));
   subprocess.stderr.on("data", chunk => report(`\`\`\`${chunk}\`\`\``));
