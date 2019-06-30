@@ -29,6 +29,8 @@ http
 handler.on("push", async event => {
   if (process.env["DEV"]) return;
 
+  console.log(event.payload);
+
   report(
     `**PUSH RECIEVED**\n[Changes](${
       event.payload.compare
