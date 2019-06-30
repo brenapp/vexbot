@@ -24,9 +24,6 @@ client.on("ready", () => {
   }
 
   probation.initalize();
-
-  if (!process.env["DEV"]) {
-  }
 });
 
 const reporter = report(client);
