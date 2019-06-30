@@ -61,7 +61,6 @@ async function approval(embed: RichEmbed) {
           resolve(true);
         }
         collector.emit("end");
-        approval.clearReactions();
         clearTimeout(timeout);
 
         resolve(false);
