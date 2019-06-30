@@ -12,7 +12,9 @@ import execa from "execa";
 import { exec } from "../../commands/debug";
 import { Message } from "discord.js";
 
-const handler = createHandler({ path: "/webhook", secret: "vexbot" });
+const secret = require("../../../config.json").github.webhook.secret;
+
+const handler = createHandler({ path: "/webhook", secret });
 const report = information(client);
 
 http
