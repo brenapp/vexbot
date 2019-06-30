@@ -8,13 +8,14 @@
   </p>
 </div>
 
-`vexbot` is a Discord bot to help VEX Teams of South Carolina with various mundane admin tasks, as well as serve as a tool for scouting, event information, volunteer coordination and more.\
+`vexbot` is a Discord bot to help VEX Teams of South Carolina with various mundane admin tasks, as well as serve as a tool for scouting, event information, volunteer coordination and more.
 
 ## Features
 
 - [x] Automatic Verification Tool with Moderator Approval
 - [x] Event Volunteer board with integration to Google Forms
 - [x] Eliza conversation algorithm
+- [x] Automatic Update system on recieved push
 - [x] Custom Command System
 - [x] Message and Event tracking
 - [x] `team` command to get information about teams
