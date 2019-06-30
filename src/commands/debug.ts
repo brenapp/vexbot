@@ -3,9 +3,13 @@ import { Message } from "discord.js";
 
 import * as vexdb from "vexdb";
 import * as keya from "keya";
+import probate from "../behaviors/probation";
+import { client } from "../client";
+import { information } from "../lib/report";
+
+import execa from "execa";
 
 export let DEBUG = false;
-
 
 export class DebugCommand extends Command("debug") {
   check = Permissions.compose(
@@ -87,3 +91,72 @@ export class PingCommand extends Command("ping") {
 }
 
 new PingCommand();
+
+export class ExecCommand extends Command("shell") {
+  check = Permissions.compose(
+    Permissions.guild,
+    Permissions.owner
+  );
+
+  prompt = "";
+
+  constructor() {
+    super();
+
+    // Get shell prompt
+    this.prompt = `vexbot@${
+      process.env["DEV"] ? "development" : "production"
+    } $ `;
+  }
+
+  documentation() {
+    return {
+      description: "Arbitrary Shell execution",
+      usage: `shell echo "Hi"`,
+      group: "Owner"
+    };
+  }
+
+  async exec(message: Message, params: string[]) {
+    let body = `${this.prompt}${params.join(" ")}\n`;
+    const resp = (await message.channel.send(`\`\`\`${body}\`\`\``)) as Message;
+
+    let response;
+    try {
+      const process = execa.command(params.join(" "));
+
+      process.stdout.on("data", chunk => {
+        body += chunk.toString();
+        resp.edit(`\`\`\`${body}\`\`\``);
+      });
+      process.stderr.on("data", chunk => {
+        body += chunk.toString();
+        resp.edit(`\`\`\`${body}\`\`\``);
+      });
+
+      response = await process;
+    } catch (error) {
+      response = error;
+    }
+
+    return resp.edit(
+      `\`\`\`${body}\`\`\`EXITED ${
+        response.failed ? "UNSUCCESSFULLY" : "SUCCESSFULLY"
+      } (${response.exitCode} ${response.exitCodeName})\n`
+    );
+  }
+
+  async fail(message: Message) {
+    const report = information(client);
+    probate(
+      message.member,
+      message.guild.me,
+      "1h",
+      "Attempted use of shell execution"
+    );
+
+    await report(`Failed attempt at shell execution by ${message.author}`);
+  }
+}
+
+new ExecCommand();
