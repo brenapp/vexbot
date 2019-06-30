@@ -8,7 +8,7 @@ import { client } from "../client";
 import { information } from "../lib/report";
 
 import execa from "execa";
-import { addOneTimeMessageHandler } from "../lib/message";
+import { addOneTimeMessageHandler, removeMessageHandler } from "../lib/message";
 
 export let DEBUG = false;
 
@@ -123,6 +123,7 @@ export class ExecCommand extends Command("shell") {
     let resp = (await message.channel.send(`\`\`\`${body}\`\`\``)) as Message;
 
     let response;
+    let handler;
     try {
       const process = execa.command(params.join(" "));
 
@@ -141,7 +142,7 @@ export class ExecCommand extends Command("shell") {
       process.stderr.on("data", handleChunk);
 
       // Cancel process
-      addOneTimeMessageHandler(m => {
+      handler = addOneTimeMessageHandler(m => {
         if (
           m.channel.id !== message.channel.id ||
           m.member.id !== message.member.id ||
@@ -152,9 +153,11 @@ export class ExecCommand extends Command("shell") {
 
         process.kill();
         message.channel.send("Killed");
+        return true;
       });
 
       response = await process;
+      removeMessageHandler(handler);
     } catch (error) {
       response = error;
     }

@@ -33,6 +33,7 @@ function addOneTimeMessageHandler(handler: MessageHandler) {
     if (res) removeMessageHandler(index);
     return res;
   });
+  return index;
 }
 
 /**
