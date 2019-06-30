@@ -1,6 +1,3 @@
-# Go to the right place
-cd vexbot;
-
 # Update from GitHub
 git pull;
 
