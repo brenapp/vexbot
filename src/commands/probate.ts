@@ -3,12 +3,14 @@ import probate from "../behaviors/probation";
 import Command, { Permissions } from "../lib/command";
 import { client } from "../client";
 
+const { owner } = require("../../config.json").discord;
+
 export class ProbateCommand extends Command("probate", "dq") {
   check = Permissions.compose(
     Permissions.admin,
     message =>
       message.channel.type === "text" &&
-      !message.mentions.members.has("274004148276690944")
+      !message.mentions.members.has(owner)
   );
 
   documentation() {
@@ -23,7 +25,7 @@ export class ProbateCommand extends Command("probate", "dq") {
     // First, chastise for trying to put me on probation
     if (
       message.channel.type === "text" &&
-      message.mentions.members.has("274004148276690944")
+      message.mentions.members.has(owner)
     ) {
       message.channel.send("nah fam");
     } else {

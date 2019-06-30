@@ -4,6 +4,8 @@ import { client } from "../client";
 
 export const PREFIX = process.env["DEV"] ? ["."] : ["/", "!"];
 
+const cng = require("../../config.json").discord;
+
 export function makeEmbed(message?: Message) {
   const embed = new RichEmbed().setTimestamp();
 
@@ -37,11 +39,6 @@ export abstract class Command {
   names: string[];
 
   static async execute(message: Message) {
-    // Ignore commands from not me in DEV Mode
-    if (process.env["DEV"] && message.author.id !== "274004148276690944") {
-      return false;
-    }
-
     const command = Object.values(REGISTRY).find(cmd => cmd.match(message));
 
     if (!command) {
@@ -177,7 +174,7 @@ export const Permissions = {
   },
 
   owner(message: Message) {
-    return message.author.id === "274004148276690944";
+    return message.author.id === cng.owner;
   },
 
   guild(message: Message) {
