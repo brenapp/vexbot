@@ -8,6 +8,7 @@ import { client } from "../client";
 import { information } from "../lib/report";
 
 import execa from "execa";
+import { addOneTimeMessageHandler } from "../lib/message";
 
 export let DEBUG = false;
 
@@ -138,6 +139,20 @@ export class ExecCommand extends Command("shell") {
 
       process.stdout.on("data", handleChunk);
       process.stderr.on("data", handleChunk);
+
+      // Cancel process
+      addOneTimeMessageHandler(m => {
+        if (
+          m.channel.id !== message.channel.id ||
+          m.member.id !== message.member.id ||
+          m.content !== "exit"
+        ) {
+          return false;
+        }
+
+        process.kill();
+        message.channel.send("Killed");
+      });
 
       response = await process;
     } catch (error) {
