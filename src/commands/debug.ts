@@ -9,6 +9,7 @@ import { information } from "../lib/report";
 
 import execa from "execa";
 import { addOneTimeMessageHandler, removeMessageHandler } from "../lib/message";
+import { code } from "../lib/util";
 
 export let DEBUG = false;
 
@@ -120,7 +121,7 @@ export class ExecCommand extends Command("shell") {
 
   async exec(message: Message, params: string[]) {
     let body = `${this.prompt}${params.join(" ")}\n`;
-    let resp = (await message.channel.send(`\`\`\`${body}\`\`\``)) as Message;
+    let resp = (await message.channel.send(code(body))) as Message;
 
     let response;
     let handler;
@@ -131,10 +132,10 @@ export class ExecCommand extends Command("shell") {
         // If length would be exceed
         if (body.length + chunk.length > 1900) {
           body = chunk;
-          resp = (await message.channel.send(`\`\`\`${body}\`\`\``)) as Message;
+          resp = (await message.channel.send(code(body))) as Message;
         } else {
           body += chunk;
-          await resp.edit(`\`\`\`${body}\`\`\``);
+          await resp.edit(code(body));
         }
       }
 
@@ -163,7 +164,7 @@ export class ExecCommand extends Command("shell") {
     }
 
     return resp.edit(
-      `\`\`\`${body}\`\`\`EXITED ${
+      `${code(body)}EXITED ${
         response.failed ? "UNSUCCESSFULLY" : "SUCCESSFULLY"
       } (${response.exitCode} ${response.exitCodeName})\n`
     );

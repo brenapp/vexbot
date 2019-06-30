@@ -11,6 +11,7 @@ import { join } from "path";
 import execa from "execa";
 import { exec } from "../../commands/debug";
 import { Message } from "discord.js";
+import { code } from "../../lib/util";
 
 const secret = require("../../../config.json").github.webhook.secret;
 
@@ -31,19 +32,19 @@ handler.on("push", async event => {
 
   report(
     `**PUSH RECIEVED**\n\n*Commits*${event.payload.commits
-      .map(commit => `\`\`\`${commit.id.slice(0, 7)} ${commit.message}\`\`\``)
+      .map(commit => code(`${commit.id.slice(0, 6)} ${commit.message}`))
       .join("\n")}\n\n*Log*`
   );
   const subprocess = execa.command("sh deploy.sh");
   let body = exec.prompt + " sh deploy.sh\n";
-  const message = (await report(`\`\`\`${body}\`\`\``)) as Message;
+  const message = (await report(code(body))) as Message;
 
   subprocess.stdout.on("data", chunk => {
     body += chunk.toString();
-    message.edit(`\`\`\`${body}\`\`\``);
+    message.edit(code(body));
   });
   subprocess.stderr.on("data", chunk => {
     body += chunk.toString();
-    message.edit(`\`\`\`${body}\`\`\``);
+    message.edit(code(body));
   });
 });
