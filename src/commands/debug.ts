@@ -119,20 +119,25 @@ export class ExecCommand extends Command("shell") {
 
   async exec(message: Message, params: string[]) {
     let body = `${this.prompt}${params.join(" ")}\n`;
-    const resp = (await message.channel.send(`\`\`\`${body}\`\`\``)) as Message;
+    let resp = (await message.channel.send(`\`\`\`${body}\`\`\``)) as Message;
 
     let response;
     try {
       const process = execa.command(params.join(" "));
 
-      process.stdout.on("data", chunk => {
-        body += chunk.toString();
-        resp.edit(`\`\`\`${body}\`\`\``);
-      });
-      process.stderr.on("data", chunk => {
-        body += chunk.toString();
-        resp.edit(`\`\`\`${body}\`\`\``);
-      });
+      async function handleChunk(chunk: any) {
+        // If length would be exceed
+        if (body.length + chunk.length > 1900) {
+          body = chunk;
+          resp = (await message.channel.send(`\`\`\`${body}\`\`\``)) as Message;
+        } else {
+          body += chunk;
+          await resp.edit(`\`\`\`${body}\`\`\``);
+        }
+      }
+
+      process.stdout.on("data", handleChunk);
+      process.stderr.on("data", handleChunk);
 
       response = await process;
     } catch (error) {
