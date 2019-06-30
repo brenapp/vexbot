@@ -12,7 +12,6 @@ import "./behaviors/log";
 import "./behaviors/random";
 import "./behaviors/eliza";
 import * as probation from "./behaviors/probation";
-import * as volunteers from "./behaviors/volunteers";
 
 client.on("ready", () => {
   console.log("vexbot#0599 is online!");
@@ -24,7 +23,6 @@ client.on("ready", () => {
   }
 
   probation.initalize();
-  volunteers.updateListings();
 });
 
 const reporter = report(client);
