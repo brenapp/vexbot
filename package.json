@@ -16,6 +16,7 @@
     "discord.js": "^11.3.2",
     "execa": "^2.0.1",
     "express": "^4.16.3",
+    "github-webhook-handler": "^0.7.1",
     "googleapis": "^40.0.0",
     "keya": "^1.1.2",
     "parse-duration": "^0.1.1",

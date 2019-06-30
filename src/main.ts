@@ -11,6 +11,7 @@ import "./commands";
 import "./behaviors/log";
 import "./behaviors/random";
 import "./behaviors/eliza";
+import "./behaviors/restart";
 import * as probation from "./behaviors/probation";
 
 client.on("ready", () => {
@@ -23,6 +24,9 @@ client.on("ready", () => {
   }
 
   probation.initalize();
+
+  if (!process.env["DEV"]) {
+  }
 });
 
 const reporter = report(client);
