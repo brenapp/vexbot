@@ -32,6 +32,6 @@ handler.on("push", function(event) {
     detached: true
   });
 
-  subprocess.stdout.on("data", report);
-  subprocess.stderr.on("data", report);
+  subprocess.stdout.on("data", chunk => report(`\`\`\`${chunk}\`\`\``));
+  subprocess.stderr.on("data", chunk => report(`\`\`\`${chunk}\`\`\``));
 });
