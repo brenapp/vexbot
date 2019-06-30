@@ -30,9 +30,7 @@ handler.on("push", async event => {
   if (process.env["DEV"]) return;
 
   report(
-    `**PUSH RECIEVED**\n[Changes](${
-      event.payload.compare
-    })\n\n*Commits*${event.payload.commits
+    `**PUSH RECIEVED**\n\n*Commits*${event.payload.commits
       .map(commit => `\`\`\`${commit.id.slice(0, 7)} ${commit.message}\`\`\``)
       .join("\n")}\n\n*Log*`
   );
