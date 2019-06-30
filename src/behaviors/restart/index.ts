@@ -25,10 +25,17 @@ handler.on("push", function(event) {
   if (process.env["DEV"]) return;
 
   console.log(event.payload);
-  report("Recieved push, restarting...");
-  child_process
-    .spawn("sh", [join(__dirname, "../deploy.sh")], {
+  report(
+    `Recieved push, restarting...\n\`\`\`${JSON.stringify(event.payload)}\`\`\``
+  );
+  const subprocess = child_process.spawn(
+    "sh",
+    [join(__dirname, "../deploy.sh")],
+    {
       detached: true
-    })
-    .stdout.on("data", report);
+    }
+  );
+
+  subprocess.stdout.on("data", report);
+  subprocess.stderr.on("data", report);
 });
