@@ -24,9 +24,10 @@ http
 handler.on("push", function(event) {
   if (process.env["DEV"]) return;
 
-  console.log(event.payload);
   report(
-    `Recieved push, restarting...\n\`\`\`${JSON.stringify(event.payload)}\`\`\``
+    `**PUSH RECIEVED**\n${event.payload.commits.map(
+      commit => `\`\`\`${commit.message}\`\`\``
+    )}Deploying changes now...`
   );
   const subprocess = child_process.spawn("sh", [join(__dirname, "deploy.sh")], {
     detached: true
