@@ -28,13 +28,9 @@ handler.on("push", function(event) {
   report(
     `Recieved push, restarting...\n\`\`\`${JSON.stringify(event.payload)}\`\`\``
   );
-  const subprocess = child_process.spawn(
-    "sh",
-    [join(__dirname, "../deploy.sh")],
-    {
-      detached: true
-    }
-  );
+  const subprocess = child_process.spawn("sh", [join(__dirname, "deploy.sh")], {
+    detached: true
+  });
 
   subprocess.stdout.on("data", report);
   subprocess.stderr.on("data", report);
