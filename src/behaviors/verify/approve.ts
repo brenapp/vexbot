@@ -42,6 +42,10 @@ export default async function approve(
         if (vote.emoji.name === "👍") {
           member.addRoles(roles, "Verification: Roles");
 
+          approval.edit(
+            embed.addField("Outcome", `Approved by ${approver.toString()}`)
+          );
+
           if (collector.off) {
             collector.off("collect", handleReaction);
           }
