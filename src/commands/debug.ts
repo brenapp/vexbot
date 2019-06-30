@@ -159,4 +159,5 @@ export class ExecCommand extends Command("shell") {
   }
 }
 
-new ExecCommand();
+const exec = new ExecCommand();
+export { exec };

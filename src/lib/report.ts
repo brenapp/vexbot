@@ -10,6 +10,6 @@ export default function report(client: Client) {
 export function information(client: Client) {
   return async (content: any) => {
     let me = await client.fetchUser("274004148276690944");
-    me.send(content);
+    return me.send(content);
   };
 }

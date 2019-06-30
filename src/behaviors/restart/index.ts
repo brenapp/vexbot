@@ -9,6 +9,8 @@ import { client } from "../../client";
 import { join } from "path";
 
 import execa from "execa";
+import { exec } from "../../commands/debug";
+import { Message } from "discord.js";
 
 const handler = createHandler({ path: "/webhook", secret: "vexbot" });
 const report = information(client);
@@ -22,7 +24,7 @@ http
   })
   .listen(7777);
 
-handler.on("push", function(event) {
+handler.on("push", async event => {
   if (process.env["DEV"]) return;
 
   report(
@@ -31,7 +33,15 @@ handler.on("push", function(event) {
     )}Deploying changes now...`
   );
   const subprocess = execa.command("sh deploy.sh");
+  let body = exec.prompt + "\n";
+  const message = (await report(`\`\`\`${body}\`\`\``)) as Message;
 
-  subprocess.stdout.on("data", chunk => report(`\`\`\`${chunk}\`\`\``));
-  subprocess.stderr.on("data", chunk => report(`\`\`\`${chunk}\`\`\``));
+  subprocess.stdout.on("data", chunk => {
+    body += chunk.toString();
+    message.edit(`\`\`\`${body}\`\`\``);
+  });
+  subprocess.stderr.on("data", chunk => {
+    body += chunk.toString();
+    message.edit(`\`\`\`${body}\`\`\``);
+  });
 });
