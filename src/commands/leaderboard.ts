@@ -75,7 +75,7 @@ async function getTotals(store: SQLiteStore, guild: Guild) {
     titles = {
       "Secret Top Tier": "messages",
       "People With No Lives": "hours on VTOSC",
-      "VEX Gods": "world championships",
+      "VEX Gods": "red trophies",
       "Banhammer Incoming": "illegal messages",
       "IQ Scores": "points",
       "Programming Wizards": "pt autonomous",
