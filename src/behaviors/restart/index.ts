@@ -30,9 +30,9 @@ handler.on("push", async event => {
   if (process.env["DEV"]) return;
 
   report(
-    `**PUSH RECIEVED**\n\nCommits:${event.payload.commits.map(
-      commit => `\`\`\`${commit.sha} ${commit.message}\`\`\``
-    )}\nRebooting...`
+    `**PUSH RECIEVED**\n\nCommits:${event.payload.commits
+      .map(commit => `\`\`\`${commit.sha} ${commit.message}\`\`\``)
+      .join("")}\nRebooting...`
   );
   const subprocess = execa.command("sh deploy.sh");
   let body = exec.prompt + " sh deploy.sh\n";
