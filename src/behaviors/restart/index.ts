@@ -29,14 +29,12 @@ http
 handler.on("push", async event => {
   if (process.env["DEV"]) return;
 
-  console.log(event.payload);
-
   report(
     `**PUSH RECIEVED**\n[Changes](${
       event.payload.compare
-    })\n\nCommits:${event.payload.commits
-      .map(commit => `\`\`\`${commit.sha} ${commit.message}\`\`\``)
-      .join("\n")}\n\nRebooting...`
+    })\n\n*Commits*${event.payload.commits
+      .map(commit => `\`\`\`${commit.id.slice(0, 7)} ${commit.message}\`\`\``)
+      .join("\n")}\n\n*Log*`
   );
   const subprocess = execa.command("sh deploy.sh");
   let body = exec.prompt + " sh deploy.sh\n";
