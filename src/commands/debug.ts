@@ -9,7 +9,7 @@ import { information } from "../lib/report";
 
 import execa from "execa";
 import { addOneTimeMessageHandler, removeMessageHandler } from "../lib/message";
-import { code } from "../lib/util";
+import { code, escape } from "../lib/util";
 
 export let DEBUG = false;
 
@@ -131,10 +131,10 @@ export class ExecCommand extends Command("shell") {
       async function handleChunk(chunk: any) {
         // If length would be exceed
         if (body.length + chunk.length > 1900) {
-          body = chunk;
+          body = escape(chunk);
           resp = (await message.channel.send(code(body))) as Message;
         } else {
-          body += chunk;
+          body += escape(chunk);
           await resp.edit(code(body));
         }
       }
