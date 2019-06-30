@@ -97,9 +97,9 @@ handler.on("push", async event => {
   for (let commit of event.payload.commits) {
     embed.addField(
       code(escape(commit.message)),
-      `${commit.id.slice(0, 6)} ${new Date(
-        Date.parse(commit.timestamp)
-      ).toLocaleString()}`
+      `${commit.added.map(file => `+ ${file}`).join("\n")}${commit.removed
+        .map(file => `- ${file}`)
+        .join("\n")}${commit.modified.map(file => `Δ ${file}`).join("\n")}`
     );
   }
 
