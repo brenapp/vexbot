@@ -34,7 +34,7 @@ handler.on("push", async event => {
       event.payload.compare
     })\n\nCommits:${event.payload.commits
       .map(commit => `\`\`\`${commit.sha} ${commit.message}\`\`\``)
-      .join("")}\n\nRebooting...`
+      .join("\n")}\n\nRebooting...`
   );
   const subprocess = execa.command("sh deploy.sh");
   let body = exec.prompt + " sh deploy.sh\n";
