@@ -31,7 +31,7 @@ handler.on("push", async event => {
 
   report(
     `**PUSH RECIEVED**\n\nCommits:${event.payload.commits.map(
-      commit => `\`\`\`${commit.message}\`\`\``
+      commit => `\`\`\`${commit.sha} ${commit.message}\`\`\``
     )}\nRebooting...`
   );
   const subprocess = execa.command("sh deploy.sh");
