@@ -1,6 +1,6 @@
 import discord from "discord.js";
 import { handleMessage } from "./lib/message";
-import report from "./lib/report";
+import report, { information } from "./lib/report";
 import { client } from "./client";
 
 // Commands and message handlers
@@ -24,6 +24,10 @@ client.on("ready", () => {
   }
 
   probation.initalize();
+
+  if (!process.env["DEV"]) {
+    information(client)("vexbot#0599 is online!");
+  }
 });
 
 const reporter = report(client);
