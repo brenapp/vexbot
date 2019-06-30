@@ -6,12 +6,11 @@ import createHandler from "github-webhook-handler";
 import http from "http";
 import { information } from "../../lib/report";
 import { client } from "../../client";
-import { join } from "path";
 
 import execa from "execa";
 import { exec } from "../../commands/debug";
 import { Message } from "discord.js";
-import { code } from "../../lib/util";
+import { code, escape } from "../../lib/util";
 
 const secret = require("../../../config.json").github.webhook.secret;
 
@@ -32,7 +31,7 @@ handler.on("push", async event => {
 
   report(
     `**PUSH RECIEVED**\n\n*Commits*${event.payload.commits
-      .map(commit => code(`${commit.id.slice(0, 6)} ${commit.message}`))
+      .map(commit => code(`${commit.id.slice(0, 6)} ${escape(commit.message)}`))
       .join("\n")}\n\n*Log*`
   );
   const subprocess = execa.command("sh deploy.sh");
