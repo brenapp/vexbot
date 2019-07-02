@@ -28,18 +28,21 @@ function changedRoles(
 
 // Administrative
 client.on("guildBanAdd", (guild: Guild, user: User) => {
+  if (process.env["DEV"]) return;
   const log = serverlog(guild);
 
   log.send(`:banhammer: ${user} was banned!`);
 });
 
 client.on("guildBanRemove", (guild: Guild, user: User) => {
+  if (process.env["DEV"]) return;
   const log = serverlog(guild);
 
   log.send(`:banhammer: ${user} was unbanned!`);
 });
 
 client.on("guildMemberRemove", (member: GuildMember) => {
+  if (process.env["DEV"]) return;
   const log = serverlog(member.guild);
 
   log.send(`:banhammer: ${member} left or was kicked`);
@@ -47,6 +50,7 @@ client.on("guildMemberRemove", (member: GuildMember) => {
 
 // User changes/actions
 client.on("guildMemberUpdate", (old, current) => {
+  if (process.env["DEV"]) return;
   const log = serverlog(old.guild);
 
   const embed = makeEmbed();
