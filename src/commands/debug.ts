@@ -154,7 +154,7 @@ export class ExecCommand extends Command("shell") {
 
         process.kill();
         process.stdout.off("data", handleChunk);
-        process.stdout.off("data", handleChunk);
+        process.stderr.off("data", handleChunk);
         message.channel.send("Killed");
         return true;
       });
