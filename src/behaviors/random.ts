@@ -2,6 +2,8 @@ import { addMessageHandler } from "../lib/message";
 import { client } from "../client";
 
 import { PREFIX, isCommand } from "../lib/command";
+import { DEBUG } from "../commands/debug";
+import { code } from "../lib/util";
 
 /**
  * Random behaviors
@@ -51,4 +53,13 @@ addMessageHandler(async message => {
   channel.setName(name);
 
   return false;
+});
+
+addMessageHandler(message => {
+  if (!DEBUG || message.channel.id !== "463891502473543690") {
+    return false;
+  }
+
+  message.channel.send(code(message.content));
+  return true;
 });

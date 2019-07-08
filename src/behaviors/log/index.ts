@@ -3,6 +3,7 @@ import { TextChannel, Guild, Message } from "discord.js";
 import { client } from "../../client";
 
 import "./important";
+import { DEBUG } from "../../commands/debug";
 
 function matchAll(str: string, re: RegExp) {
   return (str.match(re) || [])
@@ -51,7 +52,7 @@ addMessageHandler(async message => {
   if (message.author.bot) return true;
 
   if (!log) return false;
-  if (process.env["DEV"]) return false;
+  if (process.env["DEV"] && !DEBUG) return false;
 
   log.send(
     `${message.member.user.username}#${message.member.user.discriminator} in ${
