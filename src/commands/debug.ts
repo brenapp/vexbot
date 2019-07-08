@@ -76,7 +76,7 @@ export class StoreCommand extends Command("store") {
             `Can't find key ${code(args[2])} in store ${code(store.name)}`
           );
         }
-        return message.channel.send(code(value));
+        return message.channel.send(code(JSON.stringify(value)));
         break;
       case "delete":
         const deleted = await store.delete(args[2]);
