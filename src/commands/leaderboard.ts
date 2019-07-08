@@ -30,7 +30,9 @@ async function fetchAll(channel: TextChannel) {
   return messages;
 }
 
-async function getTotals(store: SQLiteStore, guild: Guild) {
+async function getTotals(store: SQLiteStore, message: Message) {
+  const guild = message.guild;
+
   const text = guild.channels.filter(
     channel => channel.type === "text"
   ) as Collection<string, TextChannel>;
@@ -48,9 +50,11 @@ async function getTotals(store: SQLiteStore, guild: Guild) {
       }
     });
     console.log(`Done! Got ${messages.size} messages`);
-  }
 
-  console.log(totals);
+    message.edit(
+      (message.content += `\n${channel}: ${messages.size} messages`)
+    );
+  }
 
   // Set totals for everyone
   await Promise.all(
@@ -125,8 +129,10 @@ async function getTotals(store: SQLiteStore, guild: Guild) {
     }
 
     async exec(message: Message) {
-      await message.channel.send("Recalculating totals...");
-      await getTotals(store, message.guild);
+      let mess = (await message.channel.send(
+        "Recalculating totals..."
+      )) as Message;
+      await getTotals(store, mess);
 
       const reply = (await message.reply("Done!")) as Message;
       leaderboard.exec(reply, ["10"]);
