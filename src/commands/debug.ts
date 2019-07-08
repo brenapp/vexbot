@@ -9,7 +9,7 @@ import { information } from "../lib/report";
 
 import execa from "execa";
 import { addOneTimeMessageHandler, removeMessageHandler } from "../lib/message";
-import { code, escape } from "../lib/util";
+import { code, escape, inline } from "../lib/util";
 
 export let DEBUG = false;
 
@@ -55,7 +55,7 @@ export class StoreCommand extends Command("store") {
     switch (args[1]) {
       case "clear":
         await store.clear();
-        return message.channel.send(`Cleared ${code(store.name)}`);
+        return message.channel.send(`Cleared ${inline(store.name)}`);
       case "list":
         const all = await store.all().then(a => a.map(v => v.key));
         const embed = makeEmbed(message)
@@ -73,7 +73,7 @@ export class StoreCommand extends Command("store") {
         const value = await store.get(args[2]);
         if (!value) {
           return message.channel.send(
-            `Can't find key ${code(args[2])} in store ${code(store.name)}`
+            `Can't find key ${inline(args[2])} in store ${inline(store.name)}`
           );
         }
         return message.channel.send(code(JSON.stringify(value)));
