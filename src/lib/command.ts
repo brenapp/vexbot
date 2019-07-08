@@ -63,6 +63,11 @@ export abstract class Command {
       return false;
     }
 
+    // Only owners are allowed to use dev mode PREFIX
+    if (process.env["DEV"] && !Permissions.owner(message)) {
+      return false;
+    }
+
     // Parse args
     const args = message.content.split(" ").slice(1);
     const start = Date.now();
