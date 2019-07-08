@@ -38,6 +38,7 @@ async function getTotals(store: SQLiteStore, message: Message) {
   ) as Collection<string, TextChannel>;
 
   let totals = {};
+  let oofs = {};
 
   for (let [id, channel] of text) {
     console.log(`Tallying #${channel.name}...`);
@@ -47,6 +48,14 @@ async function getTotals(store: SQLiteStore, message: Message) {
         totals[message.author.id]++;
       } else {
         totals[message.author.id] = 1;
+      }
+
+      if (message.content.toLowerCase() === "oof") {
+        if (oofs[message.author.id]) {
+          oofs[message.author.id]++;
+        } else {
+          oofs[message.author.id] = 1;
+        }
       }
     });
     console.log(`Done! Got ${messages.size} messages`);
@@ -58,7 +67,12 @@ async function getTotals(store: SQLiteStore, message: Message) {
 
   // Set totals for everyone
   await Promise.all(
-    Object.keys(totals).map(async id => store.set(id, totals[id]))
+    Object.keys(totals).map(async id =>
+      store.set(id, {
+        total: totals[id],
+        oof: oofs[id]
+      })
+    )
   );
 }
 
@@ -90,12 +104,18 @@ async function getTotals(store: SQLiteStore, message: Message) {
     };
 
     async exec(message: Message, args: string[]) {
-      const all = await store.all();
-      const top = all.sort((a, b) => b.value - a.value);
+      const all = (await store.all()) as ({
+        key: string;
+        value: { total: number; oof: number };
+      })[];
+      const top = all.sort((a, b) => b.value.total - a.value.total);
 
       const leaderboard = top
         .slice(0, +args[0] || 10)
         .map(v => client.users.get(v.key));
+
+      const total = all.reduce((a, b) => a + b.value.total, 0) as number;
+      const oof = all.reduce((a, b) => a + (b.value.oof || 0), 0) as number;
 
       const title = Object.keys(this.titles)[
         Math.round(Object.keys(this.titles).length * Math.random())
@@ -104,11 +124,12 @@ async function getTotals(store: SQLiteStore, message: Message) {
       const embed = makeEmbed(message)
         .setTitle(title)
         .setDescription(
-          leaderboard
+          `**Stats**\nTotal Messages Sent: ${total.toLocaleString()}\nOof Count: ${oof.toLocaleString()}\n\n${leaderboard
             .map(
-              (k, i) => `${i + 1}. ${k} — ${top[i].value} ${this.titles[title]}`
+              (k, i) =>
+                `${i + 1}. ${k} — ${top[i].value.total} ${this.titles[title]}`
             )
-            .join("\n")
+            .join("\n")}`
         );
 
       return message.channel.send(embed);
@@ -145,8 +166,16 @@ async function getTotals(store: SQLiteStore, message: Message) {
 
   // Increment messages
   addMessageHandler(async message => {
-    const value = (await store.get(message.author.id)) || 0;
-    await store.set(message.author.id, value + 1);
+    const record = (await store.get(message.author.id)) || { total: 0, oof: 0 };
+
+    if (message.content.toLowerCase() === "oof") {
+      record.oof++;
+    }
+
+    record.total++;
+
+    await store.set(message.author.id, record);
+
     return false;
   });
 })();
