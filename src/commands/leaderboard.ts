@@ -124,7 +124,10 @@ async function getTotals(store: SQLiteStore, message: Message) {
       const embed = makeEmbed(message)
         .setTitle(title)
         .setDescription(
-          `**Stats**\nTotal Messages Sent: ${total.toLocaleString()}\nOof Count: ${oof.toLocaleString()}\n\n${leaderboard
+          `**Stats**\nTotal Messages Sent: ${total.toLocaleString()}\nOof Count: ${oof.toLocaleString()} (${(
+            (oof * 100) /
+            total
+          ).toPrecision(3)}% oof)\n\n${leaderboard
             .map(
               (k, i) =>
                 `${i + 1}. ${k} — ${top[i].value.total} ${this.titles[title]}`
