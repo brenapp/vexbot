@@ -50,7 +50,7 @@ async function getTotals(store: SQLiteStore, message: Message) {
         totals[message.author.id] = 1;
       }
 
-      if (message.content.toLowerCase() === "oof") {
+      if (message.content.toLowerCase().includes("oof")) {
         if (oofs[message.author.id]) {
           oofs[message.author.id]++;
         } else {
@@ -168,7 +168,7 @@ async function getTotals(store: SQLiteStore, message: Message) {
   addMessageHandler(async message => {
     const record = (await store.get(message.author.id)) || { total: 0, oof: 0 };
 
-    if (message.content.toLowerCase() === "oof") {
+    if (message.content.toLowerCase().includes("oof")) {
       record.oof++;
     }
 
