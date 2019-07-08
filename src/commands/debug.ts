@@ -35,6 +35,63 @@ export class DebugCommand extends Command("debug") {
 
 new DebugCommand();
 
+export class StoreCommand extends Command("store") {
+  check = Permissions.compose(
+    Permissions.guild,
+    Permissions.owner
+  );
+
+  documentation() {
+    return {
+      description: "Manages keya stores",
+      usage: "cache <store name> [list|clear|get|delete] <key>",
+      group: "Owner"
+    };
+  }
+
+  async exec(message: Message, args: string[]) {
+    const store = await keya.store(args[0]);
+
+    switch (args[1]) {
+      case "clear":
+        await store.clear();
+        return message.channel.send(`Cleared ${code(store.name)}`);
+      case "list":
+        const all = await store.all().then(a => a.map(v => v.key));
+        const embed = makeEmbed(message)
+          .setTitle(store.name)
+          .setDescription(
+            `${all.length} items;\n${all.slice(0, 24).join("\n")}${
+              all.length > 25 ? "\n*...*" : ""
+            }`
+          );
+
+        return message.channel.send({ embed });
+
+        break;
+      case "get":
+        const value = await store.get(args[2]);
+        if (!value) {
+          return message.channel.send(
+            `Can't find key ${code(args[2])} in store ${code(store.name)}`
+          );
+        }
+        return message.channel.send(code(value));
+        break;
+      case "delete":
+        const deleted = await store.delete(args[2]);
+        return message.channel.send(
+          deleted
+            ? "Deleted successfully"
+            : "Did not delete! Probably because that key did not exist"
+        );
+        break;
+    }
+  }
+}
+
+new StoreCommand();
+
 export class CacheCommand extends Command("cache") {
   check = Permissions.compose(
     Permissions.guild,
