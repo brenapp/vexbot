@@ -190,6 +190,10 @@ export const Permissions = {
     return message.channel.type == "text";
   },
 
+  env(parameter: string, value: any) {
+    return (message: Message) => (process.env[parameter] = value);
+  },
+
   all() {
     return true;
   },
