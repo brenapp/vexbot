@@ -7,3 +7,4 @@ import "./leaderboard";
 import "./predict";
 import "./role";
 import "./help";
+import "./dumb";
