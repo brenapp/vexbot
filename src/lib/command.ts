@@ -53,6 +53,7 @@ export abstract class Command {
     description: string;
     usage: string;
     group: string;
+    hidden?: boolean;
   };
 
   async handle(message: Message) {
@@ -140,7 +141,10 @@ export abstract class Command {
    * @param message
    * @param args
    */
-  exec(message: Message, args: string[]): Promise<Message | Message[]> | void {
+  exec(
+    message: Message,
+    args: string[]
+  ): Promise<Message | Message[] | void> | void {
     return;
   }
 }
