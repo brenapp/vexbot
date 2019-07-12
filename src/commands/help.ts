@@ -31,7 +31,7 @@ export class HelpCommand extends Command("help") {
 
     // Get the commands that this person is able to execute
     let allowedIndex = await Promise.all(
-      commands.map(cmd => cmd.check(message))
+      commands.map(cmd => cmd.check(message) && !cmd.documentation().hidden)
     );
     commands.forEach((cmd, i) => {
       if (allowedIndex[i])
