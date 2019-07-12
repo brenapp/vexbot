@@ -33,7 +33,7 @@ function toSarcasmCase(text: string) {
 
 // Dumb Commands
 export class SarcasmCommand extends Command("s") {
-  check = Permissions.env("DEV", false);
+  check = Permissions.all;
 
   documentation() {
     return {
