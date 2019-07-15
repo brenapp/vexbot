@@ -14,14 +14,17 @@ function matchAll(str: string, re: RegExp) {
 async function clean(message: Message) {
   let content = message.content;
 
+
+
+
   const roles = await Promise.all(
-    matchAll(content, /\<\@\&([0-9]+)\>/).map(async match => ({
+    matchAll(content, /\<\@\&([0-9]+)\>/g).map(async match => ({
       key: match[0],
       role: message.guild.roles.get(match[1])
     }))
   );
   const members = await Promise.all(
-    matchAll(content, /\<\@\!([0-9]+)\>/).map(async match => ({
+    matchAll(content, /\<\@\!([0-9]+)\>/g).map(async match => ({
       key: match[0],
       member: message.guild.members.get(match[1])
     }))
