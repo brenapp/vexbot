@@ -31,21 +31,36 @@ client.on("guildBanAdd", (guild: Guild, user: User) => {
   if (process.env["DEV"]) return;
   const log = serverlog(guild);
 
-  log.send(`:banhammer: ${user} was banned!`);
+  const embed = makeEmbed();
+
+  embed.setAuthor(user.username, user.avatarURL).setTitle("Member Banned");
+
+  log.send({ embed });
 });
 
 client.on("guildBanRemove", (guild: Guild, user: User) => {
   if (process.env["DEV"]) return;
   const log = serverlog(guild);
 
-  log.send(`:banhammer: ${user} was unbanned!`);
+  const embed = makeEmbed();
+
+  embed.setAuthor(user.username, user.avatarURL).setTitle("Member Unbanned");
+
+  log.send({ embed });
 });
 
 client.on("guildMemberRemove", (member: GuildMember) => {
   if (process.env["DEV"]) return;
   const log = serverlog(member.guild);
 
-  log.send(`:banhammer: ${member} left or was kicked`);
+  const embed = makeEmbed();
+
+  embed
+    .setAuthor(member.user.username, member.user.avatarURL)
+    .setTitle("Member Removed")
+    .setDescription("This user was kicked, or left the server voluntarily");
+
+  log.send({ embed });
 });
 
 // User changes/actions
