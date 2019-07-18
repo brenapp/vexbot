@@ -203,3 +203,17 @@ export class ExecCommand extends Command("shell") {
 
 const exec = new ExecCommand();
 export { exec };
+
+export class RestartCommand extends Command("restart") {
+  check = Permissions.compose(
+    Permissions.owner,
+    Permissions.guild
+  );
+
+  async exec(message: Message) {
+    message.channel.send("Restarting...");
+    await execa.command("pm2 restart vexbot");
+  }
+}
+
+new RestartCommand();
