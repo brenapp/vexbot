@@ -73,7 +73,13 @@ export abstract class Command {
     const args = message.content.split(" ").slice(1);
     const start = Date.now();
 
+    // Use typing to indicate processing
+    message.channel.startTyping();
+
     const response = await this.exec(message, args);
+
+    // We're done processing
+    message.channel.stopTyping();
 
     if (response) {
       let resp = response instanceof Array ? response[0] : response;
@@ -191,7 +197,7 @@ export const Permissions = {
   },
 
   env(parameter: string, value: any) {
-    return (message: Message) => (process.env[parameter] === value);
+    return (message: Message) => process.env[parameter] === value;
   },
 
   all() {
