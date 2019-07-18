@@ -50,8 +50,54 @@ export class SarcasmCommand extends Command("s") {
       .fetchMessages({ limit: 2 })
       .then(messages => messages.last().content);
 
+    await message.delete();
+
     return message.channel.send(toSarcasmCase(content));
   }
 }
 
 new SarcasmCommand();
+
+// Uwuify
+const faces = ["(・`ω´・)", ";;w;;", "owo", "UwU", ">w<", "^w^"];
+
+function uwuify(str) {
+  str = str.replace(/(?:r|l)/g, "w");
+  str = str.replace(/(?:R|L)/g, "W");
+  str = str.replace(/n([aeiou])/g, "ny$1");
+  str = str.replace(/N([aeiou])/g, "Ny$1");
+  str = str.replace(/N([AEIOU])/g, "Ny$1");
+  str = str.replace(/ove/g, "uv");
+  str = str.replace(
+    /!+/g,
+    " " + faces[Math.floor(Math.random() * faces.length)] + " "
+  );
+
+  return str;
+}
+
+export class UwuCommand extends Command("uwu") {
+  check = Permissions.all;
+
+  documentation() {
+    return {
+      group: "Meta",
+      description: "Tag me to uwuize messages",
+      usage: "uwu",
+      hidden: true
+    };
+  }
+
+  async exec(message: Message, args: string[]) {
+    const channel = message.channel;
+    const content = await channel
+      .fetchMessages({ limit: 2 })
+      .then(messages => messages.last().content);
+
+    await message.delete();
+
+    return message.channel.send(uwuify(content));
+  }
+}
+
+new UwuCommand();
