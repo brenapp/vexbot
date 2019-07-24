@@ -41,6 +41,12 @@ async function handleVeto(
 ) {
   await message.react("👎");
   listen(message, ["👎"], async (reaction, collector) => {
+    if (embed.fields.some(({ name }) => name === "Veto")) {
+      // Update veto field
+      embed.fields = embed.fields.slice(0, -1);
+      return;
+    }
+
     await callback(reaction, collector);
     embed.addField(
       "Veto",
