@@ -5,9 +5,13 @@ import {
   Collection,
   Role,
   GuildMember,
-  User
+  User,
+  Message,
+  MessageReaction,
+  Collector
 } from "discord.js";
 import { makeEmbed } from "../../lib/command";
+import listen from "../../lib/reactions";
 
 // Notify #event-log about important events
 function serverlog(guild: Guild): TextChannel {
@@ -26,8 +30,19 @@ function changedRoles(
   return { added, removed };
 }
 
+async function undoMemberChange(old: GuildMember, current: GuildMember) {
+  const { added, removed } = changedRoles(old.roles, current.roles);
+
+  // Remove changed roles
+  await current.addRoles(removed);
+  await current.removeRoles(added);
+
+  // Set old nickname
+  current.setNickname(old.nickname);
+}
+
 // Administrative
-client.on("guildBanAdd", (guild: Guild, user: User) => {
+client.on("guildBanAdd", async (guild: Guild, user: User) => {
   if (process.env["DEV"]) return;
   const log = serverlog(guild);
 
@@ -35,10 +50,23 @@ client.on("guildBanAdd", (guild: Guild, user: User) => {
 
   embed.setAuthor(user.username, user.avatarURL).setTitle("Member Banned");
 
-  log.send({ embed });
+  const message = (await log.send({ embed })) as Message;
+  await message.react("👎");
+
+  listen(message, ["👎"], reaction => {
+    guild.unban(
+      user,
+      `Vetoed by ${reaction.users.map(user => user.username).join(", ")}`
+    );
+    embed.addField(
+      "Veto",
+      reaction.users.map(user => user.username).join(", ")
+    );
+    message.edit({ embed });
+  });
 });
 
-client.on("guildBanRemove", (guild: Guild, user: User) => {
+client.on("guildBanRemove", async (guild: Guild, user: User) => {
   if (process.env["DEV"]) return;
   const log = serverlog(guild);
 
@@ -46,7 +74,20 @@ client.on("guildBanRemove", (guild: Guild, user: User) => {
 
   embed.setAuthor(user.username, user.avatarURL).setTitle("Member Unbanned");
 
-  log.send({ embed });
+  const message = (await log.send({ embed })) as Message;
+  await message.react("👎");
+
+  listen(message, ["👎"], reaction => {
+    guild.ban(
+      user,
+      `Vetoed by ${reaction.users.map(user => user.username).join(", ")}`
+    );
+    embed.addField(
+      "Veto",
+      reaction.users.map(user => user.username).join(", ")
+    );
+    message.edit({ embed });
+  });
 });
 
 client.on("guildMemberRemove", (member: GuildMember) => {
@@ -64,7 +105,7 @@ client.on("guildMemberRemove", (member: GuildMember) => {
 });
 
 // User changes/actions
-client.on("guildMemberUpdate", (old, current) => {
+client.on("guildMemberUpdate", async (old, current) => {
   if (process.env["DEV"]) return;
   const log = serverlog(old.guild);
 
@@ -97,5 +138,20 @@ client.on("guildMemberUpdate", (old, current) => {
     );
   }
 
-  log.send({ embed });
+  const message = (await log.send({ embed })) as Message;
+  await message.react("👎");
+
+  listen(message, ["👎"], async reaction => {
+    await Promise.all([
+      current.setNickname(old.nickname),
+      current.addRoles(removed),
+      current.removeRoles(added)
+    ]);
+
+    embed.addField(
+      "Veto",
+      reaction.users.map(user => user.username).join(", ")
+    );
+    message.edit({ embed });
+  });
 });
