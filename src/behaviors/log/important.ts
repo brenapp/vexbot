@@ -8,7 +8,8 @@ import {
   User,
   Message,
   MessageReaction,
-  Collector
+  Collector,
+  RichEmbed
 } from "discord.js";
 import { makeEmbed } from "../../lib/command";
 import listen from "../../lib/reactions";
@@ -28,6 +29,28 @@ function changedRoles(
   const removed = old.filter(role => !current.has(role.id));
 
   return { added, removed };
+}
+
+async function handleVeto(
+  message: Message,
+  embed: RichEmbed,
+  callback: (
+    vote: MessageReaction,
+    collector: Collector<string, MessageReaction>
+  ) => any
+) {
+  await message.react("👎");
+  listen(message, ["👎"], async (reaction, collector) => {
+    await callback(reaction, collector);
+    embed.addField(
+      "Veto",
+      reaction.users
+        .filter(user => !user.bot)
+        .map(user => user)
+        .join(", ")
+    );
+    message.edit({ embed });
+  });
 }
 
 // Administrative
@@ -52,22 +75,13 @@ client.on("guildBanAdd", async (guild: Guild, user: User) => {
   embed.addField("Executor", entry.executor);
 
   const message = (await log.send({ embed })) as Message;
-  await message.react("👎");
 
-  listen(message, ["👎"], reaction => {
+  handleVeto(message, embed, reaction =>
     guild.unban(
       user,
       `Vetoed by ${reaction.users.map(user => user.username).join(", ")}`
-    );
-    embed.addField(
-      "Veto",
-      reaction.users
-        .filter(user => !user.bot)
-        .map(user => user)
-        .join(", ")
-    );
-    message.edit({ embed });
-  });
+    )
+  );
 });
 
 client.on("guildBanRemove", async (guild: Guild, user: User) => {
@@ -93,20 +107,12 @@ client.on("guildBanRemove", async (guild: Guild, user: User) => {
   const message = (await log.send({ embed })) as Message;
   await message.react("👎");
 
-  listen(message, ["👎"], reaction => {
+  handleVeto(message, embed, reaction =>
     guild.ban(
       user,
       `Vetoed by ${reaction.users.map(user => user.username).join(", ")}`
-    );
-    embed.addField(
-      "Veto",
-      reaction.users
-        .filter(user => !user.bot)
-        .map(user => user)
-        .join(", ")
-    );
-    message.edit({ embed });
-  });
+    )
+  );
 });
 
 client.on("guildMemberRemove", (member: GuildMember) => {
@@ -178,28 +184,17 @@ client.on("guildMemberUpdate", async (old, current) => {
   embed.addField("Executor", entry.executor);
 
   const message = (await log.send({ embed })) as Message;
-  await message.react("👎");
-
-  listen(message, ["👎"], async reaction => {
+  handleVeto(message, embed, reaction => {
     if (old.nickname !== current.nickname) {
-      await current.setNickname(old.nickname);
+      return current.setNickname(old.nickname);
     }
 
     if (added.size > 0) {
-      await current.removeRoles(added);
+      return current.removeRoles(added);
     }
 
     if (removed.size > 0) {
-      await current.removeRoles(removed);
+      return current.removeRoles(removed);
     }
-
-    embed.addField(
-      "Veto",
-      reaction.users
-        .filter(user => !user.bot)
-        .map(user => user)
-        .join(", ")
-    );
-    message.edit({ embed });
   });
 });
