@@ -19,6 +19,7 @@
     "github-webhook-handler": "^0.7.1",
     "googleapis": "^40.0.0",
     "keya": "^1.1.2",
+    "markov": "^0.0.7",
     "parse-duration": "^0.1.1",
     "sqlite": "^3.0.3",
     "vexdb": "^2.1.8"
