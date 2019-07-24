@@ -22,7 +22,15 @@ async function deploy() {
   let body = exec.prompt + " sh deploy.sh\n";
   let message = (await report(code(body))) as Message;
 
-  async function handleChunk(chunk: any) {
+  async function handleChunk(chunk: string) {
+    // If the chunk itself is too big, handle it in sections
+    if (chunk.length > 1900) {
+      for (let i = 0; i < chunk.length; i += 1900) {
+        const subchunk = chunk.slice(i, 1900);
+        await handleChunk(subchunk);
+      }
+    }
+
     // If length would be exceed
     if (body.length + chunk.length > 1900) {
       body = escape(chunk);
