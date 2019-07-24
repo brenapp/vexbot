@@ -142,11 +142,19 @@ client.on("guildMemberUpdate", async (old, current) => {
   await message.react("👎");
 
   listen(message, ["👎"], async reaction => {
-    await Promise.all([
-      current.setNickname(old.nickname),
-      current.addRoles(removed),
-      current.removeRoles(added)
-    ]);
+    
+    if (old.nickname !== current.nickname) {
+      await current.setNickname(old.nickname);
+    }
+
+    if (added.size > 0) {
+      await current.removeRoles(added);
+    }
+
+    if (removed.size > 0) {
+      await current.removeRoles(removed);
+    }
+
 
     embed.addField(
       "Veto",
