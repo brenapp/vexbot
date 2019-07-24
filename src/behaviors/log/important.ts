@@ -30,17 +30,6 @@ function changedRoles(
   return { added, removed };
 }
 
-async function undoMemberChange(old: GuildMember, current: GuildMember) {
-  const { added, removed } = changedRoles(old.roles, current.roles);
-
-  // Remove changed roles
-  await current.addRoles(removed);
-  await current.removeRoles(added);
-
-  // Set old nickname
-  current.setNickname(old.nickname);
-}
-
 // Administrative
 client.on("guildBanAdd", async (guild: Guild, user: User) => {
   if (process.env["DEV"]) return;
@@ -49,6 +38,18 @@ client.on("guildBanAdd", async (guild: Guild, user: User) => {
   const embed = makeEmbed();
 
   embed.setAuthor(user.username, user.avatarURL).setTitle("Member Banned");
+
+  // Establish original actor
+  const entry = await guild
+    .fetchAuditLogs({ type: "MEMBER_BAN_ADD" })
+    .then(audit => audit.entries.first());
+
+  // Ignore vetos
+  if (entry.executor.bot) {
+    return;
+  }
+
+  embed.addField("Executor", entry.executor);
 
   const message = (await log.send({ embed })) as Message;
   await message.react("👎");
@@ -76,6 +77,18 @@ client.on("guildBanRemove", async (guild: Guild, user: User) => {
   const embed = makeEmbed();
 
   embed.setAuthor(user.username, user.avatarURL).setTitle("Member Unbanned");
+
+  // Establish original actor
+  const entry = await guild
+    .fetchAuditLogs({ type: "MEMBER_BAN_REMOVE" })
+    .then(audit => audit.entries.first());
+
+  // Ignore vetos
+  if (entry.executor.bot) {
+    return;
+  }
+
+  embed.addField("Executor", entry.executor);
 
   const message = (await log.send({ embed })) as Message;
   await message.react("👎");
@@ -117,11 +130,18 @@ client.on("guildMemberUpdate", async (old, current) => {
 
   const embed = makeEmbed();
 
+  // Establish original actor
+  let entry;
+
   embed
     .setAuthor(old.user.username, old.user.avatarURL)
     .setTitle("Member Updated");
 
   if (old.nickname !== current.nickname) {
+    entry = await current.guild
+      .fetchAuditLogs({ type: "MEMBER_UPDATE" })
+      .then(audit => audit.entries.first());
+
     embed.addField(
       "Changed Nicknames",
       `\`${old.nickname}\` => \`${current.nickname}\``
@@ -129,6 +149,12 @@ client.on("guildMemberUpdate", async (old, current) => {
   }
 
   const { added, removed } = changedRoles(old.roles, current.roles);
+
+  if (added.size > 0 || removed.size > 0) {
+    entry = await current.guild
+      .fetchAuditLogs({ type: "MEMBER_ROLE_UPDATE" })
+      .then(audit => audit.entries.first());
+  }
 
   if (added.size > 0) {
     embed.addField(
@@ -143,6 +169,13 @@ client.on("guildMemberUpdate", async (old, current) => {
       `${removed.map(role => role.toString()).join(" ")}`
     );
   }
+
+  // Ignore vetos
+  if (entry.executor.bot) {
+    return;
+  }
+
+  embed.addField("Executor", entry.executor);
 
   const message = (await log.send({ embed })) as Message;
   await message.react("👎");
