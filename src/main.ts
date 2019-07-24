@@ -25,9 +25,9 @@ client.on("ready", () => {
 
   probation.initalize();
 
-  if (!process.env["DEV"]) {
-    information(client)("vexbot#0599 is online!");
-  }
+  information(client)(
+    `${process.env["DEV"] ? "DEV MODE" : "PRODUCTION"} online!`
+  );
 });
 
 const reporter = report(client);
