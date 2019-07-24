@@ -144,21 +144,21 @@ export class ExecCommand extends Command("shell") {
     try {
       const process = execa.command(params.join(" "));
 
-      async function handleChunk(chunk: string) {
+      async function handleChunk(chunk: Buffer) {
         // If the chunk itself is too big, handle it in sections
         if (chunk.length > 1900) {
           for (let i = 0; i < chunk.length; i += 1900) {
-            const subchunk = chunk.slice(i, 1900);
+            const subchunk = chunk.slice(i, i + 1900);
             await handleChunk(subchunk);
           }
         }
 
         // If length would be exceed
         if (body.length + chunk.length > 1900) {
-          body = escape(chunk);
+          body = escape(chunk.toString());
           resp = (await message.channel.send(code(body))) as Message;
         } else {
-          body += escape(chunk);
+          body += escape(chunk.toString());
           await resp.edit(code(body));
         }
       }
