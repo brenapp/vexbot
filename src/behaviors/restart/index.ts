@@ -97,11 +97,9 @@ handler.on("push", async event => {
   for (let commit of event.payload.commits) {
     embed.addField(
       code(escape(commit.message)),
-      `${commit.added
-        .map(file => `+ ${file}`)
-        .join("\n")}\n${commit.removed
+      `${commit.added.map(file => `+ ${file}`).join("\n")}${commit.removed
         .map(file => `- ${file}`)
-        .join("\n")}\n${commit.modified.map(file => `Δ ${file}`).join("\n")}`
+        .join("\n")}${commit.modified.map(file => `Δ ${file}`).join("\n")}`
     );
   }
 
