@@ -63,7 +63,7 @@ client.on("guildBanAdd", async (guild: Guild, user: User) => {
       "Veto",
       reaction.users
         .filter(user => !user.bot)
-        .map(user => user.username)
+        .map(user => user)
         .join(", ")
     );
     message.edit({ embed });
@@ -102,7 +102,7 @@ client.on("guildBanRemove", async (guild: Guild, user: User) => {
       "Veto",
       reaction.users
         .filter(user => !user.bot)
-        .map(user => user.username)
+        .map(user => user)
         .join(", ")
     );
     message.edit({ embed });
@@ -197,7 +197,7 @@ client.on("guildMemberUpdate", async (old, current) => {
       "Veto",
       reaction.users
         .filter(user => !user.bot)
-        .map(user => user.username)
+        .map(user => user)
         .join(", ")
     );
     message.edit({ embed });
