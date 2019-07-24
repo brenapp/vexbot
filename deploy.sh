@@ -1,3 +1,6 @@
+# Reset to origin branch
+git reset --hard
+
 # Update from GitHub
 git pull;
 
