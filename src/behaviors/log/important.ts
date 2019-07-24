@@ -142,7 +142,6 @@ client.on("guildMemberUpdate", async (old, current) => {
   await message.react("👎");
 
   listen(message, ["👎"], async reaction => {
-    
     if (old.nickname !== current.nickname) {
       await current.setNickname(old.nickname);
     }
@@ -155,10 +154,12 @@ client.on("guildMemberUpdate", async (old, current) => {
       await current.removeRoles(removed);
     }
 
-
     embed.addField(
       "Veto",
-      reaction.users.map(user => user.username).join(", ")
+      reaction.users
+        .filter(user => !user.bot)
+        .map(user => user.username)
+        .join(", ")
     );
     message.edit({ embed });
   });
