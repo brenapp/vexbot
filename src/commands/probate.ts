@@ -2,15 +2,15 @@ import { Message } from "discord.js";
 import probate from "../behaviors/probation";
 import Command, { Permissions } from "../lib/command";
 import { client } from "../client";
+import { authorization } from "../lib/access";
 
-const { owner } = require("../../authorization.json").discord;
+const owner = authorization("discord.owner");
 
 export class ProbateCommand extends Command("probate", "dq") {
   check = Permissions.compose(
     Permissions.admin,
     message =>
-      message.channel.type === "text" &&
-      !message.mentions.members.has(owner)
+      message.channel.type === "text" && !message.mentions.members.has(owner)
   );
 
   documentation() {

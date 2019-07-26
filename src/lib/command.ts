@@ -1,10 +1,11 @@
 import { Message, Guild, RichEmbed } from "discord.js";
 import { addMessageHandler, removeMessageHandler } from "./message";
 import { client } from "../client";
+import { authorization } from "./access";
 
 export const PREFIX = process.env["DEV"] ? ["."] : ["/", "!"];
 
-const cng = require("../../authorization.json").discord;
+const owner = authorization("discord.owner");
 
 export function makeEmbed(message?: Message) {
   const embed = new RichEmbed().setTimestamp();
