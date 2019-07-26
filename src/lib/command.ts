@@ -190,7 +190,7 @@ export const Permissions = {
   },
 
   owner(message: Message) {
-    return message.author.id === cng.owner;
+    return message.author.id === owner;
   },
 
   guild(message: Message) {
