@@ -4,7 +4,7 @@ import { client } from "../client";
 
 export const PREFIX = process.env["DEV"] ? ["."] : ["/", "!"];
 
-const cng = require("../../config.json").discord;
+const cng = require("../../authorization.json").discord;
 
 export function makeEmbed(message?: Message) {
   const embed = new RichEmbed().setTimestamp();

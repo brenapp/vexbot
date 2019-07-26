@@ -3,7 +3,7 @@ import probate from "../behaviors/probation";
 import Command, { Permissions } from "../lib/command";
 import { client } from "../client";
 
-const { owner } = require("../../config.json").discord;
+const { owner } = require("../../authorization.json").discord;
 
 export class ProbateCommand extends Command("probate", "dq") {
   check = Permissions.compose(

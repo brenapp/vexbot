@@ -1,5 +1,5 @@
 import { Client, DiscordAPIError, Message } from "discord.js";
-const { owner } = require("../../config.json").discord;
+const { owner } = require("../../authorization.json").discord;
 
 export default function report(client: Client) {
   return async (error: Error) => {

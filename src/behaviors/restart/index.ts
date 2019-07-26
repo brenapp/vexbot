@@ -12,7 +12,7 @@ import { exec } from "../../commands/debug";
 import { Message, RichEmbed, User } from "discord.js";
 import { code, escape } from "../../lib/util";
 
-const secret = require("../../../config.json").github.webhook.secret;
+const secret = require("../../../authorization.json").github.webhook.secret;
 
 const handler = createHandler({ path: "/webhook", secret });
 const report = information(client);
