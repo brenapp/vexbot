@@ -156,7 +156,7 @@ client.on("guildMemberUpdate", async (old, current) => {
 
     embed.addField(
       "Changed Nicknames",
-      `\`${old.nickname}\` => \`${current.nickname}\``
+      `\`${old.nickname}\` → \`${current.nickname}\``
     );
   }
 
