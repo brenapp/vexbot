@@ -15,10 +15,8 @@ export class ProbateCommand extends Command("probate", "dq") {
       message.channel.type === "text" && !message.mentions.members.has(owner)
   );
 
-  store: SQLiteStore | null = null;
   constructor() {
     super();
-    keya.store("probations").then(store => (this.store = store));
   }
 
   documentation() {
@@ -58,16 +56,13 @@ export class ProbateCommand extends Command("probate", "dq") {
 
     // Update probation records
 
-    // If we don't have a reference to the database by now, then we need to wait for it.
-    if (!this.store) {
-      this.store = await keya.store("probations");
-    }
+    const store = await keya.store("probations");
 
     // Get records for relevant parties
     const executor: {
       citations: number;
       executed: number;
-    } = (await this.store.get(message.member.id)) || {
+    } = (await store.get(message.member.id)) || {
       citations: 0,
       executed: 0
     };
@@ -76,7 +71,7 @@ export class ProbateCommand extends Command("probate", "dq") {
       executed: number;
     }[] = await Promise.all(
       victims.map(victim =>
-        this.store
+        store
           .get(victim.id)
           .then(record => (record ? record : { citations: 0, executed: 0 }))
       )
