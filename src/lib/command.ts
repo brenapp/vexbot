@@ -2,6 +2,7 @@ import { Message, Guild, RichEmbed } from "discord.js";
 import { addMessageHandler, removeMessageHandler } from "./message";
 import { client } from "../client";
 import { authorization } from "./access";
+import report from "./report";
 
 export const PREFIX = process.env["DEV"] ? ["."] : ["/", "!"];
 
@@ -82,6 +83,7 @@ export abstract class Command {
       response = await this.exec(message, args);
     } catch(e) {
       response = await message.channel.send(`Command execution failed. Please try again later`);
+      report(client)(e);
     } 
 
     // We're done processing
