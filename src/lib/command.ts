@@ -77,7 +77,12 @@ export abstract class Command {
     // Use typing to indicate processing
     message.channel.startTyping();
 
-    const response = await this.exec(message, args);
+    let response;
+    try {
+      response = await this.exec(message, args);
+    } catch(e) {
+      response = await message.channel.send(`Command execution failed. Please try again later`)
+    } 
 
     // We're done processing
     message.channel.stopTyping(true);
