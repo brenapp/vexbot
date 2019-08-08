@@ -222,6 +222,15 @@ export class RestartCommand extends Command("restart") {
     message.channel.send("Restarting...");
     await execa.command("pm2 restart vexbot");
   }
+
+  documentation() {
+    return {
+      group: "OWNER",
+      description: "Restarts vexbot",
+      usage: "restart"
+    }
+  }
+
 }
 
 new RestartCommand();
