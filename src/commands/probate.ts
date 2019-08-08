@@ -4,7 +4,7 @@ import Command, { Permissions } from "../lib/command";
 import { client } from "../client";
 import { authorization } from "../lib/access";
 import SQLiteStore from "keya/out/node/sqlite";
-import keya from "keya";
+import * as keya from "keya";
 
 const owner = authorization("discord.owner");
 
@@ -55,7 +55,6 @@ export class ProbateCommand extends Command("probate", "dq") {
     });
 
     // Update probation records
-
     const store = await keya.store("probations");
 
     // Get records for relevant parties
