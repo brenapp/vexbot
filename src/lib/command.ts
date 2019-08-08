@@ -81,7 +81,7 @@ export abstract class Command {
     try {
       response = await this.exec(message, args);
     } catch(e) {
-      response = await message.channel.send(`Command execution failed. Please try again later`)
+      response = await message.channel.send(`Command execution failed. Please try again later`);
     } 
 
     // We're done processing
