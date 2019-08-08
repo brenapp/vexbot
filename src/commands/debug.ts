@@ -219,8 +219,8 @@ export class RestartCommand extends Command("restart") {
   );
 
   async exec(message: Message) {
-    message.channel.send("Restarting...");
-    await execa.command("pm2 restart vexbot");
+    execa.command("pm2 restart vexbot");
+    return message.channel.send("Restarting...");
   }
 
   documentation() {
