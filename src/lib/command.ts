@@ -80,7 +80,7 @@ export abstract class Command {
     const response = await this.exec(message, args);
 
     // We're done processing
-    message.channel.stopTyping();
+    message.channel.stopTyping(true);
 
     if (response) {
       let resp = response instanceof Array ? response[0] : response;
