@@ -34,8 +34,14 @@ export class HelpCommand extends Command("help") {
       commands.map(cmd => cmd.check(message) && !cmd.documentation().hidden)
     );
     commands.forEach((cmd, i) => {
+      const groupname = cmd.documentation().group.toUpperCase();
+
+      if (!groups[groupname]) {
+        groups[groupname] = [];
+      }
+
       if (allowedIndex[i])
-        groups[cmd.documentation().group.toUpperCase()].push(cmd);
+        groups[groupname].push(cmd);
     });
 
     let body = "Here's what I can do!";
