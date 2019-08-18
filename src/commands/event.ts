@@ -57,26 +57,30 @@ export class EventCommand extends Command("events") {
       .map(word => `${word[0].toUpperCase()}${word.slice(1).toLowerCase()}`)
       .join(" ");
 
-    let params: EventsRequestObject = {};
+    let params: EventsRequestObject = {
+      season: "current",
+      status: ["future", "current"]
+    };
 
     // Special cases
     switch (region) {
       case "All":
-        params = {};
         break;
       case "Signature":
         params = {
+          ...params,
           name: name => name.includes("Signature Event")
         };
         break;
       default:
-        params = { region };
+        params = { ...params, region };
         break;
     }
 
     const events = await Promise.all(
-      (await vexdb.get("events", { ...params, season: "current" }))
+      (await vexdb.get("events", params))
         .slice(0, 25)
+        .reverse()
         .map(async event => ({
           event,
           ...(await getCapacityInformation(event.sku))
@@ -91,14 +95,14 @@ export class EventCommand extends Command("events") {
     events.forEach(({ event, open, capacity }) => {
       embed.addField(
         `[${new Date(Date.parse(event.end)).toLocaleDateString()}] ${
-          event.name
+        event.name
         }`,
         `${open} open / ${capacity} teams @ ${event.loc_venue} (${
-          event.loc_city
+        event.loc_city
         }, ${
-          event.loc_region
+        event.loc_region
         })\n[RobotEvents](https://www.robotevents.com/robot-competitions/vex-robotics-competition/${
-          event.sku
+        event.sku
         }.html)`
       );
     });
