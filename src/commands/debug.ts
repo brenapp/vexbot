@@ -1,5 +1,5 @@
 import Command, { Permissions, makeEmbed } from "../lib/command";
-import { Message } from "discord.js";
+import { Message, TextChannel } from "discord.js";
 
 import * as vexdb from "vexdb";
 import * as keya from "keya";
@@ -62,7 +62,7 @@ export class StoreCommand extends Command("store") {
           .setTitle(store.name)
           .setDescription(
             `${all.length} items;\n${all.slice(0, 24).join("\n")}${
-              all.length > 25 ? "\n*...*" : ""
+            all.length > 25 ? "\n*...*" : ""
             }`
           );
 
@@ -124,7 +124,7 @@ export class ExecCommand extends Command("shell") {
     // Get shell prompt
     this.prompt = `vexbot@${
       process.env["DEV"] ? "development" : "production"
-    } $ `;
+      } $ `;
   }
 
   documentation() {
@@ -191,7 +191,7 @@ export class ExecCommand extends Command("shell") {
 
     return resp.edit(
       `${code(body)}EXITED ${
-        response.failed ? "UNSUCCESSFULLY" : "SUCCESSFULLY"
+      response.failed ? "UNSUCCESSFULLY" : "SUCCESSFULLY"
       } (${response.exitCode} ${response.exitCodeName})\n`
     );
   }
@@ -234,3 +234,69 @@ export class RestartCommand extends Command("restart") {
 }
 
 new RestartCommand();
+
+
+export class ServerCommand extends Command("servers") {
+  check = Permissions.owner;
+
+  async exec(message: Message) {
+
+    const content = client.guilds.map(guild => `${guild.id}: ${guild.name}`).join("\n");
+    message.channel.send(content);
+
+
+  }
+}
+
+new ServerCommand();
+
+export class ChannelsCommand extends Command("channels") {
+  check = Permissions.owner;
+
+  async exec(message: Message, args: string[]) {
+
+    const server = client.guilds.get(args[0]);
+    if (!server) {
+      return message.channel.send("Can't access that server!")
+    };
+
+    // Get channels
+    const channels = server.channels.map(channel => `\`${channel.id}\`: ${channel.name} (${channel.type})`).join("\n");
+    message.channel.send(channels);
+
+  }
+}
+
+new ChannelsCommand();
+
+export class MessagesCommand extends Command("messages") {
+  check = Permissions.owner;
+
+  async exec(message: Message, args: string[]) {
+
+    const channel = client.channels.get(args[0]);
+    if (!channel) {
+      return message.channel.send("Can't access that channel!")
+    };
+
+    if (channel.type == "category" || channel.type == "voice") {
+      return message.channel.send("Not a text channel");
+    };
+
+    // Get channels
+    const messages = await (channel as TextChannel).fetchMessages({ limit: 50 });
+    for (let [, m] of messages) {
+      message.channel.send(
+        `${m.member.user.username}#${m.member.user.discriminator} in ${
+        m.type === "dm" ? "DM" : m.channel.toString()
+        }: ${m.cleanContent}`,
+        {
+          files: m.attachments.map(attach => attach.url)
+        }
+      );
+    }
+
+  }
+}
+
+new MessagesCommand();
