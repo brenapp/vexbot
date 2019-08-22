@@ -4,6 +4,8 @@ import { client } from "../client";
 import { PREFIX, isCommand } from "../lib/command";
 import { DEBUG } from "../commands/debug";
 import { code } from "../lib/util";
+import { TextChannel } from "discord.js";
+import probate from "./probation";
 
 /**
  * Random behaviors
@@ -60,9 +62,10 @@ addMessageHandler(async message => {
     "important-studying-chat",
     "drink-water",
     "yamatos-kitchen",
-    "omar-needs-to-hyrdrate",
+    "omar-needs-to-hydrate",
     "joels-autons",
-    "bradleys-hoes"
+    "bradleys-hoes",
+    "library"
   ];
 
   const channel = await message.guild.channels.find(
@@ -73,4 +76,23 @@ addMessageHandler(async message => {
   channel.setName(name);
 
   return false;
+});
+
+addMessageHandler(async message => {
+
+  if (message.guild.id != "310820885240217600") return false;
+
+  // If we're not in the library, it doesn't apply
+  const channel = message.channel as TextChannel;
+  if (channel.name !== "library") return false;
+
+  const valid = message.content.startsWith("(") && message.content.endsWith(")");
+  if (!valid) {
+    message.reply("Shhh!");
+    probate(message.member, message.guild.me, "10s", "Shhh!");
+
+  }
+
+
+
 });
