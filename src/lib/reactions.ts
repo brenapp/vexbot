@@ -22,11 +22,14 @@ export default async function listen(
     (reaction: MessageReaction, user: User) =>
       emojis.includes(reaction.emoji.name) && !user.bot
   );
-  collector.on("collect", (element, collector) => {
+  let handler;
+  collector.on("collect", handler = (element, c) => {
     const response = callback(element, collector);
 
     if (response) {
       collector.emit("end");
+      collector.off("collect", handler);
+      collector.cleanup();
     }
   });
 }

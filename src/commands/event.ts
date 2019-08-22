@@ -1,4 +1,4 @@
-import { Message } from "discord.js";
+import { Message, RichEmbed } from "discord.js";
 import Command, { Permissions, makeEmbed } from "../lib/command";
 import * as vexdb from "vexdb";
 import * as keya from "keya";
@@ -6,6 +6,8 @@ import * as keya from "keya";
 import fetch from "isomorphic-fetch";
 import cheerio from "cheerio";
 import { EventsRequestObject } from "vexdb/out/constants/RequestObjects";
+import { EventsResponseObject } from "vexdb/out/constants/ResponseObjects";
+import listen from "../lib/reactions";
 
 async function html(url: string) {
   const store = await keya.store("fetched");
@@ -21,6 +23,42 @@ async function html(url: string) {
         return text;
       });
   }
+}
+
+function constructFields(events: { capacity: string, open: string, event: EventsResponseObject }[], embed: RichEmbed) {
+
+  events.forEach(({ event, open, capacity }) => {
+    embed.addField(
+      `[${new Date(Date.parse(event.end)).toLocaleDateString()}] ${
+      event.name
+      }`,
+      `${open} open / ${capacity} teams @ ${event.loc_venue} (${
+      event.loc_city
+      }, ${
+      event.loc_region
+      })\n[RobotEvents](https://www.robotevents.com/robot-competitions/vex-robotics-competition/${
+      event.sku
+      }.html)`
+    );
+  });
+
+  return embed;
+
+}
+
+function makeEmbedFromPage(events: { capacity: string, open: string, event: EventsResponseObject }[], message: Message, page: number) {
+  const start = page * 25,
+    end = start + 25;
+
+  const subset = events.slice(start, end);
+  const embed = makeEmbed(message);
+
+  embed.setTitle(`Events (Page ${page})`);
+  embed.setDescription(`For the current season`);
+
+  constructFields(subset, embed);
+
+  return embed;
 }
 
 async function getCapacityInformation(
@@ -79,39 +117,51 @@ export class EventCommand extends Command("events") {
 
     const events = await Promise.all(
       (await vexdb.get("events", params))
-        .slice(0, 25)
-        .reverse()
+        .sort((a, b) => Date.parse(a.start) - Date.parse(b.start))
         .map(async event => ({
           event,
           ...(await getCapacityInformation(event.sku))
         }))
     );
 
-    const embed = makeEmbed(message);
 
-    embed.setTitle(`${region} Events`);
-    embed.setDescription(`For the current season (most recent 25)`);
-
-    events.forEach(({ event, open, capacity }) => {
-      embed.addField(
-        `[${new Date(Date.parse(event.end)).toLocaleDateString()}] ${
-        event.name
-        }`,
-        `${open} open / ${capacity} teams @ ${event.loc_venue} (${
-        event.loc_city
-        }, ${
-        event.loc_region
-        })\n[RobotEvents](https://www.robotevents.com/robot-competitions/vex-robotics-competition/${
-        event.sku
-        }.html)`
-      );
-    });
+    const embed = makeEmbedFromPage(events, message, 0);
 
     if (!events.length) {
       embed.addField("Empty", "No events have been listed!");
     }
 
-    return message.channel.send({ embed });
+    const response = (await message.channel.send({ embed })) as Message;
+    await response.react("⬇");
+
+    let page = 0;
+    let lastPage = Math.ceil(events.length / 25)
+    listen(response, ["⬇", "⬆"], async (reaction, collector) => {
+      await response.clearReactions();
+
+      console.log(reaction);
+
+      if (reaction.emoji.name === "⬆" && page > 0) {
+        page--;
+      } else if (reaction.emoji.name === "⬇" && page < lastPage) {
+        page++;
+      }
+
+      const embed = makeEmbedFromPage(events, message, page);
+      await response.edit({ embed });
+
+      if (page > 0) {
+        response.react("⬆");
+      }
+
+      if (page < lastPage) {
+        response.react("⬇")
+      }
+
+    });
+
+
+    return response;
   }
 }
 
