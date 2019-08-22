@@ -3,6 +3,7 @@ import { TextChannel, Guild, Message } from "discord.js";
 import { client } from "../../client";
 
 import "./important";
+import "./images";
 import { DEBUG } from "../../commands/debug";
 
 function matchAll(str: string, re: RegExp) {
