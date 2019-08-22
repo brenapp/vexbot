@@ -14,9 +14,6 @@ function matchAll(str: string, re: RegExp) {
 async function clean(message: Message) {
   let content = message.content;
 
-
-
-
   const roles = await Promise.all(
     matchAll(content, /\<\@\&([0-9]+)\>/g).map(async match => ({
       key: match[0],
@@ -59,7 +56,7 @@ addMessageHandler(async message => {
 
   log.send(
     `${message.member.user.username}#${message.member.user.discriminator} in ${
-      message.type === "dm" ? "DM" : message.channel.toString()
+    message.type === "dm" ? "DM" : message.channel.toString()
     }: ${await clean(message)}`,
     {
       files: message.attachments.map(attach => attach.url)
@@ -84,7 +81,7 @@ client.on("messageUpdate", (old, current) => {
 
   log.send(
     `${old.member.user.username}#${old.member.user.discriminator} in ${
-      old.type === "dm" ? "DM" : old.channel.toString()
+    old.type === "dm" ? "DM" : old.channel.toString()
     }: ${old.content.toString()} => ${current.content.toString()}`
   );
 });
