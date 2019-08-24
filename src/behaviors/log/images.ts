@@ -8,6 +8,10 @@ import { DEBUG } from "../../commands/debug";
 addMessageHandler(async message => {
     const channel = client.channels.get("613961623866179585") as TextChannel;
 
+    if (!message.guild) {
+        return false;
+    }
+
     if (message.guild.id !== "387717101554499584")
         return false;
 
