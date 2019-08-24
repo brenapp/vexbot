@@ -21,10 +21,16 @@ addMessageHandler(message => {
 // Navy Seal Copypasta
 addMessageHandler(message => {
   if (
-    !message.mentions.users.has(client.user.id) &&
     !message.content.toLowerCase().includes("fuck you")
-  )
+  ) {
     return false;
+  }
+
+  if (!message.mentions.members.some(member => member.user.id === client.user.id)) {
+    return false;
+  }
+
+
 
   if (process.env["DEV"]) return false;
 
