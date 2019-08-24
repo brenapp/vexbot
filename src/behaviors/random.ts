@@ -86,6 +86,7 @@ addMessageHandler(async message => {
 
 addMessageHandler(async message => {
 
+  if (!message.guild) return false;
   if (message.guild.id != "310820885240217600") return false;
 
   // If we're not in the library, it doesn't apply
