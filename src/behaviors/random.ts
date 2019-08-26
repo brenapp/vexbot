@@ -71,6 +71,7 @@ addMessageHandler(async message => {
     "omar-needs-to-hydrate",
     "joels-autons",
     "bradleys-hoes",
+    "charlies-medication",
     "library"
   ];
 
