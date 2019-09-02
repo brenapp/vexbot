@@ -86,3 +86,46 @@ client.on("messageUpdate", (old, current) => {
     }: ${old.content.toString()} => ${current.content.toString()}`
   );
 });
+
+client.on("voiceStateUpdate", (old, current) => {
+  let log = old.guild.channels.find(
+    channel => channel.name === "server-log"
+  ) as TextChannel;
+
+
+  if (!log) return false;
+  if (old.user.bot) return false;
+
+
+
+  let changed = "";
+
+  if (!old.voiceChannel) {
+    changed = `connected to ${current.voiceChannel.name}`;
+  } else if (!current.voiceChannel) {
+    changed = `disconnected from ${old.voiceChannel.name}`;
+  } else if (old.voiceChannel.id != current.voiceChannel.id) {
+    changed = `moved from ${old.voiceChannel.name} to ${current.voiceChannel.name}`;
+  } else if (!old.selfDeaf && current.selfDeaf) {
+    changed = `Deafened themself`;
+  } else if (old.selfDeaf && !current.selfDeaf) {
+    changed = `undeafened themself`;
+  } else if (!old.selfMute && current.selfMute) {
+    changed = `muted themself`;
+  } else if (old.selfMute && !current.selfMute) {
+    changed = `unmuted themself`;
+  } else if (!old.serverDeaf && current.serverDeaf) {
+    changed = `was server deafend`;
+  } else if (old.serverDeaf && !current.serverDeaf) {
+    changed = `was server undeafened`;
+  } else if (!old.serverMute && current.serverMute) {
+    changed = `was server muted`;
+  } else if (old.serverMute && !current.serverMute) {
+    changed = `was server unmuted`;
+  };
+
+
+
+  log.send(`${old.user.username}#${old.user.discriminator} ${changed}`);
+
+});

@@ -8,3 +8,4 @@ import "./predict";
 import "./role";
 import "./help";
 import "./dumb";
+import "./voicetrack"
