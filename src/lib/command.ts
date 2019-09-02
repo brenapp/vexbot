@@ -81,10 +81,10 @@ export abstract class Command {
     let response;
     try {
       response = await this.exec(message, args);
-    } catch(e) {
+    } catch (e) {
       response = await message.channel.send(`Command execution failed. Please try again later`);
       report(client)(e);
-    } 
+    }
 
     // We're done processing
     message.channel.stopTyping(true);
@@ -120,9 +120,9 @@ export abstract class Command {
       } else {
         resp.edit(
           resp.content +
-            ` *(took ${Date.now() - start}ms${
-              process.env["DEV"] ? " — DEV MODE" : ""
-            })*`
+          ` *(took ${Date.now() - start}ms${
+          process.env["DEV"] ? " — DEV MODE" : ""
+          })*`
         );
       }
     }
@@ -214,5 +214,9 @@ export const Permissions = {
 
   compose(...checks: ((message: Message) => boolean)[]) {
     return message => checks.map(check => check(message)).every(resp => resp);
+  },
+
+  any(...checks: ((message: Message) => boolean)[]) {
+    return message => checks.map(check => check(message)).some(resp => resp);
   }
 };
