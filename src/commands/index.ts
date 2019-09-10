@@ -9,3 +9,4 @@ import "./role";
 import "./help";
 import "./dumb";
 import "./voicetrack"
+import "./control";
