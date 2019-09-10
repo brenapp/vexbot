@@ -239,6 +239,14 @@ new RestartCommand();
 export class ServerCommand extends Command("servers") {
   check = Permissions.owner;
 
+  documentation() {
+    return {
+      group: "OWNER",
+      description: "Lists servers vexbot is in",
+      usage: "servers"
+    }
+  }
+
   async exec(message: Message) {
 
     const content = client.guilds.map(guild => `${guild.id}: ${guild.name}`).join("\n");
@@ -252,6 +260,14 @@ new ServerCommand();
 
 export class ChannelsCommand extends Command("channels") {
   check = Permissions.owner;
+
+  documentation() {
+    return {
+      group: "OWNER",
+      description: "Gets accessible channels in a specified server",
+      usage: "channels <id>"
+    }
+  }
 
   async exec(message: Message, args: string[]) {
 
@@ -271,6 +287,14 @@ new ChannelsCommand();
 
 export class MessagesCommand extends Command("messages") {
   check = Permissions.owner;
+
+  documentation() {
+    return {
+      group: "OWNER",
+      description: "Gets messages channels in a specified channel",
+      usage: "messages <id>"
+    };
+  }
 
   async exec(message: Message, args: string[]) {
 
