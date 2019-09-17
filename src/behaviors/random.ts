@@ -71,8 +71,12 @@ addMessageHandler(async message => {
     "omar-needs-to-hydrate",
     "joels-autons",
     "bradleys-hoes",
-    "charlies-medication",
-    "library"
+    "library",
+    "vtotw-3",
+    "vtotw-2",
+    "spambombs-here (not really)",
+    "a-professional-frat",
+    "a-social-frat"
   ];
 
   const channel = await message.guild.channels.find(
