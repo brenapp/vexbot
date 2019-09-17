@@ -19,15 +19,20 @@ export class PauseCommand extends Command("pause") {
 
 }
 
+new PauseCommand();
+
 export class HideCommand extends Command("hide") {
     check = Permissions.compose(Permissions.admin, Permissions.guild);
 
 
     async exec(message: Message) {
         const channel = message.channel as TextChannel;
-        channel.overwritePermissions(channel.guild.defaultRole, { VIEW_CHANNEL: false }, "Hide channel")
 
+        return channel.overwritePermissions(channel.guild.defaultRole, { VIEW_CHANNEL: false }, "Hide channel")
     }
 
 
 }
+
+
+new HideCommand();
