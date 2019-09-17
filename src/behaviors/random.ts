@@ -74,7 +74,6 @@ addMessageHandler(async message => {
     "library",
     "vtotw-3",
     "vtotw-2",
-    "spambombs-here (not really)",
     "a-professional-frat",
     "a-social-frat"
   ];
