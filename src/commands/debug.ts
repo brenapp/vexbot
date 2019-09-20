@@ -104,7 +104,7 @@ export class PingCommand extends Command("ping") {
   }
 
   async exec(message: Message, args: string[]) {
-    return message.reply("Pong!");
+    return message.channel.send("pong");
   }
 }
 
