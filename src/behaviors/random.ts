@@ -100,8 +100,6 @@ addMessageHandler(async message => {
   const valid = message.content.startsWith("(") && message.content.endsWith(")");
   if (!valid) {
     message.reply("Shhh!");
-    probate(message.member, message.guild.me, "10s", "Shhh!");
-
   }
 
 });
