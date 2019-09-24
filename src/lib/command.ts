@@ -4,6 +4,8 @@ import { client } from "../client";
 import { authorization } from "./access";
 import report from "./report";
 
+import { DISABLED } from "../commands/lock"
+
 export const PREFIX = process.env["DEV"] ? ["."] : ["/", "!"];
 
 const owner = authorization("discord.owner");
@@ -61,6 +63,13 @@ export abstract class Command {
   async handle(message: Message) {
     if (!this.match(message)) return false;
 
+    // If the command is disabled, don't do anything
+    const names = this.names;
+    if (names.some(name => DISABLED.has(name))) {
+      return false;
+    }
+
+    // Permission check
     if (!(await this.check(message))) {
       await this.fail(message);
       return false;

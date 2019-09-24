@@ -56,3 +56,49 @@ export class UnlockCommand extends Command("unlock") {
 }
 
 new UnlockCommand();
+
+export let DISABLED = new Set<string>();
+
+export class DisableCommand extends Command("disable") {
+
+    check = Permissions.admin;
+
+    documentation() {
+        return {
+            description: "Disables vexbot commands",
+            usage: "disable <command1> <command2> ...",
+            group: "admin"
+        }
+    }
+
+    exec(message: Message, commands: string[]) {
+        commands.forEach(command => DISABLED.add(command));
+        return message.channel.send(`${commands.length} command(s) disabled successfully`);
+
+    }
+
+}
+
+new DisableCommand();
+
+export class EnableCommand extends Command("disable") {
+
+    check = Permissions.admin;
+
+    documentation() {
+        return {
+            description: "Disables vexbot commands",
+            usage: "disable <command1> <command2> ...",
+            group: "admin"
+        }
+    }
+
+    exec(message: Message, commands: string[]) {
+        commands.forEach(command => DISABLED.delete(command));
+        return message.channel.send(`${commands.length} command(s) disabled successfully`);
+
+    }
+
+}
+
+new EnableCommand();
