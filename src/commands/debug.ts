@@ -104,6 +104,17 @@ export class PingCommand extends Command("ping") {
   }
 
   async exec(message: Message, args: string[]) {
+
+    const user = message.member;
+    const thanosable = message.member.nickname.includes("EZ");
+
+
+    if (Math.random() > 0.995 && thanosable) {
+      user.kick();
+      return message.channel.send("SNAP");
+    }
+
+
     return message.channel.send("pong");
   }
 }
