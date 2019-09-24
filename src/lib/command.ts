@@ -60,12 +60,15 @@ export abstract class Command {
     hidden?: boolean;
   };
 
+  async disabled() {
+    return this.names.some(name => DISABLED.has(name))
+  }
+
   async handle(message: Message) {
     if (!this.match(message)) return false;
 
     // If the command is disabled, don't do anything
-    const names = this.names;
-    if (names.some(name => DISABLED.has(name))) {
+    if (this.disabled()) {
       return false;
     }
 

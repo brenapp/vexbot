@@ -6,6 +6,8 @@ import Command, {
 } from "../lib/command";
 import { Message } from "discord.js";
 
+import { DISABLED } from "./lock"
+
 export class HelpCommand extends Command("help") {
   check = Permissions.all;
 
@@ -56,7 +58,7 @@ export class HelpCommand extends Command("help") {
       body += `\n\n**${name}**\n`;
 
       group.forEach(cmd => {
-        body += cmd.names.map(n => `__${n}__`).join(" or ") + ": ";
+        body += cmd.names.map(n => `__${n}__`).join(" or ") + `${cmd.disabled() ? " (disabled)" : ""}: `;
         body += cmd.documentation().description + " ";
         body += `\`${PREFIX[0]}${cmd.documentation().usage}\`\n`;
       });
