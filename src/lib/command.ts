@@ -204,6 +204,10 @@ export const Permissions = {
     return message.channel.type == "text";
   },
 
+  dm(message: Message) {
+    return message.channel.type === "dm";
+  }
+
   env(parameter: string, value: any) {
     return (message: Message) => process.env[parameter] === value;
   },
