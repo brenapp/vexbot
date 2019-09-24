@@ -9,7 +9,15 @@ export class LockCommand extends Command("lock") {
 
     check = Permissions.admin;
 
-    exec(message: Message) {
+    documentation() {
+        return {
+            description: "Locks a channel",
+            usage: "locks",
+            group: "admin"
+        }
+    }
+
+    exec(message: Message, args: string[]) {
         const channel = message.channel as TextChannel;
 
 
@@ -27,13 +35,21 @@ export class UnlockCommand extends Command("unlock") {
 
     check = Permissions.admin;
 
+    documentation() {
+        return {
+            description: "Unlocks a channel",
+            usage: "unlock",
+            group: "admin"
+        }
+    }
+
     exec(message: Message) {
         const channel = message.channel as TextChannel;
 
 
         channel.overwritePermissions(channel.guild.defaultRole, { SEND_MESSAGES: null });
 
-        return message.channel.send("Channel locked");
+        return message.channel.send("Channel unlocked");
 
     }
 
