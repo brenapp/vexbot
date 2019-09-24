@@ -10,3 +10,4 @@ import "./help";
 import "./dumb";
 import "./voicetrack"
 import "./purge";
+import "./lock";
