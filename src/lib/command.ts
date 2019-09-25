@@ -4,7 +4,7 @@ import { client } from "../client";
 import { authorization } from "./access";
 import report from "./report";
 
-import { DISABLED } from "../commands/lock"
+export let DISABLED = new Set<Command>();
 
 export const PREFIX = process.env["DEV"] ? ["."] : ["/", "!"];
 
@@ -42,8 +42,12 @@ export let RESPONSES: { [id: string]: Message } = {};
 export abstract class Command {
   names: string[];
 
+  static find(message: Message) {
+    return Object.values(REGISTRY).find(cmd => cmd.match(message));
+  }
+
   static async execute(message: Message) {
-    const command = Object.values(REGISTRY).find(cmd => cmd.match(message));
+    const command = Command.find(message);
 
     if (!command) {
       return false;
@@ -61,7 +65,7 @@ export abstract class Command {
   };
 
   async disabled() {
-    return this.names.some(name => DISABLED.has(name))
+    return this.names.some(name => DISABLED.has(this))
   }
 
   async handle(message: Message) {

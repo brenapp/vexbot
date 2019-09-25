@@ -2,11 +2,10 @@ import Command, {
   Permissions,
   REGISTRY,
   PREFIX,
-  Command as cmd
+  Command as cmd,
+  DISABLED
 } from "../lib/command";
 import { Message } from "discord.js";
-
-import { DISABLED } from "./lock"
 
 export class HelpCommand extends Command("help") {
   check = Permissions.all;

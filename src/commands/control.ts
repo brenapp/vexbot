@@ -1,4 +1,4 @@
-import Command, { Permissions } from "../lib/command";
+import Command, { DISABLED, Permissions, matchCommand, Command as CMD, REGISTRY } from "../lib/command";
 import { Message, TextChannel } from "discord.js";
 
 /**
@@ -57,7 +57,10 @@ export class UnlockCommand extends Command("unlock") {
 
 new UnlockCommand();
 
-export let DISABLED = new Set<string>();
+
+function findCommand(name: string) {
+    return Object.values(REGISTRY).find(cmd => cmd.names.includes(name));
+}
 
 export class DisableCommand extends Command("disable") {
 
@@ -72,7 +75,8 @@ export class DisableCommand extends Command("disable") {
     }
 
     exec(message: Message, commands: string[]) {
-        commands.forEach(command => DISABLED.add(command));
+
+        commands.map(findCommand).forEach(command => DISABLED.add(command));
         return message.channel.send(`${commands.length} command(s) disabled successfully`);
 
     }
@@ -81,21 +85,21 @@ export class DisableCommand extends Command("disable") {
 
 new DisableCommand();
 
-export class EnableCommand extends Command("disable") {
+export class EnableCommand extends Command("enable") {
 
     check = Permissions.admin;
 
     documentation() {
         return {
-            description: "Disables vexbot commands",
-            usage: "disable <command1> <command2> ...",
+            description: "Enables vexbot commands",
+            usage: "enable <command1> <command2> ...",
             group: "admin"
         }
     }
 
     exec(message: Message, commands: string[]) {
-        commands.forEach(command => DISABLED.delete(command));
-        return message.channel.send(`${commands.length} command(s) disabled successfully`);
+        commands.map(findCommand).forEach(command => DISABLED.delete(command));
+        return message.channel.send(`${commands.length} command(s) enabled successfully`);
 
     }
 

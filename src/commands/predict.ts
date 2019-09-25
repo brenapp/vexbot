@@ -6,6 +6,7 @@ import {
 import Command, { makeEmbed, Permissions } from "../lib/command";
 import { Message } from "discord.js";
 
+
 async function predict(
   teams: string[],
   season: string = "current",
@@ -91,8 +92,8 @@ export class PredictCommand extends Command("predict") {
         red.score > blue.score
           ? 0xff7675
           : red.score === blue.score
-          ? 0xffffff
-          : 0x0984e3
+            ? 0xffffff
+            : 0x0984e3
       )
       .setTitle(
         `${teams.slice(0, 2).join(" & ")} vs. ${teams.slice(2, 4).join(" & ")}`
