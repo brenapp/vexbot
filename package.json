@@ -23,7 +23,8 @@
     "markov": "^0.0.7",
     "parse-duration": "^0.1.1",
     "sqlite": "^3.0.3",
-    "vexdb": "^2.1.8"
+    "vexdb": "^2.1.8",
+    "snyk": "^1.230.5"
   },
   "devDependencies": {
     "nodemon": "^1.17.5",
@@ -32,6 +33,9 @@
   },
   "scripts": {
     "start": "tsc && node out/main.js",
-    "dev": "./node_modules/nodemon/bin/nodemon.js"
-  }
+    "dev": "./node_modules/nodemon/bin/nodemon.js",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
+  },
+  "snyk": true
 }
