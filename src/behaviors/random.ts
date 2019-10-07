@@ -103,3 +103,17 @@ addMessageHandler(async message => {
   }
 
 });
+
+addMessageHandler(async message => {
+
+  if (!message.guild) return false;
+  if (message.guild.id != "310820885240217600") return false;
+
+  if (message.mentions.members.has("396821025687601153")) {
+    await message.channel.send("Polo!");
+    return true;
+  }
+
+  return false;
+
+});
