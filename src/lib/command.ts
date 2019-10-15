@@ -65,16 +65,27 @@ export abstract class Command {
   };
 
   async disabled() {
-    return this.names.some(name => DISABLED.has(this))
+    return !this.enabled
   }
+
+  enabled = true;
+
+  disable() {
+    this.enabled = false;
+  }
+
+  enable() {
+    this.enabled = true;
+  }
+
 
   async handle(message: Message) {
     if (!this.match(message)) return false;
 
     // If the command is disabled, don't do anything
-    // if (this.disabled()) {
-    //   return false;
-    // }
+    if (this.disabled()) {
+      return false;
+    }
 
     // Permission check
     if (!(await this.check(message))) {

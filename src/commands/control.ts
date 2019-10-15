@@ -76,7 +76,7 @@ export class DisableCommand extends Command("disable") {
 
     exec(message: Message, commands: string[]) {
 
-        commands.map(findCommand).forEach(command => DISABLED.add(command));
+        commands.map(findCommand).forEach(command => command.disable());
         return message.channel.send(`${commands.length} command(s) disabled successfully`);
 
     }
@@ -98,7 +98,7 @@ export class EnableCommand extends Command("enable") {
     }
 
     exec(message: Message, commands: string[]) {
-        commands.map(findCommand).forEach(command => DISABLED.delete(command));
+        commands.map(findCommand).forEach(command => command.enable());
         return message.channel.send(`${commands.length} command(s) enabled successfully`);
 
     }
