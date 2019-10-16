@@ -83,7 +83,7 @@ export abstract class Command {
     if (!this.match(message)) return false;
 
     // If the command is disabled, don't do anything
-    if (this.disabled()) {
+    if (this.disabled() && !Permissions.admin(message)) {
       return false;
     }
 
