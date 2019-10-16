@@ -80,7 +80,11 @@ addMessageHandler(async message => {
     "hannys-snap",
     "anti-anime-club",
     "crackhead-energy",
-    "the-friendzone"
+    "the-friendzone",
+    "banhammers-sold-here",
+    "robotics-disucssion-only😤",
+    "spooky",
+    "goofy"
   ];
 
   const channel = await message.guild.channels.find(
