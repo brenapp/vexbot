@@ -50,7 +50,7 @@ export class StoreCommand extends Command("store") {
   }
 
   async exec(message: Message, args: string[]) {
-    const store = await keya.store(args[0]);
+    const store = await keya.store(args[1]);
 
 
     switch (args[0]) {
@@ -71,16 +71,16 @@ export class StoreCommand extends Command("store") {
         return message.channel.send({ embed });
 
       case "get":
-        const value = await store.get(args[1]);
+        const value = await store.get(args[2]);
         if (!value) {
           return message.channel.send(
-            `Can't find key ${inline(args[1])} in store ${inline(store.name)}`
+            `Can't find key ${inline(args[2])} in store ${inline(store.name)}`
           );
         }
         return message.channel.send(code(JSON.stringify(value)));
 
       case "delete":
-        const deleted = await store.delete(args[1]);
+        const deleted = await store.delete(args[2]);
         return message.channel.send(
           deleted
             ? "Deleted successfully"
