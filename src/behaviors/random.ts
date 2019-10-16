@@ -75,7 +75,12 @@ addMessageHandler(async message => {
     "vtotw-3",
     "vtotw-2",
     "a-professional-frat",
-    "a-social-frat"
+    "a-social-frat",
+    "bruh",
+    "hannys-snap",
+    "anti-anime-club",
+    "crackhead-energy",
+    "the-friendzone"
   ];
 
   const channel = await message.guild.channels.find(
