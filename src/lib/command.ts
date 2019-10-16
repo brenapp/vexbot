@@ -64,7 +64,7 @@ export abstract class Command {
     hidden?: boolean;
   };
 
-  async disabled() {
+  disabled() {
     return !this.enabled
   }
 
