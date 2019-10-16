@@ -47,8 +47,8 @@ function constructFields(events: { capacity: string, open: string, event: Events
 }
 
 function makeEmbedFromPage(events: { capacity: string, open: string, event: EventsResponseObject }[], message: Message, page: number) {
-  const start = page * 25,
-    end = start + 25;
+  const start = page * 5,
+    end = start + 5;
 
   const subset = events.slice(start, end);
   const embed = makeEmbed(message);
@@ -135,8 +135,10 @@ export class EventCommand extends Command("events") {
     await response.react("⬇");
 
     let page = 0;
-    let lastPage = Math.ceil(events.length / 25)
-    listen(response, ["⬇", "⬆"], async (reaction, collector) => {
+    let lastPage = Math.ceil(events.length / 5);
+
+    let resp;
+    listen(response, ["⬇", "⬆"], resp = async (reaction, collector) => {
       await response.clearReactions();
 
       console.log(reaction);
@@ -149,6 +151,7 @@ export class EventCommand extends Command("events") {
 
       const embed = makeEmbedFromPage(events, message, page);
       await response.edit({ embed });
+      listen(response, ["⬇", "⬆"], resp);
 
       if (page > 0) {
         response.react("⬆");
