@@ -9,7 +9,7 @@ import { EventsRequestObject } from "vexdb/out/constants/RequestObjects";
 import { EventsResponseObject } from "vexdb/out/constants/ResponseObjects";
 import listen from "../lib/reactions";
 
-async function html(url: string) {
+export async function html(url: string) {
   const store = await keya.store("fetched");
   let record = await store.get(url);
 
