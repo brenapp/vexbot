@@ -76,7 +76,7 @@ async function getTotals(store: SQLiteStore, message: Message) {
   );
 }
 
-(async function() {
+(async function () {
   const store = await keya.store(`vexbotleaderboard`);
 
   class LeaderboardCommand extends Command("leaderboard") {
@@ -176,6 +176,12 @@ async function getTotals(store: SQLiteStore, message: Message) {
     }
 
     record.total++;
+
+    // 100k notification
+    if (record.total == 100000) {
+      message.channel.send(`🎉 Congratulations on sending the hundred thousandth message, ${message.author}! 🎉`)
+    }
+
 
     await store.set(message.author.id, record);
 
