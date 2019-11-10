@@ -13,6 +13,7 @@
     "@types/isomorphic-fetch": "^0.0.35",
     "@types/node": "^10.3.4",
     "cheerio": "^1.0.0-rc.3",
+    "cheerio-tableparser": "^1.0.1",
     "discord.js": "^11.3.2",
     "dlv": "^1.1.3",
     "execa": "^2.0.1",
@@ -22,9 +23,9 @@
     "keya": "^1.1.2",
     "markov": "^0.0.7",
     "parse-duration": "^0.1.1",
+    "snyk": "^1.230.5",
     "sqlite": "^3.0.3",
-    "vexdb": "^2.1.8",
-    "snyk": "^1.230.5"
+    "vexdb": "^2.1.8"
   },
   "devDependencies": {
     "nodemon": "^1.17.5",
