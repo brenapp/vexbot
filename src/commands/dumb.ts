@@ -101,3 +101,39 @@ export class UwuCommand extends Command("uwu") {
 }
 
 new UwuCommand();
+
+
+function cowsay(message) {
+  return ` ${"-".repeat(message.length + 2)}
+< ${message} >
+ ${"-".repeat(message.length + 2)}\n` +
+    [
+      "        \\   ^__^",
+      "         \\  (oo)\\_______",
+      "            (__)\\       )\\\/\\",
+      "               ||----w |",
+      "               ||     ||"
+    ].join("\n")
+}
+
+export class CowsayCommand extends Command("cowsay") {
+  check = Permissions.all;
+
+  documentation() {
+    return {
+      group: "Meta",
+      description: "Perhaps",
+      usage: "cowsay <message>",
+      hidden: true
+    };
+  }
+
+  async exec(message: Message, args: string[]) {
+
+    const cow = args.join(" ") || "Perhaps"
+
+    return message.channel.send("```" + cowsay(cow) + "```");
+  }
+}
+
+new CowsayCommand();

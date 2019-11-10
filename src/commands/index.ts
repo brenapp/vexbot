@@ -11,3 +11,4 @@ import "./dumb";
 import "./voicetrack"
 import "./purge";
 import "./control";
+import "./qualifications";
