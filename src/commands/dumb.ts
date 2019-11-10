@@ -137,3 +137,33 @@ export class CowsayCommand extends Command("cowsay") {
 }
 
 new CowsayCommand();
+
+
+export class BeepBeepCommand extends Command("beepbeep") {
+  check = Permissions.all;
+
+  documentation() {
+    return {
+      group: "Meta",
+      description: "Delivery",
+      usage: "beepbeep <message>",
+      hidden: true
+    };
+  }
+
+  async exec(message: Message, args: string[]) {
+
+    const m = args.join(" ") || "I am #BCUZBUILT"
+
+    return message.channel.send([
+      "──────▄▌▐▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀​▀▀▀▀▀▀▌",
+      "───▄▄██▌█ beep beep",
+      `▄▄▄▌▐██▌█ ${m}`,
+      "███████▌█▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄​▄▄▄▄▄▄▌",
+      "▀(@)▀▀▀▀▀▀▀(@)(@)▀▀▀▀▀▀▀▀▀▀▀▀▀​▀▀▀▀(@)▀"
+    ].join("\n"));
+  }
+}
+
+new BeepBeepCommand();
+
