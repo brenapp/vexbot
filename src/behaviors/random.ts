@@ -75,7 +75,8 @@ addMessageHandler(async message => {
     "vtotw-3",
     "vtotw-2",
     "a-professional-frat",
-    "a-social-frat"
+    "a-social-frat",
+    "ding-dong"
   ];
 
   const channel = await message.guild.channels.find(
