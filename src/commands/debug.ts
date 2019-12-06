@@ -123,7 +123,6 @@ new PingCommand();
 
 export class ExecCommand extends Command("shell") {
   check = Permissions.compose(
-    Permissions.guild,
     Permissions.owner
   );
 
@@ -209,12 +208,16 @@ export class ExecCommand extends Command("shell") {
 
   async fail(message: Message) {
     const report = information(client);
-    probate(
-      message.member,
-      message.guild.me,
-      "1h",
-      "Attempted use of shell execution"
-    );
+
+    if (message.guild) {
+
+      probate(
+        message.member,
+        message.guild.me,
+        "1h",
+        "Attempted use of shell execution"
+      );
+    }
 
     await report(`Failed attempt at shell execution by ${message.author}`);
   }
