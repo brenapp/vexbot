@@ -68,7 +68,7 @@ async function getTotals(store: SQLiteStore, message: Message) {
   // Set totals for everyone
   await Promise.all(
     Object.keys(totals).map(async id =>
-      store.set(id, {
+      store.set(`${message.guild.id}-${message.author.id}`, {
         total: totals[id],
         oof: oofs[id]
       })
@@ -104,7 +104,7 @@ async function getTotals(store: SQLiteStore, message: Message) {
     };
 
     async exec(message: Message, args: string[]) {
-      const all = (await store.all()) as ({
+      const all = (await store.all()).filter(({ key }: { key: string }) => key.startsWith(message.guild.id)) as ({
         key: string;
         value: { total: number; oof: number };
       })[];
@@ -169,7 +169,7 @@ async function getTotals(store: SQLiteStore, message: Message) {
 
   // Increment messages
   addMessageHandler(async message => {
-    const record = (await store.get(message.author.id)) || { total: 0, oof: 0 };
+    const record = (await store.get(`${message.guild.id}-${message.author.id}`)) || { total: 0, oof: 0 };
 
     if (message.content.toLowerCase().includes("oof")) {
       record.oof++;
@@ -177,13 +177,7 @@ async function getTotals(store: SQLiteStore, message: Message) {
 
     record.total++;
 
-    // 100k notification
-    if (record.total == 100000) {
-      message.channel.send(`🎉 Congratulations on sending the hundred thousandth message, ${message.author}! 🎉`)
-    }
-
-
-    await store.set(message.author.id, record);
+    await store.set(`${message.guild.id}-${message.author.id}`, record);
 
     return false;
   });
