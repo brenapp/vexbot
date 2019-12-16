@@ -112,7 +112,7 @@ async function getTotals(store: SQLiteStore, message: Message) {
 
       const leaderboard = top
         .slice(0, +args[0] || 10)
-        .map(v => client.users.get(v.key));
+        .map(v => client.users.get(v.key.split(" ")[0]));
 
       const total = all.reduce((a, b) => a + b.value.total, 0) as number;
       const oof = all.reduce((a, b) => a + (b.value.oof || 0), 0) as number;
