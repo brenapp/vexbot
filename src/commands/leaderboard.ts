@@ -68,7 +68,7 @@ async function getTotals(store: SQLiteStore, message: Message) {
   // Set totals for everyone
   await Promise.all(
     Object.keys(totals).map(async id =>
-      store.set(`${message.guild.id}-${message.author.id}`, {
+      store.set(`${message.guild.id}-${id}`, {
         total: totals[id],
         oof: oofs[id]
       })
