@@ -1,6 +1,8 @@
 # Reset to origin branch
 git reset --hard
 
+echo "Downloading changes..."
+
 # Update from GitHub
 git pull;
 
