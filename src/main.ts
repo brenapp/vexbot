@@ -3,6 +3,8 @@ import { handleMessage } from "./lib/message";
 import report, { information } from "./lib/report";
 import { client } from "./client";
 
+import { DEBUG } from "./commands/debug"
+
 // Commands and message handlers
 import "./lib/handlers";
 import "./commands";
@@ -31,8 +33,7 @@ client.on("ready", () => {
 });
 
 const reporter = report(client);
-process.on("uncaughtException", reporter);
-process.on("unhandledRejection", reporter);
+process.on("uncaughtException", e => DEBUG ? reporter(e) : null);
+process.on("unhandledRejection", e => DEBUG ? reporter(e) : null);
 
 client.on("message", handleMessage);
-client.on("error", report);
