@@ -170,6 +170,11 @@ async function getTotals(store: SQLiteStore, message: Message) {
 
   // Increment messages
   addMessageHandler(async message => {
+
+    if (!message.guild) {
+      return;
+    }
+
     const record = (await store.get(`${message.guild.id}-${message.author.id}`)) || { total: 0, oof: 0 };
 
     if (message.content.toLowerCase().includes("oof")) {
