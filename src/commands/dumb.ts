@@ -223,3 +223,29 @@ export class SouthCarolinaFactCommand extends Command("scfact") {
 }
 
 new SouthCarolinaFactCommand();
+
+
+export class CoinFlipCommand extends Command("flip") {
+  check = Permissions.all;
+
+  documentation() {
+    return {
+      group: "Meta",
+      description: "Flips a coin",
+      usage: "flip",
+      hidden: true
+    };
+  }
+
+  async exec(message: Message, args: string[]) {
+    const random = Math.random();
+
+    if (random > 0.5) {
+      return message.channel.send("Heads!");
+    } else {
+      return message.channel.send("Tails!")
+    }
+  }
+}
+
+new CoinFlipCommand();
