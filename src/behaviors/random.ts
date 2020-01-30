@@ -77,7 +77,8 @@ addMessageHandler(async message => {
     "a-professional-frat",
     "a-social-frat",
     "ding-dong",
-    "tip-in-finals"
+    "tip-in-finals",
+    "averys-cloud-juice"
   ];
 
   const channel = await message.guild.channels.find(
