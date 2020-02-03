@@ -363,3 +363,5 @@ export class VersionCommand extends Command("version") {
     return message.channel.send(`\`\`\`\ncommit ${commit.hash}\n${commit.sanitizedSubject}\n\`\`\``);
   }
 }
+
+new VersionCommand();
