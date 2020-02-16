@@ -27,9 +27,11 @@ client.on("ready", () => {
 
   probation.initalize();
 
-  information(client)(
-    `${process.env["DEV"] ? "DEV MODE" : "PRODUCTION"} online!`
-  );
+  if (DEBUG || !process.env["DEV"]) {
+    information(client)(
+      `${process.env["DEV"] ? "DEV MODE" : "PRODUCTION"} online!`
+    );
+  }
 });
 
 const reporter = report(client);
