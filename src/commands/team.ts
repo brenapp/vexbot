@@ -30,14 +30,22 @@ function outcome(team: string, match: MatchesResponseObject) {
 }
 
 function buildRecord(team: string, matches: MatchesResponseObject[]) {
+
+  // Ensure team has captial letter
+  team = team.toUpperCase();
+
   const record = {
+    team,
     wins: 0,
     losses: 0,
-    ties: 0
+    ties: 0,
+    matches: 0
   }
 
   for (let match of matches) {
     const result = outcome(team, match);
+
+    record.matches++;
 
     if (result == MatchOutcome.WIN) {
       record.wins++;
@@ -142,3 +150,49 @@ export class TeamCommand extends Command("team") {
 }
 
 export default new TeamCommand();
+
+
+export class WinRateRankingCommand extends Command("winrates") {
+
+  check = Permissions.all;
+
+  async exec(message: Message, args: string[]) {
+
+    // Get all the teams in the region
+    const region = args[0] || "South Carolina";
+    const teams = await vexdb.get("teams", { region });
+
+    // Get all their matches
+    const teamMatches = await Promise.all(
+      teams.map(async team => ({
+        team,
+        matches: await vexdb.get("matches", { team: team.number, season: "current" })
+      }))
+    );
+
+    const records = teamMatches.map(({ team, matches }) => buildRecord(team.number, matches)).filter(record => record.matches > 0);
+
+    // Sort the records by winrate
+    const rankings = records.sort(
+      (b, a) =>
+        (a.wins / a.matches) - (b.wins / b.matches)
+    )
+
+
+    const embed = makeEmbed(message)
+      .setTitle(`${region} Season Record Leaderboard`)
+      .setDescription("Ranking by Win Rate")
+
+    for (let rank = 0; rank < Math.min(25, rankings.length); rank++) {
+      const ranking = rankings[rank];
+
+      embed.addField(`${rank + 1}. ${ranking.team} — ${(100 * ranking.wins / ranking.matches).toFixed(2)}%`, `${ranking.wins}-${ranking.losses}-${ranking.ties}`)
+    }
+
+    return message.channel.send({ embed });
+
+  }
+
+}
+
+new WinRateRankingCommand();
