@@ -31,9 +31,6 @@ function outcome(team: string, match: MatchesResponseObject) {
 
 function buildRecord(team: string, matches: MatchesResponseObject[]) {
 
-  // Ensure team has captial letter
-  team = team.toUpperCase();
-
   const record = {
     team,
     wins: 0,
@@ -72,7 +69,7 @@ export class TeamCommand extends Command("team") {
   }
 
   async exec(message: Message, args: string[]) {
-    const team = args[0];
+    const team = args[0].toUpperCase();
     const season = args.slice(1).join(" ") || "current";
 
     if (!team) {
