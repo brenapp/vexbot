@@ -11,6 +11,12 @@ import execa from "execa";
 import { addOneTimeMessageHandler, removeMessageHandler } from "../lib/message";
 import { code, escape, inline } from "../lib/util";
 
+import { getLastCommit, Commit } from "git-last-commit"
+
+const getCommit = () => new Promise<Commit>((res, rej) => {
+  getLastCommit((err, commit) => err ? rej(err) : res(commit));
+});
+
 export let DEBUG = false;
 
 export class DebugCommand extends Command("debug") {
@@ -338,3 +344,24 @@ export class MessagesCommand extends Command("messages") {
 }
 
 new MessagesCommand();
+
+
+export class VersionCommand extends Command("version") {
+  check = Permissions.owner;
+
+  documentation() {
+    return {
+      description: "Gets vexbot version",
+      usage: `version`,
+      group: "Owner"
+    };
+  }
+
+  async exec(message: Message, args: string[]) {
+
+    const commit = await getCommit();
+    return message.channel.send(`\`\`\`\ncommit ${commit.hash}\n${commit.sanitizedSubject}\n\`\`\``);
+  }
+}
+
+new VersionCommand();

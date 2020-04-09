@@ -68,7 +68,7 @@ async function getTotals(store: SQLiteStore, message: Message) {
   // Set totals for everyone
   await Promise.all(
     Object.keys(totals).map(async id =>
-      store.set(`${message.guild.id}-${message.author.id}`, {
+      store.set(`${message.guild.id}-${id}`, {
         total: totals[id],
         oof: oofs[id]
       })
@@ -112,7 +112,8 @@ async function getTotals(store: SQLiteStore, message: Message) {
 
       const leaderboard = top
         .slice(0, +args[0] || 10)
-        .map(v => client.users.get(v.key.split(" ")[0]));
+        .map(v => client.users.get(v.key.split("-")[1]));
+
 
       const total = all.reduce((a, b) => a + b.value.total, 0) as number;
       const oof = all.reduce((a, b) => a + (b.value.oof || 0), 0) as number;
@@ -169,6 +170,11 @@ async function getTotals(store: SQLiteStore, message: Message) {
 
   // Increment messages
   addMessageHandler(async message => {
+
+    if (!message.guild) {
+      return;
+    }
+
     const record = (await store.get(`${message.guild.id}-${message.author.id}`)) || { total: 0, oof: 0 };
 
     if (message.content.toLowerCase().includes("oof")) {

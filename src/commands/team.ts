@@ -6,9 +6,15 @@ import {
 import Command, { makeEmbed, Permissions } from "../lib/command";
 import { Message } from "discord.js";
 
+enum MatchOutcome {
+  WIN,
+  TIE,
+  LOSS
+}
+
 function outcome(team: string, match: MatchesResponseObject) {
   if (match.redscore === match.bluescore) {
-    return "tie";
+    return MatchOutcome.TIE;
   }
 
   if (
@@ -17,10 +23,36 @@ function outcome(team: string, match: MatchesResponseObject) {
     (match.bluescore > match.redscore &&
       [match.blue1, match.blue2, match.blue3].includes(team))
   ) {
-    return "win";
+    return MatchOutcome.WIN;
   }
 
-  return "loss";
+  return MatchOutcome.LOSS;
+}
+
+function buildRecord(team: string, matches: MatchesResponseObject[]) {
+  const record = {
+    team,
+    wins: 0,
+    losses: 0,
+    ties: 0,
+    matches: 0
+  };
+
+  for (let match of matches) {
+    const result = outcome(team, match);
+
+    record.matches++;
+
+    if (result == MatchOutcome.WIN) {
+      record.wins++;
+    } else if (result == MatchOutcome.LOSS) {
+      record.losses++;
+    } else {
+      record.ties++;
+    }
+  }
+
+  return record;
 }
 
 export class TeamCommand extends Command("team") {
@@ -35,7 +67,7 @@ export class TeamCommand extends Command("team") {
   }
 
   async exec(message: Message, args: string[]) {
-    const team = args[0];
+    const team = args[0].toUpperCase();
     const season = args.slice(1).join(" ") || "current";
 
     if (!team) {
@@ -52,40 +84,15 @@ export class TeamCommand extends Command("team") {
       return;
     }
 
-    let events = await vexdb.get("events", { team, season });
-    let rankings = await Promise.all(
-      events.map(evt =>
-        vexdb
-          .get("rankings", { sku: evt.sku, team, season })
-          .then(
-            rank => rank[0] || { wins: 0, losses: 0, ties: 0, rank: "Unranked" }
-          )
-      )
-    );
-    let awards = await Promise.all(
-      events.map(evt => vexdb.get("awards", { sku: evt.sku, team, season }))
-    );
+    const events = await vexdb.get("events", { team, season });
+    const matches = await vexdb.get("matches", { team, season, scored: 1 });
+    const awards = await vexdb.get("awards", { team, season });
+    const rankings = await vexdb.get("rankings", { team, season });
 
-    let totalWins = events
-      .map((evt, i) => rankings[i].wins)
-      .reduce((a, b) => a + b, 0);
-    let totalLosses = events
-      .map((evt, i) => rankings[i].losses)
-      .reduce((a, b) => a + b, 0);
-    let totalTies = events
-      .map((evt, i) => rankings[i].ties)
-      .reduce((a, b) => a + b, 0);
+    // Make the season record
+    const seasonRecord = buildRecord(team, matches);
 
-    // Get eliminations matches
-    const elims = (await vexdb.get("matches", { season, team })).filter(match =>
-      [16, 3, 4, 5].includes(match.round)
-    );
-
-    // Add wins, losses and ties
-    totalWins += elims.filter(match => outcome(team, match) === "win").length;
-    totalLosses += elims.filter(match => outcome(team, match) === "loss")
-      .length;
-    totalTies += elims.filter(match => outcome(team, match) === "tie").length;
+    console.log(seasonRecord);
 
     const embed = makeEmbed(message);
     embed
@@ -99,42 +106,95 @@ export class TeamCommand extends Command("team") {
       .setDescription(
         `${record.program == "VEXU" ? "VEXU" : record.grade} Team @ ${
           record.organisation
-        } (${record.city}, ${
-          record.region
-        })\nSeason Record: ${totalWins}-${totalLosses}-${totalTies} (${(
-          (totalWins / (totalLosses + totalTies + totalWins)) *
-          100
-        ).toPrecision(4)}% WR)`
+        } (${record.city}, ${record.region})\nSeason Record: ${
+          seasonRecord.wins
+        }-${seasonRecord.losses}-${seasonRecord.ties} (${(
+          (100 * seasonRecord.wins) /
+          matches.length
+        ).toFixed(2)}% WR)`
       );
 
-    for (let [i, event] of events.entries()) {
+    for (let event of events) {
+      const localAwards = awards.filter(award => award.sku === event.sku);
+      const ranking = rankings.find(rank => rank.sku === event.sku);
+      const eventRecord = buildRecord(
+        team,
+        matches.filter(match => match.sku === event.sku)
+      );
+
+      let output = "";
+
+      if (ranking) {
+        output += `Ranked #${ranking.rank} (${ranking.wins}-${ranking.losses}-${ranking.ties} in quals and ${eventRecord.wins}-${eventRecord.losses}-${eventRecord.ties} total)\n`;
+      }
+
+      if (localAwards.length > 0) {
+        output +=
+          localAwards.map(award => award.name.split("(")[0]).join(", ") + "\n";
+      }
+
+      if (!output || new Date(event.start).getTime() > Date.now()) {
+        output = "No Data Available";
+      }
+
       embed.addField(
-        new Date(event.start).getTime() > Date.now()
-          ? `(FUTURE EVENT) ${event.name}`
-          : event.name,
-        `${
-          rankings[i].rank && new Date(event.start).getTime() < Date.now()
-            ? `Ranked #${rankings[i].rank} (${rankings[i].wins}-${
-                rankings[i].losses
-              }-${rankings[i].ties})`
-            : `Unranked`
-        }. ${awards[i].map(award => award.name.split(" (")[0]).join(", ")}`
+        `${new Date(event.end).toLocaleDateString()} ${event.name}`,
+        output
       );
     }
-
-    if (events.length < 1) {
-      embed.addField(
-        "Empty",
-        `No logged events for ${
-          season === "current" ? "Tower Takeover" : season
-        }`
-      );
-    }
-
-    embed.setTimestamp();
 
     return message.channel.send(embed);
   }
 }
 
 export default new TeamCommand();
+
+export class WinRateRankingCommand extends Command("winrates") {
+  check = Permissions.all;
+
+  async exec(message: Message, args: string[]) {
+    // Get all the teams in the region
+    const region = args[0] || "South Carolina";
+    const teams = await vexdb.get("teams", { region });
+
+    // Get all their matches
+    const teamMatches = await Promise.all(
+      teams.map(async team => ({
+        team,
+        matches: await vexdb.get("matches", {
+          team: team.number,
+          season: "current"
+        })
+      }))
+    );
+
+    const records = teamMatches
+      .map(({ team, matches }) => buildRecord(team.number, matches))
+      .filter(record => record.matches > 0);
+
+    // Sort the records by winrate
+    const rankings = records.sort(
+      (b, a) => a.wins / a.matches - b.wins / b.matches
+    );
+
+    const embed = makeEmbed(message)
+      .setTitle(`${region} Season Record Leaderboard`)
+      .setDescription("Ranking by Win Rate");
+
+    for (let rank = 0; rank < Math.min(25, rankings.length); rank++) {
+      const ranking = rankings[rank];
+
+      embed.addField(
+        `${rank + 1}. ${ranking.team} — ${(
+          (100 * ranking.wins) /
+          ranking.matches
+        ).toFixed(2)}%`,
+        `${ranking.wins}-${ranking.losses}-${ranking.ties}`
+      );
+    }
+
+    return message.channel.send({ embed });
+  }
+}
+
+new WinRateRankingCommand();

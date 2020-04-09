@@ -221,7 +221,11 @@ export default class ElizaBot {
       if (k >= 0) rpl = this._execRule(k);
     }
     // return reply or default string
-    return rpl != "" ? rpl : "I am at a loss for words.";
+
+    const defaults = ["I am at a loss for words.", "Keep Going?", "Yeah?", "Tell me more.", "Oh?"];
+    const str = defaults[defaults.length * Math.random() | 0]
+
+    return rpl != "" ? rpl : str;
   }
 
   _execRule(k: number) {
