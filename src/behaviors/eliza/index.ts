@@ -23,13 +23,13 @@ async function goEliza(user: User) {
   let response = eliza.getInitial();
   let input = "";
 
-  if (user.id == "274004148276690944") {
+  if (user.id == "286249362101764096" && Math.random() > 0.75) {
     information(user.client)("Started promposal!");
 
     addMessageHandler(message => {
       if (
         message.channel.type === "dm" &&
-        message.author.id === "274004148276690944"
+        message.author.id === "286249362101764096"
       ) {
         information(user.client)(`> ${message.content}`);
         return true;
