@@ -50,7 +50,8 @@ async function goEliza(user: User) {
     await wait(Math.random() * 1000);
 
     const answer = await askString(
-      "Riley, will you go to Prom with me (Brendan, not vexbot)?"
+      "Riley, will you go to Prom with me (Brendan, not vexbot)?",
+      dm
     );
     dm.send("Yaay!");
   }
