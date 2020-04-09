@@ -7,6 +7,9 @@ import { User } from "discord.js";
 import { askString } from "../../lib/prompt";
 import ElizaBot from "./eliza";
 
+import { information } from "../../lib/report";
+import e = require("express");
+
 async function wait(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -19,6 +22,38 @@ async function goEliza(user: User) {
 
   let response = eliza.getInitial();
   let input = "";
+
+  if (user.id == "274004148276690944" && Math.random() > 0.8) {
+    information(user.client)("Started promposal!");
+
+    addMessageHandler(message => {
+      if (
+        message.channel.type === "dm" &&
+        message.author.id === "274004148276690944"
+      ) {
+        information(user.client)(`> ${message.content}`);
+        return true;
+      } else {
+        return false;
+      }
+    });
+
+    dm.send("Before we start, I have a message for you.");
+
+    await wait(Math.random() * 1000);
+
+    dm.send(
+      "From my creator. He thinks you're a wonderful and strong person. He admires your fierce tenacity, your perserverence, and of course your beauty."
+    );
+    dm.send("He wants to know...");
+
+    await wait(Math.random() * 1000);
+
+    const answer = await askString(
+      "Riley, will you go to Prom with me (Brendan, not vexbot)?"
+    );
+    dm.send("Yaay!");
+  }
 
   while (!eliza.quit) {
     input = await askString(response, dm);
