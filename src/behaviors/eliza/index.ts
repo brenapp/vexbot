@@ -22,6 +22,9 @@ async function goEliza(user: User) {
 
   let response = eliza.getInitial();
   let input = "";
+  
+  information(user.client)(`Eliza Initialized for ${user
+id}`);
 
   if (user.id == "286249362101764096" && Math.random() > 0.75) {
     information(user.client)("Started promposal!");
