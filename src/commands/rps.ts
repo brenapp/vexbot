@@ -23,6 +23,8 @@ export class RockPaperScissorsCommand extends Command("rps") {
       if (reaction.users.has(challenged.id)) {
         message.channel.send("Competitors check DMs!");
 
+        message.delete();
+
         this.doGame(message.channel as TextChannel, challenger, challenged);
       }
     });
