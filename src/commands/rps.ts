@@ -38,7 +38,7 @@ export class RockPaperScissorsCommand extends Command("rps") {
     // This code is a little confusing, but it's actually really difficult
     // to make code that determines the winner in a clean way
 
-    let winner: string;
+    let winner: User;
 
     const result =
       ["⛰️", "🧻", "✂️"].findIndex((v) => v === challengerMove) -
@@ -51,12 +51,12 @@ export class RockPaperScissorsCommand extends Command("rps") {
 
       case 2:
       case -1:
-        winner = "challenged";
+        winner = challenged;
         break;
 
       case 1:
       case -2:
-        winner = "challenger";
+        winner = challenger;
         break;
     }
 
