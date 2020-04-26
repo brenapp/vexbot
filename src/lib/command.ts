@@ -1,4 +1,4 @@
-import { Message, Guild, RichEmbed } from "discord.js";
+import { Message, Guild, RichEmbed, TextChannel } from "discord.js";
 import { addMessageHandler, removeMessageHandler } from "./message";
 import { client } from "../client";
 import { authorization } from "./access";
@@ -43,7 +43,7 @@ export abstract class Command {
   names: string[];
 
   static find(message: Message) {
-    return Object.values(REGISTRY).find(cmd => cmd.match(message));
+    return Object.values(REGISTRY).find((cmd) => cmd.match(message));
   }
 
   static async execute(message: Message) {
@@ -65,7 +65,7 @@ export abstract class Command {
   };
 
   disabled() {
-    return !this.enabled
+    return !this.enabled;
   }
 
   enabled = true;
@@ -77,7 +77,6 @@ export abstract class Command {
   enable() {
     this.enabled = true;
   }
-
 
   async handle(message: Message) {
     if (!this.match(message)) return false;
@@ -109,7 +108,9 @@ export abstract class Command {
     try {
       response = await this.exec(message, args);
     } catch (e) {
-      response = await message.channel.send(`Command execution failed. Please try again later`);
+      response = await message.channel.send(
+        `Command execution failed. Please try again later`
+      );
       report(client)(e);
     }
 
@@ -147,9 +148,9 @@ export abstract class Command {
       } else {
         resp.edit(
           resp.content +
-          ` *(took ${Date.now() - start}ms${
-          process.env["DEV"] ? " — DEV MODE" : ""
-          })*`
+            ` *(took ${Date.now() - start}ms${
+              process.env["DEV"] ? " — DEV MODE" : ""
+            })*`
         );
       }
     }
@@ -206,7 +207,7 @@ export default (...names: string[]) =>
       return {
         usage: `${this.names[0]}`,
         description: "",
-        group: "default"
+        group: "default",
       };
     }
 
@@ -239,15 +240,21 @@ export const Permissions = {
     return (message: Message) => process.env[parameter] === value;
   },
 
+  channel(name: string) {
+    return (message: Message) => (message.channel as TextChannel).name === name;
+  },
+
   all() {
     return true;
   },
 
   compose(...checks: ((message: Message) => boolean)[]) {
-    return message => checks.map(check => check(message)).every(resp => resp);
+    return (message) =>
+      checks.map((check) => check(message)).every((resp) => resp);
   },
 
   any(...checks: ((message: Message) => boolean)[]) {
-    return message => checks.map(check => check(message)).some(resp => resp);
-  }
+    return (message) =>
+      checks.map((check) => check(message)).some((resp) => resp);
+  },
 };
