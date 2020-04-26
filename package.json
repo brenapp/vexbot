@@ -40,5 +40,5 @@
     "snyk-protect": "snyk protect",
     "prepublish": "npm run snyk-protect"
   },
-  "snyk": true
+  "snyk": false
 }
