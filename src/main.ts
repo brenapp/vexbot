@@ -3,7 +3,7 @@ import { handleMessage } from "./lib/message";
 import report, { information } from "./lib/report";
 import { client } from "./client";
 
-import { DEBUG } from "./commands/debug"
+import { DEBUG } from "./commands/debug";
 
 // Commands and message handlers
 import "./lib/handlers";
@@ -20,6 +20,7 @@ client.on("ready", () => {
   console.log("vexbot#0599 is online!");
 
   if (process.env["DEV"]) {
+    console.log("DEV MODE ENABLED");
     client.user.setActivity("with VSCode", { type: "PLAYING" });
   } else {
     client.user.setActivity("over the server", { type: "WATCHING" });
@@ -35,7 +36,7 @@ client.on("ready", () => {
 });
 
 const reporter = report(client);
-process.on("uncaughtException", e => DEBUG ? reporter(e) : null);
-process.on("unhandledRejection", e => DEBUG ? reporter(e) : null);
+process.on("uncaughtException", (e) => (DEBUG ? reporter(e) : null));
+process.on("unhandledRejection", (e) => (DEBUG ? reporter(e) : null));
 
 client.on("message", handleMessage);
