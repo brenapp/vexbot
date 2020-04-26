@@ -8,7 +8,8 @@ import "./predict";
 import "./role";
 import "./help";
 import "./dumb";
-import "./voicetrack"
+import "./voicetrack";
 import "./purge";
 import "./control";
 import "./qualifications";
+import "./rps";
