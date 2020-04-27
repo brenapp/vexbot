@@ -62,11 +62,21 @@ export class RockPaperScissorsCommand extends Command("rps") {
         break;
     }
 
-    output.send(
+    let out = await output.send(
       `${challenger} plays ${challengerMove}\n${challenged} plays ${challengedMove}\n${
         winner ? `${winner} wins!` : "It's a tie!"
-      }`
+      } (React with 🔥 to play again)`
     );
+
+    if (out instanceof Array) {
+      out = out[0];
+    }
+
+    listen(out, ["🔥"], (fire) => {
+      if (fire.users.has(challenger.id) && fire.users.has(challenged.id)) {
+        this.doGame(output, challenger, challenged);
+      }
+    });
   }
 
   async getInput(user: User): Promise<string> {
