@@ -204,7 +204,7 @@ export default (...names: string[]) =>
     }
 
     documentation = {
-      usage: `${this.names[0]}`,
+      usage: "",
       description: "",
       group: "default",
     };
