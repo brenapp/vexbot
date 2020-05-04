@@ -60,7 +60,7 @@ async function approval(embed: RichEmbed) {
     let handleReaction;
     collector.on(
       "collect",
-      (handleReaction = vote => {
+      (handleReaction = (vote) => {
         const approver = vote.users.last();
 
         if (vote.emoji.name === "👍") {
@@ -81,14 +81,14 @@ async function approval(embed: RichEmbed) {
 
 http
   .createServer((req, res) => {
-    handler(req, res, function(err) {
+    handler(req, res, function (err) {
       res.statusCode = 404;
       res.end("no such location");
     });
   })
   .listen(7777);
 
-handler.on("push", async event => {
+handler.on("push", async (event) => {
   if (process.env["DEV"]) return;
 
   const embed = new RichEmbed();
@@ -106,9 +106,11 @@ handler.on("push", async event => {
   for (let commit of event.payload.commits) {
     embed.addField(
       code(escape(commit.message)),
-      `${commit.added.map(file => `+ ${file}`).join("\n")}${commit.removed
-        .map(file => `- ${file}`)
-        .join("\n")}${commit.modified.map(file => `Δ ${file}`).join("\n")}`
+      `${commit.added
+        .map((file) => `+ ${file}`)
+        .join("\n")}${commit.removed
+        .map((file) => `- ${file}`)
+        .join("\n")}${commit.modified.map((file) => `Δ ${file}`).join("\n")}`
     );
   }
 
