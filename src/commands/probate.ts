@@ -11,7 +11,7 @@ const owner = authorization("discord.owner");
 export class ProbateCommand extends Command("probate", "dq") {
   check = Permissions.compose(
     Permissions.admin,
-    message =>
+    (message) =>
       message.channel.type === "text" && !message.mentions.members.has(owner)
   );
 
@@ -19,13 +19,11 @@ export class ProbateCommand extends Command("probate", "dq") {
     super();
   }
 
-  documentation() {
-    return {
-      usage: "[probate|dq] @MayorMonty @bradley 10m I don't like you",
-      description: "Puts listed members on probation",
-      group: "ADMIN"
-    };
-  }
+  documentation = {
+    usage: "[probate|dq] @MayorMonty @bradley 10m I don't like you",
+    description: "Puts listed members on probation",
+    group: "ADMIN",
+  };
 
   fail(message: Message) {
     // First, chastise for trying to put me on probation
@@ -50,7 +48,7 @@ export class ProbateCommand extends Command("probate", "dq") {
     const victims = message.mentions.members;
     const [duration, ...reason] = args.slice(victims.size);
 
-    message.mentions.members.forEach(member => {
+    message.mentions.members.forEach((member) => {
       probate(member, message.member, duration, reason.join(" "));
     });
 
@@ -63,16 +61,16 @@ export class ProbateCommand extends Command("probate", "dq") {
       executed: number;
     } = (await store.get(message.member.id)) || {
       citations: 0,
-      executed: 0
+      executed: 0,
     };
     const citations: {
       citations: number;
       executed: number;
     }[] = await Promise.all(
-      victims.map(victim =>
+      victims.map((victim) =>
         store
           .get(victim.id)
-          .then(record => (record ? record : { citations: 0, executed: 0 }))
+          .then((record) => (record ? record : { citations: 0, executed: 0 }))
       )
     );
 

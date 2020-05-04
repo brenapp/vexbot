@@ -35,20 +35,18 @@ function toSarcasmCase(text: string) {
 export class SarcasmCommand extends Command("s") {
   check = Permissions.all;
 
-  documentation() {
-    return {
-      group: "Meta",
-      description: "SaRcAsM",
-      usage: "s",
-      hidden: true
-    };
-  }
+  documentation = {
+    group: "Meta",
+    description: "SaRcAsM",
+    usage: "s",
+    hidden: true,
+  };
 
   async exec(message: Message, args: string[]) {
     const channel = message.channel;
     const content = await channel
       .fetchMessages({ limit: 2 })
-      .then(messages => messages.last().content);
+      .then((messages) => messages.last().content);
 
     await message.delete();
 
@@ -79,20 +77,18 @@ function uwuify(str) {
 export class UwuCommand extends Command("uwu") {
   check = Permissions.all;
 
-  documentation() {
-    return {
-      group: "Meta",
-      description: "Tag me to uwuize messages",
-      usage: "uwu",
-      hidden: true
-    };
-  }
+  documentation = {
+    group: "Meta",
+    description: "Tag me to uwuize messages",
+    usage: "uwu",
+    hidden: true,
+  };
 
   async exec(message: Message, args: string[]) {
     const channel = message.channel;
     const content = await channel
       .fetchMessages({ limit: 2 })
-      .then(messages => messages.last().content);
+      .then((messages) => messages.last().content);
 
     await message.delete();
 
@@ -102,35 +98,33 @@ export class UwuCommand extends Command("uwu") {
 
 new UwuCommand();
 
-
 function cowsay(message) {
-  return ` ${"-".repeat(message.length + 2)}
+  return (
+    ` ${"-".repeat(message.length + 2)}
 < ${message} >
  ${"-".repeat(message.length + 2)}\n` +
     [
       "        \\   ^__^",
       "         \\  (oo)\\_______",
-      "            (__)\\       )\\\/\\",
+      "            (__)\\       )\\/\\",
       "               ||----w |",
-      "               ||     ||"
+      "               ||     ||",
     ].join("\n")
+  );
 }
 
 export class CowsayCommand extends Command("cowsay") {
   check = Permissions.all;
 
-  documentation() {
-    return {
-      group: "Meta",
-      description: "Perhaps",
-      usage: "cowsay <message>",
-      hidden: true
-    };
-  }
+  documentation = {
+    group: "Meta",
+    description: "Perhaps",
+    usage: "cowsay <message>",
+    hidden: true,
+  };
 
   async exec(message: Message, args: string[]) {
-
-    const cow = args.join(" ") || "Perhaps"
+    const cow = args.join(" ") || "Perhaps";
 
     return message.channel.send("```" + cowsay(cow) + "```");
   }
@@ -138,30 +132,28 @@ export class CowsayCommand extends Command("cowsay") {
 
 new CowsayCommand();
 
-
 export class BeepBeepCommand extends Command("beepbeep") {
   check = Permissions.all;
 
-  documentation() {
-    return {
-      group: "Meta",
-      description: "Delivery",
-      usage: "beepbeep <message>",
-      hidden: true
-    };
-  }
+  documentation = {
+    group: "Meta",
+    description: "Delivery",
+    usage: "beepbeep <message>",
+    hidden: true,
+  };
 
   async exec(message: Message, args: string[]) {
+    const m = args.join(" ") || "I am #BCUZBUILT";
 
-    const m = args.join(" ") || "I am #BCUZBUILT"
-
-    return message.channel.send([
-      "──────▄▌▐▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀​▀▀▀▀▀▀▌",
-      "───▄▄██▌█ beep beep",
-      `▄▄▄▌▐██▌█ ${m}`,
-      "███████▌█▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄​▄▄▄▄▄▄▌",
-      "▀(@)▀▀▀▀▀▀▀(@)(@)▀▀▀▀▀▀▀▀▀▀▀▀▀​▀▀▀▀(@)▀"
-    ].join("\n"));
+    return message.channel.send(
+      [
+        "──────▄▌▐▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀​▀▀▀▀▀▀▌",
+        "───▄▄██▌█ beep beep",
+        `▄▄▄▌▐██▌█ ${m}`,
+        "███████▌█▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄​▄▄▄▄▄▄▌",
+        "▀(@)▀▀▀▀▀▀▀(@)(@)▀▀▀▀▀▀▀▀▀▀▀▀▀​▀▀▀▀(@)▀",
+      ].join("\n")
+    );
   }
 }
 
@@ -170,17 +162,14 @@ new BeepBeepCommand();
 export class SouthCarolinaFactCommand extends Command("scfact") {
   check = Permissions.all;
 
-  documentation() {
-    return {
-      group: "Meta",
-      description: "Lists a random fact about SC",
-      usage: "scfacts",
-      hidden: false
-    };
-  }
+  documentation = {
+    group: "Meta",
+    description: "Lists a random fact about SC",
+    usage: "scfacts",
+    hidden: false,
+  };
 
   async exec(message: Message, args: string[]) {
-
     const facts = [
       `The oldest living organism this side of the Mississippi is the Angel Oak located on John's Island. It's estimated to be over 500 years old, and has a shady area of over 17,000 square feet.`,
       `Clemson University used to grow blue cheese in a civil-war era tunnel north of the campus called the Stumphouse Tunnel.`,
@@ -211,31 +200,27 @@ export class SouthCarolinaFactCommand extends Command("scfact") {
       `South Carolina is one of many states that are a part of the Academic Common Market, which allows students declaring certain majors to pay in-state tuition at institutions even if they hail from out of state.`,
       `In 1865, SC Senator Preston Brooks almost fatally beat Massachusetts Senator Charles Sumner on the floor of the US Senate Chamber.`,
       `There is a town in SC called Frog Level. However, the residents of the town call it "Prosperity", since "Frog Level doesn't sound appealing." This has worked so well that even Google and Apple Maps have it labeled as Prosperity.`,
-      `In 1958, the US Government accidentally dropped a Nuclear Bomb on Mars Bluff, SC. The blast created a hole 75 feet wide and 30 feet deep, and miraculously killed nobody.`
-    ]
+      `In 1958, the US Government accidentally dropped a Nuclear Bomb on Mars Bluff, SC. The blast created a hole 75 feet wide and 30 feet deep, and miraculously killed nobody.`,
+    ];
 
     // Get random fact
     const fact = facts[Math.round(Math.random() * facts.length)];
 
     return message.channel.send(fact);
-
   }
 }
 
 new SouthCarolinaFactCommand();
 
-
 export class CoinFlipCommand extends Command("flip") {
   check = Permissions.all;
 
-  documentation() {
-    return {
-      group: "Meta",
-      description: "Flips a coin",
-      usage: "flip",
-      hidden: true
-    };
-  }
+  documentation = {
+    group: "Meta",
+    description: "Flips a coin",
+    usage: "flip",
+    hidden: true,
+  };
 
   async exec(message: Message, args: string[]) {
     const random = Math.random();
@@ -243,7 +228,7 @@ export class CoinFlipCommand extends Command("flip") {
     if (random > 0.5) {
       return message.channel.send("Heads!");
     } else {
-      return message.channel.send("Tails!")
+      return message.channel.send("Tails!");
     }
   }
 }

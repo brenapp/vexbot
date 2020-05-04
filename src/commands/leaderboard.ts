@@ -14,10 +14,12 @@ async function fetchAll(channel: TextChannel) {
   process.stdout.write(" fetching");
 
   do {
-    batch = (await channel.fetchMessages({
-      limit: 100,
-      before: pointer
-    })).filter(message => !message.author.bot);
+    batch = (
+      await channel.fetchMessages({
+        limit: 100,
+        before: pointer,
+      })
+    ).filter((message) => !message.author.bot);
 
     pointer = batch.lastKey();
     messages = messages.concat(batch);
@@ -34,7 +36,7 @@ async function getTotals(store: SQLiteStore, message: Message) {
   const guild = message.guild;
 
   const text = guild.channels.filter(
-    channel => channel.type === "text"
+    (channel) => channel.type === "text"
   ) as Collection<string, TextChannel>;
 
   let totals = {};
@@ -43,7 +45,7 @@ async function getTotals(store: SQLiteStore, message: Message) {
   for (let [id, channel] of text) {
     console.log(`Tallying #${channel.name}...`);
     const messages = await fetchAll(channel);
-    messages.forEach(message => {
+    messages.forEach((message) => {
       if (totals[message.author.id]) {
         totals[message.author.id]++;
       } else {
@@ -67,10 +69,10 @@ async function getTotals(store: SQLiteStore, message: Message) {
 
   // Set totals for everyone
   await Promise.all(
-    Object.keys(totals).map(async id =>
+    Object.keys(totals).map(async (id) =>
       store.set(`${message.guild.id}-${id}`, {
         total: totals[id],
-        oof: oofs[id]
+        oof: oofs[id],
       })
     )
   );
@@ -82,13 +84,11 @@ async function getTotals(store: SQLiteStore, message: Message) {
   class LeaderboardCommand extends Command("leaderboard") {
     check = Permissions.guild;
 
-    documentation() {
-      return {
-        usage: "leaderboard",
-        description: "Lists people by their number of messages posted",
-        group: "META"
-      };
-    }
+    documentation = {
+      usage: "leaderboard",
+      description: "Lists people by their number of messages posted",
+      group: "META",
+    };
 
     titles = {
       "Secret Top Tier": "messages",
@@ -100,20 +100,21 @@ async function getTotals(store: SQLiteStore, message: Message) {
       "Highest Build Quality": "halfcuts",
       "Best Head Refs": "dqs",
       "Poking the Beehive": "posts on VF",
-      "Tournaments 'Won'": "bo1'd matches"
+      "Tournaments 'Won'": "bo1'd matches",
     };
 
     async exec(message: Message, args: string[]) {
-      const all = (await store.all()).filter(({ key }: { key: string }) => key.startsWith(message.guild.id)) as ({
+      const all = (await store.all()).filter(({ key }: { key: string }) =>
+        key.startsWith(message.guild.id)
+      ) as {
         key: string;
         value: { total: number; oof: number };
-      })[];
+      }[];
       const top = all.sort((a, b) => b.value.total - a.value.total);
 
       const leaderboard = top
         .slice(0, +args[0] || 10)
-        .map(v => client.users.get(v.key.split("-")[1]));
-
+        .map((v) => client.users.get(v.key.split("-")[1]));
 
       const total = all.reduce((a, b) => a + b.value.total, 0) as number;
       const oof = all.reduce((a, b) => a + (b.value.oof || 0), 0) as number;
@@ -145,13 +146,11 @@ async function getTotals(store: SQLiteStore, message: Message) {
   class LeaderboardTallyCommand extends Command("tally") {
     check = Permissions.admin;
 
-    documentation() {
-      return {
-        description: "Tallies the leaderboard",
-        usage: "tally",
-        group: "META"
-      };
-    }
+    documentation = {
+      description: "Tallies the leaderboard",
+      usage: "tally",
+      group: "META",
+    };
 
     async exec(message: Message) {
       let mess = (await message.channel.send(
@@ -169,13 +168,14 @@ async function getTotals(store: SQLiteStore, message: Message) {
   new LeaderboardTallyCommand();
 
   // Increment messages
-  addMessageHandler(async message => {
-
+  addMessageHandler(async (message) => {
     if (!message.guild) {
       return;
     }
 
-    const record = (await store.get(`${message.guild.id}-${message.author.id}`)) || { total: 0, oof: 0 };
+    const record = (await store.get(
+      `${message.guild.id}-${message.author.id}`
+    )) || { total: 0, oof: 0 };
 
     if (message.content.toLowerCase().includes("oof")) {
       record.oof++;

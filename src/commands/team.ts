@@ -1,7 +1,7 @@
 import * as vexdb from "vexdb";
 import {
   EventsResponseObject,
-  MatchesResponseObject
+  MatchesResponseObject,
 } from "vexdb/out/constants/ResponseObjects";
 import Command, { makeEmbed, Permissions } from "../lib/command";
 import { Message } from "discord.js";
@@ -9,7 +9,7 @@ import { Message } from "discord.js";
 enum MatchOutcome {
   WIN,
   TIE,
-  LOSS
+  LOSS,
 }
 
 function outcome(team: string, match: MatchesResponseObject) {
@@ -35,7 +35,7 @@ function buildRecord(team: string, matches: MatchesResponseObject[]) {
     wins: 0,
     losses: 0,
     ties: 0,
-    matches: 0
+    matches: 0,
   };
 
   for (let match of matches) {
@@ -58,13 +58,11 @@ function buildRecord(team: string, matches: MatchesResponseObject[]) {
 export class TeamCommand extends Command("team") {
   check = Permissions.all;
 
-  documentation() {
-    return {
-      description: "Lists team record for this season",
-      usage: "team 3796B",
-      group: "VEX"
-    };
-  }
+  documentation = {
+    description: "Lists team record for this season",
+    usage: "team 3796B",
+    group: "VEX",
+  };
 
   async exec(message: Message, args: string[]) {
     const team = args[0].toUpperCase();
@@ -77,7 +75,7 @@ export class TeamCommand extends Command("team") {
       return;
     }
 
-    let record = await vexdb.get("teams", { team }).then(res => res[0]);
+    let record = await vexdb.get("teams", { team }).then((res) => res[0]);
 
     if (!record) {
       message.reply("There doesn't appear to be a team with that number!");
@@ -115,11 +113,11 @@ export class TeamCommand extends Command("team") {
       );
 
     for (let event of events) {
-      const localAwards = awards.filter(award => award.sku === event.sku);
-      const ranking = rankings.find(rank => rank.sku === event.sku);
+      const localAwards = awards.filter((award) => award.sku === event.sku);
+      const ranking = rankings.find((rank) => rank.sku === event.sku);
       const eventRecord = buildRecord(
         team,
-        matches.filter(match => match.sku === event.sku)
+        matches.filter((match) => match.sku === event.sku)
       );
 
       let output = "";
@@ -130,7 +128,8 @@ export class TeamCommand extends Command("team") {
 
       if (localAwards.length > 0) {
         output +=
-          localAwards.map(award => award.name.split("(")[0]).join(", ") + "\n";
+          localAwards.map((award) => award.name.split("(")[0]).join(", ") +
+          "\n";
       }
 
       if (!output || new Date(event.start).getTime() > Date.now()) {
@@ -159,18 +158,18 @@ export class WinRateRankingCommand extends Command("winrates") {
 
     // Get all their matches
     const teamMatches = await Promise.all(
-      teams.map(async team => ({
+      teams.map(async (team) => ({
         team,
         matches: await vexdb.get("matches", {
           team: team.number,
-          season: "current"
-        })
+          season: "current",
+        }),
       }))
     );
 
     const records = teamMatches
       .map(({ team, matches }) => buildRecord(team.number, matches))
-      .filter(record => record.matches > 0);
+      .filter((record) => record.matches > 0);
 
     // Sort the records by winrate
     const rankings = records.sort(

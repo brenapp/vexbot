@@ -14,6 +14,7 @@ import "./behaviors/log";
 import "./behaviors/random";
 import "./behaviors/eliza";
 import "./behaviors/restart";
+import "./behaviors/elo";
 import * as probation from "./behaviors/probation";
 
 client.on("ready", () => {

@@ -57,7 +57,7 @@ export abstract class Command {
   }
 
   abstract match(message: Message): boolean;
-  abstract documentation(): {
+  abstract documentation: {
     description: string;
     usage: string;
     group: string;
@@ -203,13 +203,11 @@ export default (...names: string[]) =>
       }
     }
 
-    documentation() {
-      return {
-        usage: `${this.names[0]}`,
-        description: "",
-        group: "default",
-      };
-    }
+    documentation = {
+      usage: `${this.names[0]}`,
+      description: "",
+      group: "default",
+    };
 
     match(message: Message) {
       return matchCommand(message, names);

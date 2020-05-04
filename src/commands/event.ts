@@ -17,36 +17,33 @@ export async function html(url: string) {
     return record as string;
   } else {
     return fetch(url)
-      .then(res => res.text())
-      .then(async text => {
+      .then((res) => res.text())
+      .then(async (text) => {
         await store.set(url, text);
         return text;
       });
   }
 }
 
-function constructFields(events: { capacity: string, open: string, event: EventsResponseObject }[], embed: RichEmbed) {
-
+function constructFields(
+  events: { capacity: string; open: string; event: EventsResponseObject }[],
+  embed: RichEmbed
+) {
   events.forEach(({ event, open, capacity }) => {
     embed.addField(
-      `[${new Date(Date.parse(event.end)).toLocaleDateString()}] ${
-      event.name
-      }`,
-      `${open} open / ${capacity} teams @ ${event.loc_venue} (${
-      event.loc_city
-      }, ${
-      event.loc_region
-      })\n[RobotEvents](https://www.robotevents.com/robot-competitions/vex-robotics-competition/${
-      event.sku
-      }.html)`
+      `[${new Date(Date.parse(event.end)).toLocaleDateString()}] ${event.name}`,
+      `${open} open / ${capacity} teams @ ${event.loc_venue} (${event.loc_city}, ${event.loc_region})\n[RobotEvents](https://www.robotevents.com/robot-competitions/vex-robotics-competition/${event.sku}.html)`
     );
   });
 
   return embed;
-
 }
 
-function makeEmbedFromPage(events: { capacity: string, open: string, event: EventsResponseObject }[], message: Message, page: number) {
+function makeEmbedFromPage(
+  events: { capacity: string; open: string; event: EventsResponseObject }[],
+  message: Message,
+  page: number
+) {
   const start = page * 5,
     end = start + 5;
 
@@ -67,14 +64,14 @@ async function getCapacityInformation(
   return html(
     `https://www.robotevents.com/robot-competitions/vex-robotics-competition/${sku}.html`
   )
-    .then(html => cheerio.load(html))
-    .then($ =>
+    .then((html) => cheerio.load(html))
+    .then(($) =>
       $(
         "#front-app > div.panel.panel-default > div.panel-body > div > div:nth-child(2) > p:nth-child(4)"
       ).text()
     )
-    .then(text => {
-      let [capacity, open] = text.split(" / ").map(t => t.split(": ")[1]);
+    .then((text) => {
+      let [capacity, open] = text.split(" / ").map((t) => t.split(": ")[1]);
       return { capacity, open };
     });
 }
@@ -82,22 +79,20 @@ async function getCapacityInformation(
 export class EventCommand extends Command("events") {
   check = Permissions.all;
 
-  documentation() {
-    return {
-      description: "Lists events in a given region",
-      usage: "events South Carolina",
-      group: "VEX"
-    };
-  }
+  documentation = {
+    description: "Lists events in a given region",
+    usage: "events South Carolina",
+    group: "VEX",
+  };
 
   async exec(message: Message, args: string[]) {
     let region = args
-      .map(word => `${word[0].toUpperCase()}${word.slice(1).toLowerCase()}`)
+      .map((word) => `${word[0].toUpperCase()}${word.slice(1).toLowerCase()}`)
       .join(" ");
 
     let params: EventsRequestObject = {
       season: "current",
-      status: ["future", "current"]
+      status: ["future", "current"],
     };
 
     // Special cases
@@ -107,7 +102,7 @@ export class EventCommand extends Command("events") {
       case "Signature":
         params = {
           ...params,
-          name: name => name.includes("Signature Event")
+          name: (name) => name.includes("Signature Event"),
         };
         break;
       default:
@@ -118,12 +113,11 @@ export class EventCommand extends Command("events") {
     const events = await Promise.all(
       (await vexdb.get("events", params))
         .sort((a, b) => Date.parse(a.start) - Date.parse(b.start))
-        .map(async event => ({
+        .map(async (event) => ({
           event,
-          ...(await getCapacityInformation(event.sku))
+          ...(await getCapacityInformation(event.sku)),
         }))
     );
-
 
     const embed = makeEmbedFromPage(events, message, 0);
 
@@ -138,31 +132,33 @@ export class EventCommand extends Command("events") {
     let lastPage = Math.ceil(events.length / 5);
 
     let resp;
-    listen(response, ["⬇", "⬆"], resp = async (reaction, collector) => {
-      await response.clearReactions();
+    listen(
+      response,
+      ["⬇", "⬆"],
+      (resp = async (reaction, collector) => {
+        await response.clearReactions();
 
-      console.log(reaction);
+        console.log(reaction);
 
-      if (reaction.emoji.name === "⬆" && page > 0) {
-        page--;
-      } else if (reaction.emoji.name === "⬇" && page < lastPage) {
-        page++;
-      }
+        if (reaction.emoji.name === "⬆" && page > 0) {
+          page--;
+        } else if (reaction.emoji.name === "⬇" && page < lastPage) {
+          page++;
+        }
 
-      const embed = makeEmbedFromPage(events, message, page);
-      await response.edit({ embed });
-      listen(response, ["⬇", "⬆"], resp);
+        const embed = makeEmbedFromPage(events, message, page);
+        await response.edit({ embed });
+        listen(response, ["⬇", "⬆"], resp);
 
-      if (page > 0) {
-        response.react("⬆");
-      }
+        if (page > 0) {
+          response.react("⬆");
+        }
 
-      if (page < lastPage) {
-        response.react("⬇")
-      }
-
-    });
-
+        if (page < lastPage) {
+          response.react("⬇");
+        }
+      })
+    );
 
     return response;
   }

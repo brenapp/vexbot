@@ -11,27 +11,23 @@ import execa from "execa";
 import { addOneTimeMessageHandler, removeMessageHandler } from "../lib/message";
 import { code, escape, inline } from "../lib/util";
 
-import { getLastCommit, Commit } from "git-last-commit"
+import { getLastCommit, Commit } from "git-last-commit";
 
-const getCommit = () => new Promise<Commit>((res, rej) => {
-  getLastCommit((err, commit) => err ? rej(err) : res(commit));
-});
+const getCommit = () =>
+  new Promise<Commit>((res, rej) => {
+    getLastCommit((err, commit) => (err ? rej(err) : res(commit)));
+  });
 
 export let DEBUG = false;
 
 export class DebugCommand extends Command("debug") {
-  check = Permissions.compose(
-    Permissions.guild,
-    Permissions.owner
-  );
+  check = Permissions.compose(Permissions.guild, Permissions.owner);
 
-  documentation() {
-    return {
-      description: "Toggles debug mode. Owner Only Command",
-      usage: "debug",
-      group: "Owner"
-    };
-  }
+  documentation = {
+    description: "Toggles debug mode. Owner Only Command",
+    usage: "debug",
+    group: "Owner",
+  };
 
   exec(message: Message, args: string[]) {
     DEBUG = !DEBUG;
@@ -42,35 +38,29 @@ export class DebugCommand extends Command("debug") {
 new DebugCommand();
 
 export class StoreCommand extends Command("store") {
-  check = Permissions.compose(
-    Permissions.guild,
-    Permissions.owner
-  );
+  check = Permissions.compose(Permissions.guild, Permissions.owner);
 
-  documentation() {
-    return {
-      description: "Manages keya stores",
-      usage: "cache <store name> [list|clear|get|delete] <key>",
-      group: "Owner"
-    };
-  }
+  documentation = {
+    description: "Manages keya stores",
+    usage: "cache <store name> [list|clear|get|delete] <key>",
+    group: "Owner",
+  };
 
   async exec(message: Message, args: string[]) {
     const store = await keya.store(args[1]);
-
 
     switch (args[0]) {
       case "clear":
         await store.clear();
         return message.channel.send(`Cleared ${inline(store.name)}`);
       case "list":
-        const all = await store.all().then(a => a.map(v => v.key));
+        const all = await store.all().then((a) => a.map((v) => v.key));
 
         const embed = makeEmbed(message)
           .setTitle(store.name)
           .setDescription(
             `${all.length} items;\n${all.slice(0, 24).join("\n")}${
-            all.length > 25 ? "\n*...*" : ""
+              all.length > 25 ? "\n*...*" : ""
             }`
           );
 
@@ -101,25 +91,20 @@ new StoreCommand();
 export class PingCommand extends Command("ping") {
   check = Permissions.all;
 
-  documentation() {
-    return {
-      description: "Heartbeat",
-      usage: `ping`,
-      group: "Meta"
-    };
-  }
+  documentation = {
+    description: "Heartbeat",
+    usage: `ping`,
+    group: "Meta",
+  };
 
   async exec(message: Message, args: string[]) {
-
     const user = message.member;
     const thanosable = message.member.nickname.includes("EZ");
-
 
     if (Math.random() > 0.995 && thanosable) {
       user.kick();
       return message.channel.send("SNAP");
     }
-
 
     return message.channel.send("pong");
   }
@@ -128,9 +113,7 @@ export class PingCommand extends Command("ping") {
 new PingCommand();
 
 export class ExecCommand extends Command("shell") {
-  check = Permissions.compose(
-    Permissions.owner
-  );
+  check = Permissions.compose(Permissions.owner);
 
   prompt = "";
 
@@ -140,16 +123,14 @@ export class ExecCommand extends Command("shell") {
     // Get shell prompt
     this.prompt = `vexbot@${
       process.env["DEV"] ? "development" : "production"
-      } $ `;
+    } $ `;
   }
 
-  documentation() {
-    return {
-      description: "Arbitrary Shell execution",
-      usage: `shell echo "Hi"`,
-      group: "Owner"
-    };
-  }
+  documentation = {
+    description: "Arbitrary Shell execution",
+    usage: `shell echo "Hi"`,
+    group: "Owner",
+  };
 
   async exec(message: Message, params: string[]) {
     let body = `${this.prompt}${params.join(" ")}\n`;
@@ -183,7 +164,7 @@ export class ExecCommand extends Command("shell") {
       process.stderr.on("data", handleChunk);
 
       // Cancel process
-      handler = addOneTimeMessageHandler(m => {
+      handler = addOneTimeMessageHandler((m) => {
         if (
           m.channel.id !== message.channel.id ||
           m.member.id !== message.member.id ||
@@ -207,7 +188,7 @@ export class ExecCommand extends Command("shell") {
 
     return resp.edit(
       `${code(body)}EXITED ${
-      response.failed ? "UNSUCCESSFULLY" : "SUCCESSFULLY"
+        response.failed ? "UNSUCCESSFULLY" : "SUCCESSFULLY"
       } (${response.exitCode} ${response.exitCodeName})\n`
     );
   }
@@ -216,7 +197,6 @@ export class ExecCommand extends Command("shell") {
     const report = information(client);
 
     if (message.guild) {
-
       probate(
         message.member,
         message.guild.me,
@@ -233,46 +213,36 @@ const exec = new ExecCommand();
 export { exec };
 
 export class RestartCommand extends Command("restart") {
-  check = Permissions.compose(
-    Permissions.owner,
-    Permissions.guild
-  );
+  check = Permissions.compose(Permissions.owner, Permissions.guild);
 
   async exec(message: Message) {
     execa.command("pm2 restart vexbot");
     return message.channel.send("Restarting...");
   }
 
-  documentation() {
-    return {
-      group: "OWNER",
-      description: "Restarts vexbot",
-      usage: "restart"
-    }
-  }
-
+  documentation = {
+    group: "OWNER",
+    description: "Restarts vexbot",
+    usage: "restart",
+  };
 }
 
 new RestartCommand();
 
-
 export class ServerCommand extends Command("servers") {
   check = Permissions.owner;
 
-  documentation() {
-    return {
-      group: "OWNER",
-      description: "Lists servers vexbot is in",
-      usage: "servers"
-    }
-  }
+  documentation = {
+    group: "OWNER",
+    description: "Lists servers vexbot is in",
+    usage: "servers",
+  };
 
   async exec(message: Message) {
-
-    const content = client.guilds.map(guild => `${guild.id}: ${guild.name}`).join("\n");
+    const content = client.guilds
+      .map((guild) => `${guild.id}: ${guild.name}`)
+      .join("\n");
     message.channel.send(content);
-
-
   }
 }
 
@@ -281,25 +251,23 @@ new ServerCommand();
 export class ChannelsCommand extends Command("channels") {
   check = Permissions.owner;
 
-  documentation() {
-    return {
-      group: "OWNER",
-      description: "Gets accessible channels in a specified server",
-      usage: "channels <id>"
-    }
-  }
+  documentation = {
+    group: "OWNER",
+    description: "Gets accessible channels in a specified server",
+    usage: "channels <id>",
+  };
 
   async exec(message: Message, args: string[]) {
-
     const server = client.guilds.get(args[0]);
     if (!server) {
-      return message.channel.send("Can't access that server!")
-    };
+      return message.channel.send("Can't access that server!");
+    }
 
     // Get channels
-    const channels = server.channels.map(channel => `\`${channel.id}\`: ${channel.name} (${channel.type})`).join("\n");
+    const channels = server.channels
+      .map((channel) => `\`${channel.id}\`: ${channel.name} (${channel.type})`)
+      .join("\n");
     message.channel.send(channels);
-
   }
 }
 
@@ -308,59 +276,55 @@ new ChannelsCommand();
 export class MessagesCommand extends Command("messages") {
   check = Permissions.owner;
 
-  documentation() {
-    return {
-      group: "OWNER",
-      description: "Gets messages channels in a specified channel",
-      usage: "messages <id>"
-    };
-  }
+  documentation = {
+    group: "OWNER",
+    description: "Gets messages channels in a specified channel",
+    usage: "messages <id>",
+  };
 
   async exec(message: Message, args: string[]) {
-
     const channel = client.channels.get(args[0]);
     if (!channel) {
-      return message.channel.send("Can't access that channel!")
-    };
+      return message.channel.send("Can't access that channel!");
+    }
 
     if (channel.type == "category" || channel.type == "voice") {
       return message.channel.send("Not a text channel");
-    };
+    }
 
     // Get channels
-    const messages = await (channel as TextChannel).fetchMessages({ limit: 50 });
+    const messages = await (channel as TextChannel).fetchMessages({
+      limit: 50,
+    });
     for (let [, m] of messages) {
       message.channel.send(
         `${m.member.user.username}#${m.member.user.discriminator} in ${
-        m.type === "dm" ? "DM" : m.channel.toString()
+          m.type === "dm" ? "DM" : m.channel.toString()
         }: ${m.cleanContent}`,
         {
-          files: m.attachments.map(attach => attach.url)
+          files: m.attachments.map((attach) => attach.url),
         }
       );
     }
-
   }
 }
 
 new MessagesCommand();
 
-
 export class VersionCommand extends Command("version") {
   check = Permissions.owner;
 
-  documentation() {
-    return {
-      description: "Gets vexbot version",
-      usage: `version`,
-      group: "Owner"
-    };
-  }
+  documentation = {
+    description: "Gets vexbot version",
+    usage: `version`,
+    group: "Owner",
+  };
 
   async exec(message: Message, args: string[]) {
-
     const commit = await getCommit();
-    return message.channel.send(`\`\`\`\ncommit ${commit.hash}\n${commit.sanitizedSubject}\n\`\`\``);
+    return message.channel.send(
+      `\`\`\`\ncommit ${commit.hash}\n${commit.sanitizedSubject}\n\`\`\``
+    );
   }
 }
 
