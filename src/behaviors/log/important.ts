@@ -9,7 +9,7 @@ import {
   Message,
   MessageReaction,
   Collector,
-  RichEmbed
+  RichEmbed,
 } from "discord.js";
 import { makeEmbed } from "../../lib/command";
 import listen from "../../lib/reactions";
@@ -17,7 +17,7 @@ import listen from "../../lib/reactions";
 // Notify #event-log about important events
 function serverlog(guild: Guild): TextChannel {
   return guild.channels.find(
-    channel => channel.name === "event-log" && channel.type === "text"
+    (channel) => channel.name === "event-log" && channel.type === "text"
   ) as TextChannel;
 }
 
@@ -25,8 +25,8 @@ function changedRoles(
   old: Collection<string, Role>,
   current: Collection<string, Role>
 ): { added: Collection<string, Role>; removed: Collection<string, Role> } {
-  const added = current.filter(role => !old.has(role.id));
-  const removed = old.filter(role => !current.has(role.id));
+  const added = current.filter((role) => !old.has(role.id));
+  const removed = old.filter((role) => !current.has(role.id));
 
   return { added, removed };
 }
@@ -51,8 +51,8 @@ async function handleVeto(
     embed.addField(
       "Veto",
       reaction.users
-        .filter(user => !user.bot)
-        .map(user => user)
+        .filter((user) => !user.bot)
+        .map((user) => user)
         .join(", ")
     );
     message.edit({ embed });
@@ -71,7 +71,7 @@ client.on("guildBanAdd", async (guild: Guild, user: User) => {
   // Establish original actor
   const entry = await guild
     .fetchAuditLogs({ type: "MEMBER_BAN_ADD" })
-    .then(audit => audit.entries.first());
+    .then((audit) => audit.entries.first());
 
   // Ignore vetos
   if (entry.executor.bot) {
@@ -82,10 +82,10 @@ client.on("guildBanAdd", async (guild: Guild, user: User) => {
 
   const message = (await log.send({ embed })) as Message;
 
-  handleVeto(message, embed, reaction =>
+  handleVeto(message, embed, (reaction) =>
     guild.unban(
       user,
-      `Vetoed by ${reaction.users.map(user => user.username).join(", ")}`
+      `Vetoed by ${reaction.users.map((user) => user.username).join(", ")}`
     )
   );
 });
@@ -101,7 +101,7 @@ client.on("guildBanRemove", async (guild: Guild, user: User) => {
   // Establish original actor
   const entry = await guild
     .fetchAuditLogs({ type: "MEMBER_BAN_REMOVE" })
-    .then(audit => audit.entries.first());
+    .then((audit) => audit.entries.first());
 
   // Ignore vetos
   if (entry.executor.bot) {
@@ -113,10 +113,10 @@ client.on("guildBanRemove", async (guild: Guild, user: User) => {
   const message = (await log.send({ embed })) as Message;
   await message.react("👎");
 
-  handleVeto(message, embed, reaction =>
+  handleVeto(message, embed, (reaction) =>
     guild.ban(
       user,
-      `Vetoed by ${reaction.users.map(user => user.username).join(", ")}`
+      `Vetoed by ${reaction.users.map((user) => user.username).join(", ")}`
     )
   );
 });
@@ -152,7 +152,7 @@ client.on("guildMemberUpdate", async (old, current) => {
   if (old.nickname !== current.nickname) {
     entry = await current.guild
       .fetchAuditLogs({ type: "MEMBER_UPDATE" })
-      .then(audit => audit.entries.first());
+      .then((audit) => audit.entries.first());
 
     embed.addField(
       "Changed Nicknames",
@@ -165,20 +165,20 @@ client.on("guildMemberUpdate", async (old, current) => {
   if (added.size > 0 || removed.size > 0) {
     entry = await current.guild
       .fetchAuditLogs({ type: "MEMBER_ROLE_UPDATE" })
-      .then(audit => audit.entries.first());
+      .then((audit) => audit.entries.first());
   }
 
   if (added.size > 0) {
     embed.addField(
       "Added Roles",
-      `${added.map(role => role.toString()).join(" ")}`
+      `${added.map((role) => role.toString()).join(" ")}`
     );
   }
 
   if (removed.size > 0) {
     embed.addField(
       "Removed Roles",
-      `${removed.map(role => role.toString()).join(" ")}`
+      `${removed.map((role) => role.toString()).join(" ")}`
     );
   }
 
@@ -190,7 +190,7 @@ client.on("guildMemberUpdate", async (old, current) => {
   embed.addField("Executor", entry.executor);
 
   const message = (await log.send({ embed })) as Message;
-  handleVeto(message, embed, reaction => {
+  handleVeto(message, embed, (reaction) => {
     if (old.nickname !== current.nickname) {
       return current.setNickname(old.nickname);
     }
