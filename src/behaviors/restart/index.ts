@@ -20,7 +20,8 @@ const report = information(client);
 
 async function deploy() {
   const subprocess = execa.command("sh deploy.sh");
-  let body = exec.prompt + " sh deploy.sh\n";
+  let body = `vexbot@${process.env["DEV"] ? "development" : "production"} $ `;
+  +" sh deploy.sh\n";
   let message = (await report(code(body))) as Message;
 
   async function handleChunk(chunk: string) {

@@ -1,24 +1,19 @@
-import Command, {
-  DISABLED,
-  Permissions,
-  matchCommand,
-  Command as CMD,
-  REGISTRY,
-} from "../lib/command";
+import Command, { DISABLED, Permissions, REGISTRY } from "../lib/command";
 import { Message, TextChannel } from "discord.js";
 
 /**
  * Locks a specific channel
  */
 
-export class LockCommand extends Command("lock") {
-  check = Permissions.admin;
+Command({
+  names: ["lock"],
+  check: Permissions.admin,
 
-  documentation = {
+  documentation: {
     description: "Locks a channel",
     usage: "locks",
     group: "admin",
-  };
+  },
 
   exec(message: Message, args: string[]) {
     const channel = message.channel as TextChannel;
@@ -28,19 +23,22 @@ export class LockCommand extends Command("lock") {
     });
 
     return message.channel.send("Channel locked");
-  }
-}
+  },
+});
 
-new LockCommand();
+/**
+ * Unlocks a channel
+ */
 
-export class UnlockCommand extends Command("unlock") {
-  check = Permissions.admin;
+Command({
+  names: ["unlock"],
+  check: Permissions.admin,
 
-  documentation = {
+  documentation: {
     description: "Unlocks a channel",
     usage: "unlock",
     group: "admin",
-  };
+  },
 
   exec(message: Message) {
     const channel = message.channel as TextChannel;
@@ -50,49 +48,45 @@ export class UnlockCommand extends Command("unlock") {
     });
 
     return message.channel.send("Channel unlocked");
-  }
-}
+  },
+});
 
-new UnlockCommand();
+/**
+ * Command Enable
+ */
 
-function findCommand(name: string) {
-  return Object.values(REGISTRY).find((cmd) => cmd.names.includes(name));
-}
+Command({
+  names: ["disable"],
+  check: Permissions.admin,
 
-export class DisableCommand extends Command("disable") {
-  check = Permissions.admin;
-
-  documentation = {
+  documentation: {
     description: "Disables vexbot commands",
     usage: "disable <command1> <command2> ...",
     group: "admin",
-  };
+  },
 
   exec(message: Message, commands: string[]) {
-    commands.map(findCommand).forEach((command) => command.disable());
-    return message.channel.send(
-      `${commands.length} command(s) disabled successfully`
-    );
-  }
-}
+    for (const command of commands) {
+      const config = REGISTRY.get(command);
+      DISABLED.add(config);
+    }
+  },
+});
 
-new DisableCommand();
+Command({
+  names: ["enable"],
+  check: Permissions.admin,
 
-export class EnableCommand extends Command("enable") {
-  check = Permissions.admin;
-
-  documentation = {
+  documentation: {
     description: "Enables vexbot commands",
-    usage: "enable <command1> <command2> ...",
+    usage: "disable <command1> <command2> ...",
     group: "admin",
-  };
+  },
 
   exec(message: Message, commands: string[]) {
-    commands.map(findCommand).forEach((command) => command.enable());
-    return message.channel.send(
-      `${commands.length} command(s) enabled successfully`
-    );
-  }
-}
-
-new EnableCommand();
+    for (const command of commands) {
+      const config = REGISTRY.get(command);
+      DISABLED.delete(config);
+    }
+  },
+});
