@@ -1,218 +1,160 @@
 import { Message, Guild, RichEmbed, TextChannel } from "discord.js";
-import { addMessageHandler, removeMessageHandler } from "./message";
-import { client } from "../client";
-import { authorization } from "./access";
+import { authorization, config } from "./access";
+import { makeEmbed } from "./util";
 import report from "./report";
 
-export let DISABLED = new Set<Command>();
-
-export const PREFIX = process.env["DEV"] ? ["."] : ["/", "!"];
-
 const owner = authorization("discord.owner");
+export const PREFIX: string[] = process.env["DEV"]
+  ? config("prefix.dev")
+  : config("prefix.prod");
 
-export function makeEmbed(message?: Message) {
-  const embed = new RichEmbed().setTimestamp();
-
-  if (message) {
-    const invoker =
-      message.channel.type === "text"
-        ? message.member.displayName
-        : message.author.username;
-    embed.setFooter(`Invoked by ${invoker}`);
-  }
-
-  return embed;
-}
-
-export function matchCommand(message: Message, names: string[]) {
-  return (
-    PREFIX.includes(message.content[0]) &&
-    names.includes(message.content.split(" ")[0].slice(1))
-  );
-}
-
+/**
+ * Identifies if a passed message is a commmand
+ * @param message
+ */
 export function isCommand(message: Message) {
   return PREFIX.includes(message.content[0]);
 }
 
-// Command Registry & Responses
-export let REGISTRY: { [command: string]: Command } = {};
-export let RESPONSES: { [id: string]: Message } = {};
-
-export abstract class Command {
+export interface CommandConfiguration {
   names: string[];
 
-  static find(message: Message) {
-    return Object.values(REGISTRY).find((cmd) => cmd.match(message));
-  }
-
-  static async execute(message: Message) {
-    const command = Command.find(message);
-
-    if (!command) {
-      return false;
-    }
-
-    return command.handle(message);
-  }
-
-  abstract match(message: Message): boolean;
-  abstract documentation: {
+  documentation: {
     description: string;
     usage: string;
     group: string;
     hidden?: boolean;
   };
 
-  disabled() {
-    return !this.enabled;
-  }
+  // Lifecycle methods
 
-  enabled = true;
+  // See if it's valid to use the command (see the Permissions object below)
+  check: (message: Message) => boolean | Promise<boolean>;
 
-  disable() {
-    this.enabled = false;
-  }
+  // If the check fails
+  fail?: (message: Message) => void;
 
-  enable() {
-    this.enabled = true;
-  }
-
-  async handle(message: Message) {
-    if (!this.match(message)) return false;
-
-    // If the command is disabled, don't do anything
-    if (this.disabled() && !Permissions.admin(message)) {
-      return false;
-    }
-
-    // Permission check
-    if (!(await this.check(message))) {
-      await this.fail(message);
-      return false;
-    }
-
-    // Only owners are allowed to use dev mode PREFIX
-    if (process.env["DEV"] && !Permissions.owner(message)) {
-      return false;
-    }
-
-    // Parse args
-    const args = message.content.split(" ").slice(1);
-    const start = Date.now();
-
-    // Use typing to indicate processing
-    message.channel.startTyping();
-
-    let response;
-    try {
-      response = await this.exec(message, args);
-    } catch (e) {
-      response = await message.channel.send(
-        `Command execution failed. Please try again later`
-      );
-      report(client)(e);
-    }
-
-    // We're done processing
-    message.channel.stopTyping(true);
-
-    if (response) {
-      let resp = response instanceof Array ? response[0] : response;
-
-      // Record response
-      RESPONSES[message.id] = resp;
-
-      if (resp.embeds.length > 0) {
-        let embed = resp.embeds[0];
-        embed.footer.text += ` (took ${Date.now() - start}ms)`;
-
-        // Copy over embed
-        const replacement = makeEmbed(resp)
-          .setFooter(embed.footer.text)
-          .setTitle(embed.title)
-          .setColor(embed.color)
-          .setDescription(embed.description)
-          .setImage((embed.image || { url: undefined }).url)
-          .setThumbnail((embed.thumbnail || { url: undefined }).url)
-          .setTimestamp(new Date(embed.timestamp))
-          .setURL(embed.url);
-
-        if (embed.author) {
-          replacement.setAuthor(embed.author);
-        }
-
-        replacement.fields = embed.fields;
-
-        resp.edit({ embed: replacement });
-      } else {
-        resp.edit(
-          resp.content +
-            ` *(took ${Date.now() - start}ms${
-              process.env["DEV"] ? " — DEV MODE" : ""
-            })*`
-        );
-      }
-    }
-    return true;
-  }
-
-  unregister() {
-    for (let name in this.names) {
-      delete REGISTRY[name];
-    }
-  }
-
-  /**
-   * Check if the command can/should be run
-   * @param message
-   */
-  check(message: Message): Promise<boolean> | boolean {
-    return true;
-  }
-
-  /**
-   * Runs when check() evaluates to false
-   */
-  fail(message: Message): void | Promise<void> {
-    return;
-  }
-
-  /**
-   * Executes the command
-   * @param message
-   * @param args
-   */
+  // Execute the command
   exec(
     message: Message,
     args: string[]
-  ): Promise<Message | Message[] | void> | void {
-    return;
-  }
+  ): Promise<Message | Message[] | void> | void;
 }
 
-export default (...names: string[]) =>
-  class NamedCommand extends Command {
-    constructor() {
-      super();
-      this.names = names;
+// Holds all the registered commands (with each name being mapped)
+export const REGISTRY = new Map<string, CommandConfiguration>();
 
-      // Add the instance of myself to the registry
-      for (let name of names) {
-        REGISTRY[name] = this;
+export function matchCommand(message: Message) {
+  const name = message.content.slice(1).split(" ")[0];
+
+  if (!REGISTRY.has(name)) {
+    return null;
+  }
+
+  return REGISTRY.get(name);
+}
+
+/**
+ * Adds new commands to the registry
+ * @param config
+ */
+export default function makeCommand(config: CommandConfiguration) {
+  for (const name of config.names) {
+    REGISTRY.set(name, config);
+  }
+
+  return config;
+}
+
+// Handles all of the commands we've already executed
+export const RESPONSES = new Map<Message, Message>();
+
+// Commands that are disabled go here
+export const DISABLED = new Set<CommandConfiguration>();
+
+/**
+ * Actually handles the commands we send
+ * @param message
+ */
+export async function handle(message: Message): Promise<boolean> {
+  if (!isCommand(message)) return false;
+
+  // Get the appropriate command, if it exists
+  const command = matchCommand(message);
+  if (!command) {
+    message.channel.send(
+      `No such command \`${message.content.slice(1).split(" ")[0]}\`. Use \`${
+        PREFIX[0]
+      }help\` for a list of commands`
+    );
+    return false;
+  }
+
+  // Check if the command is disabled
+  const disabled = DISABLED.has(command);
+  if (disabled && !Permissions.owner(message)) {
+    return false;
+  }
+
+  // See if the command is allowed to be used by the permission system
+  const allowed = await command.check.call(command, message);
+  if (!allowed && command.fail) {
+    command.fail.call(command, message);
+
+    return true;
+  }
+
+  // Get the arguments
+  const argv = message.content.split(" ").slice(1);
+
+  // Start the timer (for when we edit the message later to indicate how long the command takes)
+  const start = Date.now();
+  const response = await command.exec.call(command, message, argv);
+
+  const time = Date.now() - start;
+
+  // If the command gave us a response to track
+  if (response) {
+    const main = response instanceof Array ? response[0] : response;
+
+    // Archive that resposne
+    RESPONSES.set(message, main);
+
+    // If there isn't any attached embeds, then edit the message itself
+    if (main.embeds.length < 1) {
+      main.edit(
+        main.content +
+          ` *(took ${Date.now() - start}ms${
+            process.env["DEV"] ? " — DEV MODE" : ""
+          })*`
+      );
+
+      // Otherwise get the last embed and edit it;
+    } else {
+      const embed = main.embeds[0];
+
+      const replacement = makeEmbed(main)
+        .setFooter(embed.footer.text)
+        .setTitle(embed.title)
+        .setColor(embed.color)
+        .setDescription(embed.description)
+        .setImage((embed.image || { url: undefined }).url)
+        .setThumbnail((embed.thumbnail || { url: undefined }).url)
+        .setTimestamp(new Date(embed.timestamp))
+        .setURL(embed.url);
+
+      if (embed.author) {
+        replacement.setAuthor(embed.author);
       }
-    }
 
-    documentation = {
-      usage: "",
-      description: "",
-      group: "default",
-    };
+      replacement.fields = embed.fields;
 
-    match(message: Message) {
-      return matchCommand(message, names);
+      main.edit({ embed: replacement });
     }
-  };
+  }
+
+  return true;
+}
 
 export const Permissions = {
   admin(message: Message) {
