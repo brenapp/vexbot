@@ -2,71 +2,64 @@ import Command, {
   Permissions,
   REGISTRY,
   PREFIX,
-  Command as cmd,
   DISABLED,
+  CommandConfiguration,
 } from "../lib/command";
 import { Message } from "discord.js";
 
-export class HelpCommand extends Command("help") {
-  check = Permissions.all;
-
-  documentation = {
+Command({
+  names: ["help"],
+  documentation: {
     description: "Lists all commands and usage",
     usage: "help",
     group: "META",
-  };
+  },
 
+  check: Permissions.all,
   async exec(message: Message) {
-    const groups: { [key: string]: cmd[] } = {
-      META: [],
-      VEX: [],
-      OWNER: [],
-      ADMIN: [],
-    };
+    // Let's organize the commands into their group
+    const groups: {
+      [group: string]: CommandConfiguration[];
+    } = {};
 
-    let commands = Object.values(REGISTRY).filter(
-      (cmd, i, array) =>
-        i === array.findIndex((c) => c.names[0] === cmd.names[0])
-    );
+    // Go through each command
+    for (const [name, command] of REGISTRY) {
+      // Get rid of all aliases
+      if (name !== command.names[0]) continue;
 
-    // Get the commands that this person is able to execute
-    let allowedIndex = await Promise.all(
-      commands.map((cmd) => cmd.check(message) && !cmd.documentation.hidden)
-    );
-    commands.forEach((cmd, i) => {
-      const groupname = cmd.documentation.group.toUpperCase();
+      // Get rid of invisible commands
+      if (command.documentation.hidden) continue;
 
-      if (!groups[groupname]) {
-        groups[groupname] = [];
+      // Make sure the user is able to access this command
+      const allowed = await command.check(message);
+      if (!allowed) continue;
+
+      // Place it into its group
+      const group = command.documentation.group.toUpperCase();
+
+      if (groups[group]) {
+        groups[group].push(command);
+      } else {
+        groups[group] = [command];
       }
+    }
 
-      if (allowedIndex[i]) groups[groupname].push(cmd);
-    });
-
+    // Build the output
     let body = "Here's what I can do!";
 
-    Object.keys(groups).forEach((name) => {
-      const group = groups[name];
-
-      if (!group.length) {
-        return;
-      }
-
+    // List all of the command channels
+    for (const [name, commands] of Object.entries(groups)) {
       body += `\n\n**${name}**\n`;
 
-      group.forEach((cmd) => {
-        body +=
-          cmd.names.map((n) => `__${n}__`).join(" or ") +
-          `${cmd.disabled() ? " (disabled)" : ""}: `;
-        body += cmd.documentation.description + " ";
-        body += `\`${PREFIX[0]}${cmd.documentation.usage}\`\n`;
-      });
-    });
+      for (const command of commands) {
+        body += body += command.names.map((n) => `__${n}__`).join(" or ");
+        body += command.documentation.description + " ";
+        body += `\`${PREFIX[0]}${command.documentation.usage}\`\n`;
+      }
+    }
 
     body += "\nRemember to keep most bot usage in the appropriate channel!";
 
     return message.reply(body);
-  }
-}
-
-export default new HelpCommand();
+  },
+});

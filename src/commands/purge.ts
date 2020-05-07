@@ -5,15 +5,15 @@ import { Message, TextChannel } from "discord.js";
  * Purges messages in the used channel
  */
 
-export default class PurgeCommand extends Command("purge") {
-  check = Permissions.admin;
-
-  documentation = {
+Command({
+  names: ["purge"],
+  documentation: {
     group: "ADMIN",
     description: "Purges messages from a user, channel or role",
     usage: "purge <number of messages> @USER @ROLE #CHANNEL",
-  };
+  },
 
+  check: Permissions.admin,
   async exec(message: Message, [count]: string[]) {
     let channel: TextChannel;
 
@@ -58,7 +58,5 @@ export default class PurgeCommand extends Command("purge") {
     );
 
     return message.channel.send(`Deleted ${count} messages from ${channel}`);
-  }
-}
-
-new PurgeCommand();
+  },
+});

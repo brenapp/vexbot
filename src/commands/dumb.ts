@@ -32,15 +32,17 @@ function toSarcasmCase(text: string) {
 }
 
 // Dumb Commands
-export class SarcasmCommand extends Command("s") {
-  check = Permissions.all;
 
-  documentation = {
+Command({
+  names: ["s"],
+  documentation: {
     group: "Meta",
     description: "SaRcAsM",
     usage: "s",
     hidden: true,
-  };
+  },
+
+  check: Permissions.all,
 
   async exec(message: Message, args: string[]) {
     const channel = message.channel;
@@ -51,10 +53,8 @@ export class SarcasmCommand extends Command("s") {
     await message.delete();
 
     return message.channel.send(toSarcasmCase(content));
-  }
-}
-
-new SarcasmCommand();
+  },
+});
 
 // Uwuify
 const faces = ["(・`ω´・)", ";;w;;", "owo", "UwU", ">w<", "^w^"];
@@ -74,15 +74,16 @@ function uwuify(str) {
   return str;
 }
 
-export class UwuCommand extends Command("uwu") {
-  check = Permissions.all;
-
-  documentation = {
+Command({
+  names: ["uwu"],
+  documentation: {
     group: "Meta",
     description: "Tag me to uwuize messages",
     usage: "uwu",
     hidden: true,
-  };
+  },
+
+  check: Permissions.all,
 
   async exec(message: Message, args: string[]) {
     const channel = message.channel;
@@ -93,10 +94,8 @@ export class UwuCommand extends Command("uwu") {
     await message.delete();
 
     return message.channel.send(uwuify(content));
-  }
-}
-
-new UwuCommand();
+  },
+});
 
 function cowsay(message) {
   return (
@@ -113,35 +112,33 @@ function cowsay(message) {
   );
 }
 
-export class CowsayCommand extends Command("cowsay") {
-  check = Permissions.all;
-
-  documentation = {
+Command({
+  names: ["cowsay"],
+  documentation: {
     group: "Meta",
     description: "Perhaps",
     usage: "cowsay <message>",
     hidden: true,
-  };
+  },
 
+  check: Permissions.all,
   async exec(message: Message, args: string[]) {
     const cow = args.join(" ") || "Perhaps";
 
     return message.channel.send("```" + cowsay(cow) + "```");
-  }
-}
+  },
+});
 
-new CowsayCommand();
-
-export class BeepBeepCommand extends Command("beepbeep") {
-  check = Permissions.all;
-
-  documentation = {
+Command({
+  names: ["beepbeep"],
+  documentation: {
     group: "Meta",
     description: "Delivery",
     usage: "beepbeep <message>",
     hidden: true,
-  };
+  },
 
+  check: Permissions.all,
   async exec(message: Message, args: string[]) {
     const m = args.join(" ") || "I am #BCUZBUILT";
 
@@ -154,20 +151,19 @@ export class BeepBeepCommand extends Command("beepbeep") {
         "▀(@)▀▀▀▀▀▀▀(@)(@)▀▀▀▀▀▀▀▀▀▀▀▀▀​▀▀▀▀(@)▀",
       ].join("\n")
     );
-  }
-}
+  },
+});
 
-new BeepBeepCommand();
+Command({
+  names: ["scfact"],
+  check: Permissions.all,
 
-export class SouthCarolinaFactCommand extends Command("scfact") {
-  check = Permissions.all;
-
-  documentation = {
+  documentation: {
     group: "Meta",
     description: "Lists a random fact about SC",
     usage: "scfacts",
     hidden: false,
-  };
+  },
 
   async exec(message: Message, args: string[]) {
     const facts = [
@@ -207,22 +203,20 @@ export class SouthCarolinaFactCommand extends Command("scfact") {
     const fact = facts[Math.round(Math.random() * facts.length)];
 
     return message.channel.send(fact);
-  }
-}
+  },
+});
 
-new SouthCarolinaFactCommand();
-
-export class CoinFlipCommand extends Command("flip") {
-  check = Permissions.all;
-
-  documentation = {
+Command({
+  names: ["flip"],
+  documentation: {
     group: "Meta",
     description: "Flips a coin",
     usage: "flip",
     hidden: true,
-  };
+  },
 
-  async exec(message: Message, args: string[]) {
+  check: Permissions.all,
+  async exec(message) {
     const random = Math.random();
 
     if (random > 0.5) {
@@ -230,7 +224,5 @@ export class CoinFlipCommand extends Command("flip") {
     } else {
       return message.channel.send("Tails!");
     }
-  }
-}
-
-new CoinFlipCommand();
+  },
+});

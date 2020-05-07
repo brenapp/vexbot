@@ -8,22 +8,19 @@ import * as keya from "keya";
 
 const owner = authorization("discord.owner");
 
-export class ProbateCommand extends Command("probate", "dq") {
-  check = Permissions.compose(
-    Permissions.admin,
-    (message) =>
-      message.channel.type === "text" && !message.mentions.members.has(owner)
-  );
-
-  constructor() {
-    super();
-  }
-
-  documentation = {
+Command({
+  names: ["probate", "dq"],
+  documentation: {
     usage: "[probate|dq] @MayorMonty @bradley 10m I don't like you",
     description: "Puts listed members on probation",
     group: "ADMIN",
-  };
+  },
+
+  check: Permissions.compose(
+    Permissions.admin,
+    (message) =>
+      message.channel.type === "text" && !message.mentions.members.has(owner)
+  ),
 
   fail(message: Message) {
     // First, chastise for trying to put me on probation
@@ -42,7 +39,7 @@ export class ProbateCommand extends Command("probate", "dq") {
       "1m",
       "Unauthorized use of probate"
     );
-  }
+  },
 
   async exec(message: Message, args: string[]) {
     const victims = message.mentions.members;
@@ -78,7 +75,5 @@ export class ProbateCommand extends Command("probate", "dq") {
     executor.executed++;
 
     // Increment victims
-  }
-}
-
-export default new ProbateCommand();
+  },
+});
