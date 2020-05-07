@@ -1,10 +1,12 @@
 import * as keya from "keya";
 import FileSystemStore from "keya/out/node/filesystem";
 import { Guild, Collection, TextChannel, Message } from "discord.js";
-import Command, { Permissions, makeEmbed } from "../lib/command";
+import Command, { Permissions } from "../lib/command";
+import { makeEmbed } from "../lib/util";
 import SQLiteStore from "keya/out/node/sqlite";
 import { client } from "../client";
 import { addMessageHandler } from "../lib/message";
+import { config } from "../lib/access";
 
 async function fetchAll(channel: TextChannel) {
   let messages = await channel.fetchMessages({ limit: 100 });
@@ -81,29 +83,19 @@ async function getTotals(store: SQLiteStore, message: Message) {
 (async function () {
   const store = await keya.store(`vexbotleaderboard`);
 
-  class LeaderboardCommand extends Command("leaderboard") {
-    check = Permissions.guild;
-
-    documentation = {
+  const leaderboard = Command({
+    names: ["leaderboard"],
+    documentation: {
       usage: "leaderboard",
       description: "Lists people by their number of messages posted",
       group: "META",
-    };
+    },
 
-    titles = {
-      "Secret Top Tier": "messages",
-      "People With No Lives": "hours on VTOSC",
-      "VEX Gods": "red trophies",
-      "Banhammer Incoming": "illegal messages",
-      "IQ Scores": "points",
-      "Programming Wizards": "pt autonomous",
-      "Highest Build Quality": "halfcuts",
-      "Best Head Refs": "dqs",
-      "Poking the Beehive": "posts on VF",
-      "Tournaments 'Won'": "bo1'd matches",
-    };
+    check: Permissions.all,
 
     async exec(message: Message, args: string[]) {
+      const titles = config("leaderboard.titles");
+
       const all = (await store.all()).filter(({ key }: { key: string }) =>
         key.startsWith(message.guild.id)
       ) as {
@@ -119,8 +111,8 @@ async function getTotals(store: SQLiteStore, message: Message) {
       const total = all.reduce((a, b) => a + b.value.total, 0) as number;
       const oof = all.reduce((a, b) => a + (b.value.oof || 0), 0) as number;
 
-      const title = Object.keys(this.titles)[
-        Math.round(Object.keys(this.titles).length * Math.random())
+      const title = Object.keys(titles)[
+        Math.round(Object.keys(titles).length * Math.random())
       ];
 
       const embed = makeEmbed(message)
@@ -132,26 +124,24 @@ async function getTotals(store: SQLiteStore, message: Message) {
           ).toPrecision(3)}% oof)\n\n${leaderboard
             .map(
               (k, i) =>
-                `${i + 1}. ${k} — ${top[i].value.total} ${this.titles[title]}`
+                `${i + 1}. ${k} — ${top[i].value.total} ${titles[title]}`
             )
             .join("\n")}`
         );
 
       return message.channel.send(embed);
-    }
-  }
+    },
+  });
 
-  const leaderboard = new LeaderboardCommand();
-
-  class LeaderboardTallyCommand extends Command("tally") {
-    check = Permissions.admin;
-
-    documentation = {
+  Command({
+    names: ["tally"],
+    documentation: {
       description: "Tallies the leaderboard",
       usage: "tally",
       group: "META",
-    };
+    },
 
+    check: Permissions.admin,
     async exec(message: Message) {
       let mess = (await message.channel.send(
         "Recalculating totals..."
@@ -162,10 +152,8 @@ async function getTotals(store: SQLiteStore, message: Message) {
       leaderboard.exec(reply, ["10"]);
 
       return reply;
-    }
-  }
-
-  new LeaderboardTallyCommand();
+    },
+  });
 
   // Increment messages
   addMessageHandler(async (message) => {
