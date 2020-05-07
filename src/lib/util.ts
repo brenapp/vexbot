@@ -1,3 +1,5 @@
+import { Message, RichEmbed } from "discord.js";
+
 export function code(text: string) {
   return `\`\`\`${text}\`\`\``;
 }
@@ -8,4 +10,18 @@ export function inline(text: string) {
 
 export function escape(text: string) {
   return (text + "").replace(/[\\"']/g, "\\$&").replace(/\u0000/g, "\\0");
+}
+
+export function makeEmbed(message?: Message) {
+  const embed = new RichEmbed().setTimestamp();
+
+  if (message) {
+    const invoker =
+      message.channel.type === "text"
+        ? message.member.displayName
+        : message.author.username;
+    embed.setFooter(`Invoked by ${invoker}`);
+  }
+
+  return embed;
 }
