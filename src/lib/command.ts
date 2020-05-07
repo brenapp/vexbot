@@ -17,6 +17,9 @@ export function isCommand(message: Message) {
 }
 
 export interface CommandConfiguration {
+  // Allow the user to add other properties for state or whatever
+  [key: string]: any;
+
   names: string[];
 
   documentation: {
