@@ -6,9 +6,16 @@ import Command, { Permissions } from "../lib/command";
 import { Message, Channel, User, TextChannel } from "discord.js";
 import listen from "../lib/reactions";
 
-export class RockPaperScissorsCommand extends Command("rps") {
-  check = Permissions.compose(Permissions.channel("bots"), Permissions.guild);
+export const RockPaperScissorsCommand = Command({
+  names: ["rps", "rockpaperscissors"],
 
+  documentation: {
+    description: "Rock Paper Scissors",
+    usage: "rps @MayorMonty",
+    group: "Meta",
+  },
+
+  check: Permissions.compose(Permissions.channel("bots"), Permissions.guild),
   async exec(message: Message, argv: string[]) {
     const challenger = message.author;
     const challenged = message.mentions.users.first();
@@ -28,8 +35,7 @@ export class RockPaperScissorsCommand extends Command("rps") {
         this.doGame(message.channel as TextChannel, challenger, challenged);
       }
     });
-  }
-
+  },
   async doGame(output: TextChannel, challenger: User, challenged: User) {
     const [challengerMove, challengedMove] = await Promise.all([
       this.getInput(challenger),
@@ -77,7 +83,7 @@ export class RockPaperScissorsCommand extends Command("rps") {
         this.doGame(output, challenger, challenged);
       }
     });
-  }
+  },
 
   async getInput(user: User): Promise<string> {
     const dms = await user.createDM();
@@ -96,11 +102,9 @@ export class RockPaperScissorsCommand extends Command("rps") {
         resolve(reaction.emoji.toString())
       )
     );
-  }
+  },
 
   fail(message: Message) {
     message.channel.send("Not here!");
-  }
-}
-
-export default new RockPaperScissorsCommand();
+  },
+});

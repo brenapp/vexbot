@@ -151,6 +151,12 @@ export default new TeamCommand();
 export class WinRateRankingCommand extends Command("winrates") {
   check = Permissions.all;
 
+  documentation: {
+    group: "VEX";
+    description: "Calcuates winrates for the given region";
+    usage: "winrates South Carolina";
+  };
+
   async exec(message: Message, args: string[]) {
     // Get all the teams in the region
     const region = args[0] || "South Carolina";

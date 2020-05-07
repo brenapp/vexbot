@@ -1,16 +1,15 @@
-import Command, { Permissions, makeEmbed } from "../lib/command";
+import Command, { Permissions } from "../lib/command";
 import { Message } from "discord.js";
-import { findOrMakeRole } from "../behaviors/verify";
 
-export class GrantCommand extends Command("grant") {
-  check = Permissions.compose(Permissions.guild, Permissions.admin);
-
-  documentation = {
+export const GrantCommand = Command({
+  names: ["grant"],
+  documentation: {
     usage: "grant Role",
     description: "Grants the user a role",
     group: "Admin",
-  };
+  },
 
+  check: Permissions.compose(Permissions.guild, Permissions.admin),
   exec(message: Message, args: string[]) {
     let name = args.slice(message.mentions.members.size).join(" ");
     const role = message.guild.roles.find((role) => role.name === name);
@@ -20,20 +19,18 @@ export class GrantCommand extends Command("grant") {
     }
 
     message.mentions.members.forEach((member) => member.addRole(role));
-  }
-}
+  },
+});
 
-new GrantCommand();
-
-export class VanityCommand extends Command("vanity") {
-  check = Permissions.compose(Permissions.guild, Permissions.admin);
-
-  documentation = {
+export const VanityCommand = Command({
+  names: ["vanity"],
+  documentation: {
     usage: "vanity Your Vanity Role Name",
     description: "Creates a vanity role",
     group: "Admin",
-  };
+  },
 
+  check: Permissions.compose(Permissions.guild, Permissions.admin),
   async exec(message: Message, args: string[]) {
     const name = args.join(" ").trim();
     let role = message.guild.roles.find((role) => role.name === name);
@@ -50,7 +47,5 @@ export class VanityCommand extends Command("vanity") {
         permissions: 0,
       });
     }
-  }
-}
-
-new VanityCommand();
+  },
+});
