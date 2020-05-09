@@ -8,7 +8,6 @@ import { information } from "../../lib/report";
 import { client } from "../../client";
 
 import execa from "execa";
-import { exec } from "../../commands/debug";
 import { Message, RichEmbed, User } from "discord.js";
 import { code, escape } from "../../lib/util";
 import { authorization } from "../../lib/access";
