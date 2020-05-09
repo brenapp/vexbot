@@ -2,7 +2,6 @@ import Command, {
   Permissions,
   REGISTRY,
   PREFIX,
-  DISABLED,
   CommandConfiguration,
 } from "../lib/command";
 import { Message } from "discord.js";
