@@ -2,7 +2,7 @@
   "owner": "274004148276690944",
   "prefix": {
     "dev": ["."],
-    "prod": ["!", "/"]
+    "prod": ["/", "!"]
   },
   "leaderboard": {
     "titles": {
