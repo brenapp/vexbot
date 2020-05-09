@@ -8,7 +8,6 @@ import { information } from "../../lib/report";
 import { client } from "../../client";
 
 import execa from "execa";
-import { exec } from "../../commands/debug";
 import { Message, RichEmbed, User } from "discord.js";
 import { code, escape } from "../../lib/util";
 import { authorization } from "../../lib/access";
@@ -20,7 +19,8 @@ const report = information(client);
 
 async function deploy() {
   const subprocess = execa.command("sh deploy.sh");
-  let body = exec.prompt + " sh deploy.sh\n";
+  let body = `vexbot@${process.env["DEV"] ? "development" : "production"} $ `;
+  +" sh deploy.sh\n";
   let message = (await report(code(body))) as Message;
 
   async function handleChunk(chunk: string) {

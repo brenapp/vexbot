@@ -11,26 +11,26 @@ import probate from "./probation";
  * Random behaviors
  */
 
-addMessageHandler(message => {
+addMessageHandler((message) => {
   if (!message.mentions.users.has(client.user.id)) return false;
 
-  const ping = client.emojis.find(emoji => emoji.name === "ping");
+  const ping = client.emojis.find((emoji) => emoji.name === "ping");
   message.react(ping);
 });
 
 // Navy Seal Copypasta
-addMessageHandler(message => {
+addMessageHandler((message) => {
+  if (!message.content.toLowerCase().includes("fuck you")) {
+    return false;
+  }
+
   if (
-    !message.content.toLowerCase().includes("fuck you")
+    !message.mentions.members.some(
+      (member) => member.user.id === client.user.id
+    )
   ) {
     return false;
   }
-
-  if (!message.mentions.members.some(member => member.user.id === client.user.id)) {
-    return false;
-  }
-
-
 
   if (process.env["DEV"]) return false;
 
@@ -40,7 +40,7 @@ addMessageHandler(message => {
 });
 
 // Rename #regret to something random
-addMessageHandler(async message => {
+addMessageHandler(async (message) => {
   if (!isCommand(message)) return false;
 
   if (!message.guild) return false;
@@ -78,11 +78,11 @@ addMessageHandler(async message => {
     "a-social-frat",
     "ding-dong",
     "tip-in-finals",
-    "averys-cloud-juice"
+    "averys-cloud-juice",
   ];
 
   const channel = await message.guild.channels.find(
-    channel => channel.id === ID
+    (channel) => channel.id === ID
   );
 
   const name = names[Math.round(Math.random() * (names.length - 1))];
@@ -91,8 +91,7 @@ addMessageHandler(async message => {
   return false;
 });
 
-addMessageHandler(async message => {
-
+addMessageHandler(async (message) => {
   if (!message.guild) return false;
   if (message.guild.id != "310820885240217600") return false;
 
@@ -100,15 +99,14 @@ addMessageHandler(async message => {
   const channel = message.channel as TextChannel;
   if (channel.name !== "library") return false;
 
-  const valid = message.content.startsWith("(") && message.content.endsWith(")");
+  const valid =
+    message.content.startsWith("(") && message.content.endsWith(")");
   if (!valid) {
     message.reply("Shhh!");
   }
-
 });
 
-addMessageHandler(async message => {
-
+addMessageHandler(async (message) => {
   if (!message.guild) return false;
   if (message.guild.id != "310820885240217600") return false;
 
@@ -118,5 +116,4 @@ addMessageHandler(async message => {
   }
 
   return false;
-
 });

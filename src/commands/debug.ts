@@ -1,15 +1,13 @@
-import Command, { Permissions, makeEmbed } from "../lib/command";
 import { Message, TextChannel } from "discord.js";
+import Command, { Permissions } from "../lib/command";
+import { information } from "../lib/report";
 
-import * as vexdb from "vexdb";
-import * as keya from "keya";
 import probate from "../behaviors/probation";
 import { client } from "../client";
-import { information } from "../lib/report";
 
 import execa from "execa";
 import { addOneTimeMessageHandler, removeMessageHandler } from "../lib/message";
-import { code, escape, inline } from "../lib/util";
+import { code, escape } from "../lib/util";
 
 import { getLastCommit, Commit } from "git-last-commit";
 
@@ -20,83 +18,31 @@ const getCommit = () =>
 
 export let DEBUG = false;
 
-export class DebugCommand extends Command("debug") {
-  check = Permissions.compose(Permissions.guild, Permissions.owner);
+export const DebugCommand = Command({
+  names: ["debug"],
+  check: Permissions.compose(Permissions.guild, Permissions.owner),
 
-  documentation = {
+  documentation: {
     description: "Toggles debug mode. Owner Only Command",
     usage: "debug",
     group: "Owner",
-  };
+  },
 
   exec(message: Message, args: string[]) {
     DEBUG = !DEBUG;
-    message.channel.send(`Debug ${DEBUG ? "ENABLED" : "DISABLED"}`);
-  }
-}
+    return message.channel.send(`Debug ${DEBUG ? "ENABLED" : "DISABLED"}`);
+  },
+});
 
-new DebugCommand();
-
-export class StoreCommand extends Command("store") {
-  check = Permissions.compose(Permissions.guild, Permissions.owner);
-
-  documentation = {
-    description: "Manages keya stores",
-    usage: "cache <store name> [list|clear|get|delete] <key>",
-    group: "Owner",
-  };
-
-  async exec(message: Message, args: string[]) {
-    const store = await keya.store(args[1]);
-
-    switch (args[0]) {
-      case "clear":
-        await store.clear();
-        return message.channel.send(`Cleared ${inline(store.name)}`);
-      case "list":
-        const all = await store.all().then((a) => a.map((v) => v.key));
-
-        const embed = makeEmbed(message)
-          .setTitle(store.name)
-          .setDescription(
-            `${all.length} items;\n${all.slice(0, 24).join("\n")}${
-              all.length > 25 ? "\n*...*" : ""
-            }`
-          );
-
-        return message.channel.send({ embed });
-
-      case "get":
-        const value = await store.get(args[2]);
-        if (!value) {
-          return message.channel.send(
-            `Can't find key ${inline(args[2])} in store ${inline(store.name)}`
-          );
-        }
-        return message.channel.send(code(JSON.stringify(value)));
-
-      case "delete":
-        const deleted = await store.delete(args[2]);
-        return message.channel.send(
-          deleted
-            ? "Deleted successfully"
-            : "Did not delete! Probably because that key did not exist"
-        );
-    }
-  }
-}
-
-new StoreCommand();
-
-export class PingCommand extends Command("ping") {
-  check = Permissions.all;
-
-  documentation = {
+export const PingCommand = Command({
+  names: ["ping"],
+  documentation: {
     description: "Heartbeat",
     usage: `ping`,
     group: "Meta",
-  };
+  },
 
+  check: Permissions.all,
   async exec(message: Message, args: string[]) {
     const user = message.member;
     const thanosable = message.member.nickname.includes("EZ");
@@ -107,33 +53,40 @@ export class PingCommand extends Command("ping") {
     }
 
     return message.channel.send("pong");
-  }
-}
+  },
+});
 
-new PingCommand();
+export const ShellCommand = Command({
+  names: ["shell"],
 
-export class ExecCommand extends Command("shell") {
-  check = Permissions.compose(Permissions.owner);
-
-  prompt = "";
-
-  constructor() {
-    super();
-
-    // Get shell prompt
-    this.prompt = `vexbot@${
-      process.env["DEV"] ? "development" : "production"
-    } $ `;
-  }
-
-  documentation = {
+  documentation: {
     description: "Arbitrary Shell execution",
     usage: `shell echo "Hi"`,
     group: "Owner",
-  };
+  },
+
+  check: Permissions.owner,
+
+  async fail(message: Message) {
+    const report = information(client);
+
+    if (message.guild) {
+      probate(
+        message.member,
+        message.guild.me,
+        "1h",
+        "Attempted use of shell execution"
+      );
+    }
+
+    await report(`Failed attempt at shell execution by ${message.author}`);
+  },
 
   async exec(message: Message, params: string[]) {
-    let body = `${this.prompt}${params.join(" ")}\n`;
+    const prompt = `vexbot@${
+      process.env["DEV"] ? "development" : "production"
+    } $ `;
+    let body = `${prompt}${params.join(" ")}\n`;
     let resp = (await message.channel.send(code(body))) as Message;
 
     let response;
@@ -191,73 +144,52 @@ export class ExecCommand extends Command("shell") {
         response.failed ? "UNSUCCESSFULLY" : "SUCCESSFULLY"
       } (${response.exitCode} ${response.exitCodeName})\n`
     );
-  }
+  },
+});
 
-  async fail(message: Message) {
-    const report = information(client);
+export const RestartCommand = Command({
+  names: ["restart"],
 
-    if (message.guild) {
-      probate(
-        message.member,
-        message.guild.me,
-        "1h",
-        "Attempted use of shell execution"
-      );
-    }
-
-    await report(`Failed attempt at shell execution by ${message.author}`);
-  }
-}
-
-const exec = new ExecCommand();
-export { exec };
-
-export class RestartCommand extends Command("restart") {
-  check = Permissions.compose(Permissions.owner, Permissions.guild);
-
-  async exec(message: Message) {
-    execa.command("pm2 restart vexbot");
-    return message.channel.send("Restarting...");
-  }
-
-  documentation = {
+  documentation: {
     group: "OWNER",
     description: "Restarts vexbot",
     usage: "restart",
-  };
-}
+  },
 
-new RestartCommand();
+  check: Permissions.compose(Permissions.owner, () => !process.env["DEV"]),
+  async exec(message: Message) {
+    execa.command("pm2 restart vexbot");
+    return message.channel.send("Restarting...");
+  },
+});
 
-export class ServerCommand extends Command("servers") {
-  check = Permissions.owner;
-
-  documentation = {
+export const ServersCommand = Command({
+  names: ["servers"],
+  documentation: {
     group: "OWNER",
     description: "Lists servers vexbot is in",
     usage: "servers",
-  };
+  },
 
+  check: Permissions.owner,
   async exec(message: Message) {
     const content = client.guilds
       .map((guild) => `${guild.id}: ${guild.name}`)
       .join("\n");
     message.channel.send(content);
-  }
-}
+  },
+});
 
-new ServerCommand();
-
-export class ChannelsCommand extends Command("channels") {
-  check = Permissions.owner;
-
-  documentation = {
+export const ChannelsCommand = Command({
+  names: ["channels"],
+  documentation: {
     group: "OWNER",
     description: "Gets accessible channels in a specified server",
     usage: "channels <id>",
-  };
+  },
 
-  async exec(message: Message, args: string[]) {
+  check: Permissions.owner,
+  async exec(message: Message, args) {
     const server = client.guilds.get(args[0]);
     if (!server) {
       return message.channel.send("Can't access that server!");
@@ -268,21 +200,19 @@ export class ChannelsCommand extends Command("channels") {
       .map((channel) => `\`${channel.id}\`: ${channel.name} (${channel.type})`)
       .join("\n");
     message.channel.send(channels);
-  }
-}
+  },
+});
 
-new ChannelsCommand();
-
-export class MessagesCommand extends Command("messages") {
-  check = Permissions.owner;
-
-  documentation = {
+export const MessagesCommand = Command({
+  names: ["messages"],
+  documentation: {
     group: "OWNER",
     description: "Gets messages channels in a specified channel",
     usage: "messages <id>",
-  };
+  },
 
-  async exec(message: Message, args: string[]) {
+  check: Permissions.owner,
+  async exec(message: Message, args) {
     const channel = client.channels.get(args[0]);
     if (!channel) {
       return message.channel.send("Can't access that channel!");
@@ -306,26 +236,23 @@ export class MessagesCommand extends Command("messages") {
         }
       );
     }
-  }
-}
+  },
+});
 
-new MessagesCommand();
+export const VersionCommand = Command({
+  names: ["version"],
 
-export class VersionCommand extends Command("version") {
-  check = Permissions.owner;
-
-  documentation = {
+  documentation: {
     description: "Gets vexbot version",
     usage: `version`,
     group: "Owner",
-  };
+  },
 
+  check: Permissions.owner,
   async exec(message: Message, args: string[]) {
     const commit = await getCommit();
     return message.channel.send(
       `\`\`\`\ncommit ${commit.hash}\n${commit.sanitizedSubject}\n\`\`\``
     );
-  }
-}
-
-new VersionCommand();
+  },
+});

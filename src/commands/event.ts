@@ -1,5 +1,6 @@
 import { Message, RichEmbed } from "discord.js";
-import Command, { Permissions, makeEmbed } from "../lib/command";
+import Command, { Permissions } from "../lib/command";
+import { makeEmbed } from "../lib/util";
 import * as vexdb from "vexdb";
 import * as keya from "keya";
 
@@ -76,15 +77,14 @@ async function getCapacityInformation(
     });
 }
 
-export class EventCommand extends Command("events") {
-  check = Permissions.all;
-
-  documentation = {
+export const EventsCommand = Command({
+  names: ["events"],
+  documentation: {
     description: "Lists events in a given region",
     usage: "events South Carolina",
     group: "VEX",
-  };
-
+  },
+  check: Permissions.all,
   async exec(message: Message, args: string[]) {
     let region = args
       .map((word) => `${word[0].toUpperCase()}${word.slice(1).toLowerCase()}`)
@@ -161,7 +161,5 @@ export class EventCommand extends Command("events") {
     );
 
     return response;
-  }
-}
-
-export default new EventCommand();
+  },
+});

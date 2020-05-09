@@ -11,7 +11,7 @@ import {
   Collector,
   RichEmbed,
 } from "discord.js";
-import { makeEmbed } from "../../lib/command";
+import { makeEmbed } from "../../lib/util";
 import listen from "../../lib/reactions";
 
 // Notify #event-log about important events
