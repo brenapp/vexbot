@@ -59,7 +59,7 @@ export const SarcasmCommand = Command({
 // Uwuify
 const faces = ["(・`ω´・)", ";;w;;", "owo", "UwU", ">w<", "^w^"];
 
-function uwuify(str) {
+function uwuify(str: string) {
   str = str.replace(/(?:r|l)/g, "w");
   str = str.replace(/(?:R|L)/g, "W");
   str = str.replace(/n([aeiou])/g, "ny$1");
@@ -97,7 +97,7 @@ export const UWUCommand = Command({
   },
 });
 
-function cowsay(message) {
+function cowsay(message: string) {
   return (
     ` ${"-".repeat(message.length + 2)}
 < ${message} >

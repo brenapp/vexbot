@@ -116,7 +116,7 @@ export async function handle(message: Message): Promise<boolean> {
   // Start the timer (for when we edit the message later to indicate how long the command takes)
   const start = Date.now();
 
-  let response: Promise<void | Message[] | Message> | void;
+  let response: void | Message[] | Message;
   try {
     response = await command.exec.call(command, message, argv);
   } catch (e) {
@@ -128,7 +128,7 @@ export async function handle(message: Message): Promise<boolean> {
       message.channel.send("Command execution failed. Try again later");
     }
 
-    return;
+    return true;
   }
 
   // If the command gave us a response to track
@@ -207,12 +207,12 @@ export const Permissions = {
   },
 
   compose(...checks: ((message: Message) => boolean)[]) {
-    return (message) =>
+    return (message: Message) =>
       checks.map((check) => check(message)).every((resp) => resp);
   },
 
   any(...checks: ((message: Message) => boolean)[]) {
-    return (message) =>
+    return (message: Message) =>
       checks.map((check) => check(message)).some((resp) => resp);
   },
 };

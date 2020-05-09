@@ -2,15 +2,18 @@ import * as keya from "keya";
 import { client } from "../../client";
 import { GuildMember, Guild } from "discord.js";
 
+// @ts-ignore
 import parse from "parse-duration";
 
-export let TIMEOUTS = {};
+export let TIMEOUTS: { [key: string]: NodeJS.Timeout } = {};
 
 export function updateActivity() {
-  const names = Object.keys(TIMEOUTS).map(ids => {
+  const names = Object.keys(TIMEOUTS).map((ids) => {
     const [guildid, memberid] = ids.split(":");
     const guild = client.guilds.get(guildid);
+    if (!guild) return;
     const member = guild.members.get(memberid);
+    if (!member) return;
 
     return member.nickname.split(" |")[0];
   });
@@ -48,9 +51,9 @@ export async function initalize() {
 }
 
 export const free = (memberid: string, guildid: string) => async () => {
-  const guild = client.guilds.get(guildid);
-  const member = guild.members.get(memberid);
-  const probation = guild.roles.find(role => role.name === "Probation");
+  const guild = client.guilds.get(guildid) as Guild;
+  const member = guild.members.get(memberid) as GuildMember;
+  const probation = guild.roles.find((role) => role.name === "Probation");
 
   console.log(`Free ${member}`);
 
@@ -89,7 +92,7 @@ export default async function probate(
     start: Date.now(),
     end,
     reason,
-    guild: member.guild.id
+    guild: member.guild.id,
   });
 
   // Set up timeout
@@ -99,7 +102,9 @@ export default async function probate(
   );
 
   // Actually do the probation
-  const probation = member.guild.roles.find(role => role.name === "Probation");
+  const probation = member.guild.roles.find(
+    (role) => role.name === "Probation"
+  );
 
   await member.addRole(
     probation,
@@ -109,7 +114,7 @@ export default async function probate(
   // Slide into DMs to give warning
   const dm = await member.createDM();
   const appeals = member.guild.channels.find(
-    channel => channel.name === "appeals"
+    (channel) => channel.name === "appeals"
   );
   dm.send(
     `You've been put on probation by ${by} for ${time} with the following reason: ${reason}. While you are on probation, you cannot post or speak in any channel. If you believe this is in error, you can communicate with Admins in ${appeals}`

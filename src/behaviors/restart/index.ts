@@ -8,7 +8,7 @@ import { information } from "../../lib/report";
 import { client } from "../../client";
 
 import execa from "execa";
-import { Message, RichEmbed, User } from "discord.js";
+import { Message, RichEmbed, User, MessageReaction } from "discord.js";
 import { code, escape } from "../../lib/util";
 import { authorization } from "../../lib/access";
 
@@ -57,7 +57,7 @@ async function approval(embed: RichEmbed) {
       (vote, usr: User) =>
         (vote.emoji.name === "👎" || vote.emoji.name === "👍") && !usr.bot
     );
-    let handleReaction;
+    let handleReaction: (vote: MessageReaction) => void;
     collector.on(
       "collect",
       (handleReaction = (vote) => {
@@ -107,10 +107,12 @@ handler.on("push", async (event) => {
     embed.addField(
       code(escape(commit.message)),
       `${commit.added
-        .map((file) => `+ ${file}`)
+        .map((file: string) => `+ ${file}`)
         .join("\n")}${commit.removed
-        .map((file) => `- ${file}`)
-        .join("\n")}${commit.modified.map((file) => `Δ ${file}`).join("\n")}`
+        .map((file: string) => `- ${file}`)
+        .join("\n")}${commit.modified
+        .map((file: string) => `Δ ${file}`)
+        .join("\n")}`
     );
   }
 

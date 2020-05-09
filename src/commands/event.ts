@@ -1,4 +1,4 @@
-import { Message, RichEmbed } from "discord.js";
+import { Message, RichEmbed, MessageReaction } from "discord.js";
 import Command, { Permissions } from "../lib/command";
 import { makeEmbed } from "../lib/util";
 import * as vexdb from "vexdb";
@@ -131,11 +131,11 @@ export const EventsCommand = Command({
     let page = 0;
     let lastPage = Math.ceil(events.length / 5);
 
-    let resp;
+    let resp: (reaction: MessageReaction) => void;
     listen(
       response,
       ["⬇", "⬆"],
-      (resp = async (reaction, collector) => {
+      (resp = async (reaction: MessageReaction) => {
         await response.clearReactions();
 
         console.log(reaction);

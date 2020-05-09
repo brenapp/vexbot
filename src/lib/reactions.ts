@@ -3,7 +3,7 @@ import {
   ReactionEmoji,
   User,
   MessageReaction,
-  Collector
+  Collector,
 } from "discord.js";
 
 /**
@@ -22,14 +22,17 @@ export default async function listen(
     (reaction: MessageReaction, user: User) =>
       emojis.includes(reaction.emoji.name) && !user.bot
   );
-  let handler;
-  collector.on("collect", handler = (element, c) => {
-    const response = callback(element, collector);
+  let handler: (element: MessageReaction) => void;
+  collector.on(
+    "collect",
+    (handler = (element: MessageReaction) => {
+      const response = callback(element, collector);
 
-    if (response) {
-      collector.emit("end");
-      collector.off("collect", handler);
-      collector.cleanup();
-    }
-  });
+      if (response) {
+        collector.emit("end");
+        collector.off("collect", handler);
+        collector.cleanup();
+      }
+    })
+  );
 }

@@ -41,6 +41,8 @@ async function handleVeto(
 ) {
   await message.react("👎");
   listen(message, ["👎"], async (reaction, collector) => {
+    if (!embed.fields) return;
+
     if (embed.fields.some(({ name }) => name === "Veto")) {
       // Update veto field
       embed.fields = embed.fields.slice(0, -1);
@@ -183,7 +185,7 @@ client.on("guildMemberUpdate", async (old, current) => {
   }
 
   // Ignore vetos
-  if (entry.executor.bot) {
+  if (!entry || entry.executor.bot) {
     return;
   }
 

@@ -44,7 +44,7 @@ export const UnlockCommand = Command({
     const channel = message.channel as TextChannel;
 
     channel.overwritePermissions(channel.guild.defaultRole, {
-      SEND_MESSAGES: null,
+      SEND_MESSAGES: undefined,
     });
 
     return message.channel.send("Channel unlocked");
@@ -68,6 +68,11 @@ export const DisableCommand = Command({
   exec(message: Message, commands: string[]) {
     for (const command of commands) {
       const config = REGISTRY.get(command);
+
+      if (!config) {
+        return message.channel.send(`Could not find command \`${command}\`!`);
+      }
+
       DISABLED.add(config);
     }
 
@@ -88,6 +93,11 @@ export const EnableCommand = Command({
   exec(message: Message, commands: string[]) {
     for (const command of commands) {
       const config = REGISTRY.get(command);
+
+      if (!config) {
+        return message.channel.send(`Could not find command \`${command}\`!`);
+      }
+
       DISABLED.delete(config);
     }
 

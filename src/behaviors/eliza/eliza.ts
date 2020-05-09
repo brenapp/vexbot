@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import {
   elizaKeywords,
   elizaSynons,
@@ -6,7 +8,7 @@ import {
   elizaFinals,
   elizaInitials,
   elizaPostTransforms,
-  elizaQuits
+  elizaQuits,
 } from "./data";
 
 export default class ElizaBot {
@@ -222,8 +224,14 @@ export default class ElizaBot {
     }
     // return reply or default string
 
-    const defaults = ["I am at a loss for words.", "Keep Going?", "Yeah?", "Tell me more.", "Oh?"];
-    const str = defaults[defaults.length * Math.random() | 0]
+    const defaults = [
+      "I am at a loss for words.",
+      "Keep Going?",
+      "Yeah?",
+      "Tell me more.",
+      "Oh?",
+    ];
+    const str = defaults[(defaults.length * Math.random()) | 0];
 
     return rpl != "" ? rpl : str;
   }

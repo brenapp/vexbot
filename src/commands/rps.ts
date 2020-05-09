@@ -46,7 +46,7 @@ export const RockPaperScissorsCommand = Command({
     // This code is a little confusing, but it's actually really difficult
     // to make code that determines the winner in a clean way
 
-    let winner: User;
+    let winner: User | null = null;
 
     const result =
       ["⛰️", "🧻", "✂️"].findIndex((v) => v === challengerMove) -

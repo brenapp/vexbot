@@ -41,8 +41,8 @@ async function getTotals(store: SQLiteStore, message: Message) {
     (channel) => channel.type === "text"
   ) as Collection<string, TextChannel>;
 
-  let totals = {};
-  let oofs = {};
+  let totals: { [key: string]: number } = {};
+  let oofs: { [key: string]: number } = {};
 
   for (let [id, channel] of text) {
     console.log(`Tallying #${channel.name}...`);
@@ -158,7 +158,7 @@ async function getTotals(store: SQLiteStore, message: Message) {
   // Increment messages
   addMessageHandler(async (message) => {
     if (!message.guild) {
-      return;
+      return false;
     }
 
     const record = (await store.get(

@@ -1,4 +1,11 @@
-import { GuildMember, RichEmbed, TextChannel, Message, User } from "discord.js";
+import {
+  GuildMember,
+  RichEmbed,
+  TextChannel,
+  Message,
+  User,
+  MessageReaction,
+} from "discord.js";
 import { client } from "../../client";
 
 export default async function approve(
@@ -13,7 +20,7 @@ export default async function approve(
     .setTitle(`Verification for ${name}`)
     .setDescription(
       `${member} \n Requested Roles: ${roles
-        .map(role => member.guild.roles.get(role).toString())
+        .map((role) => member.guild.roles.get(role)?.toString())
         .join(", ")}`
     )
     .addField("Primary Team", team)
@@ -22,7 +29,7 @@ export default async function approve(
 
   // Post verification request
   const channel = member.guild.channels.find(
-    channel => channel.name === "member-approval" && channel.type == "text"
+    (channel) => channel.name === "member-approval" && channel.type == "text"
   ) as TextChannel;
 
   const approval = (await channel.send(embed)) as Message;
@@ -33,10 +40,10 @@ export default async function approve(
       (vote, usr: User) =>
         (vote.emoji.name === "👎" || vote.emoji.name === "👍") && !usr.bot
     );
-    let handleReaction;
+    let handleReaction: (vote: MessageReaction) => void;
     collector.on(
       "collect",
-      (handleReaction = vote => {
+      (handleReaction = (vote) => {
         const approver = vote.users.last();
 
         if (vote.emoji.name === "👍") {
