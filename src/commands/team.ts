@@ -1,10 +1,8 @@
-import * as vexdb from "vexdb";
-import {
-  EventsResponseObject,
-  MatchesResponseObject,
-} from "vexdb/out/constants/ResponseObjects";
-import Command, { makeEmbed, Permissions } from "../lib/command";
 import { Message } from "discord.js";
+import * as vexdb from "vexdb";
+import { MatchesResponseObject } from "vexdb/out/constants/ResponseObjects";
+import Command, { Permissions } from "../lib/command";
+import { makeEmbed } from "../lib/util";
 
 enum MatchOutcome {
   WIN,
@@ -55,15 +53,16 @@ function buildRecord(team: string, matches: MatchesResponseObject[]) {
   return record;
 }
 
-export class TeamCommand extends Command("team") {
-  check = Permissions.all;
+export const TeamCommand = Command({
+  names: ["team"],
 
-  documentation = {
+  documentation: {
     description: "Lists team record for this season",
     usage: "team 3796B",
     group: "VEX",
-  };
+  },
 
+  check: Permissions.all,
   async exec(message: Message, args: string[]) {
     const team = args[0].toUpperCase();
     const season = args.slice(1).join(" ") || "current";
@@ -83,7 +82,11 @@ export class TeamCommand extends Command("team") {
     }
 
     const events = await vexdb.get("events", { team, season });
-    const matches = await vexdb.get("matches", { team, season, scored: 1 });
+    const matches = await vexdb.get("matches", {
+      team,
+      season,
+      scored: 1,
+    });
     const awards = await vexdb.get("awards", { team, season });
     const rankings = await vexdb.get("rankings", { team, season });
 
@@ -143,20 +146,19 @@ export class TeamCommand extends Command("team") {
     }
 
     return message.channel.send(embed);
-  }
-}
+  },
+});
 
-export default new TeamCommand();
-
-export class WinRateRankingCommand extends Command("winrates") {
-  check = Permissions.all;
+export const WinRateRankingCommand = Command({
+  names: ["winrates"],
 
   documentation: {
-    group: "VEX";
-    description: "Calcuates winrates for the given region";
-    usage: "winrates South Carolina";
-  };
+    group: "VEX",
+    description: "Calcuates winrates for the given region",
+    usage: "winrates South Carolina",
+  },
 
+  check: Permissions.all,
   async exec(message: Message, args: string[]) {
     // Get all the teams in the region
     const region = args[0] || "South Carolina";
@@ -199,7 +201,5 @@ export class WinRateRankingCommand extends Command("winrates") {
     }
 
     return message.channel.send({ embed });
-  }
-}
-
-new WinRateRankingCommand();
+  },
+});
