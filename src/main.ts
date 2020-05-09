@@ -5,10 +5,6 @@ import { client } from "./client";
 
 import { DEBUG } from "./commands/debug";
 
-// Commands and message handlers
-import "./lib/handlers";
-import "./commands";
-
 // Behaviors
 import "./behaviors/log";
 import "./behaviors/random";
@@ -16,6 +12,10 @@ import "./behaviors/eliza";
 import "./behaviors/restart";
 import "./behaviors/elo";
 import * as probation from "./behaviors/probation";
+
+// Commands and message handlers
+import "./lib/handlers";
+import "./commands";
 
 client.on("ready", () => {
   console.log("vexbot#0599 is online!");
