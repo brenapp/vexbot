@@ -7,7 +7,7 @@ import Command, {
 } from "../lib/command";
 import { Message } from "discord.js";
 
-Command({
+export const HelpCommand = Command({
   names: ["help"],
   documentation: {
     description: "Lists all commands and usage",
@@ -52,14 +52,26 @@ Command({
       body += `\n\n**${name}**\n`;
 
       for (const command of commands) {
-        body += body += command.names.map((n) => `__${n}__`).join(" or ");
-        body += command.documentation.description + " ";
+        body += command.names.map((n) => `__${n}__`).join(" or ");
+        body += " " + command.documentation.description + " ";
         body += `\`${PREFIX[0]}${command.documentation.usage}\`\n`;
       }
     }
 
     body += "\nRemember to keep most bot usage in the appropriate channel!";
 
-    return message.reply(body);
+    // If the body is too big, we need to handle it in chunks
+    async function postMessage(chunk: string) {
+      if (chunk.length > 1900) {
+        for (let i = 0; i < chunk.length; i += 1900) {
+          const subchunk = chunk.slice(i, i + 1900);
+          await postMessage(subchunk);
+        }
+      } else {
+        return message.channel.send(chunk);
+      }
+    }
+
+    return postMessage(body);
   },
 });
