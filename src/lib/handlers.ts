@@ -1,6 +1,5 @@
 import { addMessageHandler } from "./message";
 
-import "./command";
 import { handle, isCommand, RESPONSES } from "./command";
 import { client } from "../client";
 
