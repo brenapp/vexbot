@@ -8,7 +8,7 @@ import * as keya from "keya";
 
 const owner = authorization("discord.owner");
 
-Command({
+export const ProbateCommand = Command({
   names: ["probate", "dq"],
   documentation: {
     usage: "[probate|dq] @MayorMonty @bradley 10m I don't like you",

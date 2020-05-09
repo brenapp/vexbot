@@ -5,7 +5,7 @@ import { Message, TextChannel } from "discord.js";
  * Purges messages in the used channel
  */
 
-Command({
+export const PurgeCommand = Command({
   names: ["purge"],
   documentation: {
     group: "ADMIN",
