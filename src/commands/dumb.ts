@@ -33,7 +33,7 @@ function toSarcasmCase(text: string) {
 
 // Dumb Commands
 
-Command({
+export const SarcasmCommand = Command({
   names: ["s"],
   documentation: {
     group: "Meta",
@@ -74,7 +74,7 @@ function uwuify(str) {
   return str;
 }
 
-Command({
+export const UWUCommand = Command({
   names: ["uwu"],
   documentation: {
     group: "Meta",
@@ -112,7 +112,7 @@ function cowsay(message) {
   );
 }
 
-Command({
+export const CowsayCommand = Command({
   names: ["cowsay"],
   documentation: {
     group: "Meta",
@@ -129,7 +129,7 @@ Command({
   },
 });
 
-Command({
+export const BeepBeepCommand = Command({
   names: ["beepbeep"],
   documentation: {
     group: "Meta",
@@ -154,7 +154,7 @@ Command({
   },
 });
 
-Command({
+export const SCFactCommand = Command({
   names: ["scfact"],
   check: Permissions.all,
 
@@ -206,7 +206,7 @@ Command({
   },
 });
 
-Command({
+export const CoinFlipCommand = Command({
   names: ["flip"],
   documentation: {
     group: "Meta",

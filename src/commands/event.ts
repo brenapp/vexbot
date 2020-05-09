@@ -77,7 +77,7 @@ async function getCapacityInformation(
     });
 }
 
-Command({
+export const EventsCommand = Command({
   names: ["events"],
   documentation: {
     description: "Lists events in a given region",

@@ -18,7 +18,7 @@ const getCommit = () =>
 
 export let DEBUG = false;
 
-Command({
+export const DebugCommand = Command({
   names: ["debug"],
   check: Permissions.compose(Permissions.guild, Permissions.owner),
 
@@ -34,7 +34,7 @@ Command({
   },
 });
 
-Command({
+export const PingCommand = Command({
   names: ["ping"],
   documentation: {
     description: "Heartbeat",
@@ -56,7 +56,7 @@ Command({
   },
 });
 
-Command({
+export const ShellCommand = Command({
   names: ["shell"],
 
   documentation: {
@@ -147,7 +147,7 @@ Command({
   },
 });
 
-Command({
+export const RestartCommand = Command({
   names: ["restart"],
 
   documentation: {
@@ -156,14 +156,14 @@ Command({
     usage: "restart",
   },
 
-  check: Permissions.all,
+  check: Permissions.compose(Permissions.owner, () => !process.env["DEV"]),
   async exec(message: Message) {
     execa.command("pm2 restart vexbot");
     return message.channel.send("Restarting...");
   },
 });
 
-Command({
+export const ServersCommand = Command({
   names: ["servers"],
   documentation: {
     group: "OWNER",
@@ -180,7 +180,7 @@ Command({
   },
 });
 
-Command({
+export const ChannelsCommand = Command({
   names: ["channels"],
   documentation: {
     group: "OWNER",
@@ -203,7 +203,7 @@ Command({
   },
 });
 
-Command({
+export const MessagesCommand = Command({
   names: ["messages"],
   documentation: {
     group: "OWNER",
@@ -239,7 +239,7 @@ Command({
   },
 });
 
-Command({
+export const VersionCommand = Command({
   names: ["version"],
 
   documentation: {

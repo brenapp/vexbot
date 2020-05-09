@@ -5,7 +5,7 @@ import { Message, TextChannel } from "discord.js";
  * Locks a specific channel
  */
 
-Command({
+export const LockCommand = Command({
   names: ["lock"],
   check: Permissions.admin,
 
@@ -30,7 +30,7 @@ Command({
  * Unlocks a channel
  */
 
-Command({
+export const UnlockCommand = Command({
   names: ["unlock"],
   check: Permissions.admin,
 
@@ -55,7 +55,7 @@ Command({
  * Command Enable
  */
 
-Command({
+export const DisableCommand = Command({
   names: ["disable"],
   check: Permissions.admin,
 
@@ -70,10 +70,12 @@ Command({
       const config = REGISTRY.get(command);
       DISABLED.add(config);
     }
+
+    return message.channel.send(`Disabled ${commands.length} command(s)!`);
   },
 });
 
-Command({
+export const EnableCommand = Command({
   names: ["enable"],
   check: Permissions.admin,
 
@@ -88,5 +90,7 @@ Command({
       const config = REGISTRY.get(command);
       DISABLED.delete(config);
     }
+
+    return message.channel.send(`Enabled ${commands.length} command(s)!`);
   },
 });

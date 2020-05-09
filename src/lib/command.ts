@@ -42,6 +42,9 @@ export interface CommandConfiguration {
     message: Message,
     args: string[]
   ): Promise<Message | Message[] | void> | void;
+
+  // Error handling
+  error?(error: any, message: Message, args: string[]): void;
 }
 
 // Holds all the registered commands (with each name being mapped)
@@ -112,9 +115,21 @@ export async function handle(message: Message): Promise<boolean> {
 
   // Start the timer (for when we edit the message later to indicate how long the command takes)
   const start = Date.now();
-  const response = await command.exec.call(command, message, argv);
 
-  const time = Date.now() - start;
+  let response: Promise<void | Message[] | Message> | void;
+  try {
+    response = await command.exec.call(command, message, argv);
+  } catch (e) {
+    report(message.client)(e);
+
+    if (command.error) {
+      command.error(e, message, argv);
+    } else {
+      message.channel.send("Command execution failed. Try again later");
+    }
+
+    return;
+  }
 
   // If the command gave us a response to track
   if (response) {
