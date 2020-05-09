@@ -93,14 +93,12 @@ export const TeamCommand = Command({
     // Make the season record
     const seasonRecord = buildRecord(team, matches);
 
-    console.log(seasonRecord);
-
     const embed = makeEmbed(message);
     embed
       .setColor(3447003)
       .setTitle(
         `${record.team_name} (${record.number}) — ${
-          season === "current" ? "Tower Takeover" : season
+          season === "current" ? "Change Up" : season
         }`
       )
       .setURL(`https://vexdb.io/teams/view/${record.number}`)
