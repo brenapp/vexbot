@@ -10,7 +10,7 @@ Command({
     group: "ADMIN",
   },
 
-  check: Permissions.all,
+  check: Permissions.admin,
   exec(message: Message) {
     message.mentions.members.forEach((member) => {
       verify(member);
