@@ -160,31 +160,14 @@ export async function handle(message: Message): Promise<boolean> {
       // Otherwise get the last embed and edit it;
     } else {
       const embed = main.embeds[0];
+      const replacement = new RichEmbed(embed);
 
-      const replacement = makeEmbed(main)
-        .setFooter(
-          embed.footer.text +
-            `\n(took ${Date.now() - start}ms${
-              process.env["DEV"] ? " — DEV MODE" : ""
-            })`
-        )
-        .setTitle(embed.title)
-        .setColor(embed.color)
-        .setDescription(embed.description)
-        .setImage((embed.image || { url: undefined }).url)
-        .setThumbnail((embed.thumbnail || { url: undefined }).url)
-        .setTimestamp(new Date(embed.timestamp))
-        .setURL(embed.url);
-
-      if (embed.author) {
-        replacement.setAuthor(
-          embed.author.name,
-          embed.author.iconURL,
-          embed.author.url
-        );
-      }
-
-      replacement.fields = embed.fields;
+      replacement.setFooter(
+        embed.footer.text +
+          `\n(took ${Date.now() - start}ms${
+            process.env["DEV"] ? " — DEV MODE" : ""
+          })`
+      );
 
       main.edit({ embed: replacement });
     }
