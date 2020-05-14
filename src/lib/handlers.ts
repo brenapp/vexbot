@@ -12,7 +12,11 @@ addMessageHandler((message) => message.author.bot);
 addMessageHandler(handle);
 
 // Command editing
-client.on("messageUpdate", (old, current) => {
+client.on("messageUpdate", async (old, current) => {
+  if (old.partial) {
+    old = await old.fetch();
+  }
+
   // Don't consider bot messages
   if (old.author.bot) {
     return false;

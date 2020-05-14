@@ -1,4 +1,4 @@
-import { Message, RichEmbed } from "discord.js";
+import { Message, MessageEmbed } from "discord.js";
 
 export function code(text: string) {
   return `\`\`\`${text}\`\`\``;
@@ -13,9 +13,9 @@ export function escape(text: string) {
 }
 
 export function makeEmbed(message?: Message) {
-  const embed = new RichEmbed().setTimestamp();
+  const embed = new MessageEmbed().setTimestamp();
 
-  if (message) {
+  if (message && message.member) {
     const invoker =
       message.channel.type === "text"
         ? message.member.displayName

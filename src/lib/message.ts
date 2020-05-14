@@ -42,11 +42,13 @@ function addOneTimeMessageHandler(handler: MessageHandler) {
  * @return {Function} The function that handled this message
  */
 async function handleMessage(message: Message) {
-  let i = 0;
-  while (!(await handlers[i++](message)) && i < handlers.length) {
-    // console.log(`Handler passed`, handlers[i]);
+  for (const handler of handlers) {
+    const result = await handler(message);
+
+    if (result) {
+      return handler;
+    }
   }
-  return handlers[i];
 }
 
 type CommandHandler = (
@@ -58,5 +60,5 @@ export {
   removeMessageHandler,
   addMessageHandler,
   addOneTimeMessageHandler,
-  handleMessage
+  handleMessage,
 };

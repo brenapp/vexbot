@@ -1,4 +1,10 @@
-import { Message, Guild, RichEmbed, TextChannel } from "discord.js";
+import {
+  Message,
+  Guild,
+  MessageEmbed,
+  TextChannel,
+  PartialMessage,
+} from "discord.js";
 import { authorization, config } from "./access";
 import { makeEmbed } from "./util";
 import report from "./report";
@@ -82,7 +88,13 @@ export const DISABLED = new Set<CommandConfiguration>();
  * Actually handles the commands we send
  * @param message
  */
-export async function handle(message: Message): Promise<boolean> {
+export async function handle(
+  message: Message | PartialMessage
+): Promise<boolean> {
+  if (message.partial) {
+    message = await message.fetch();
+  }
+
   if (!isCommand(message)) return false;
 
   // Get the appropriate command, if it exists
@@ -160,10 +172,10 @@ export async function handle(message: Message): Promise<boolean> {
       // Otherwise get the last embed and edit it;
     } else {
       const embed = main.embeds[0];
-      const replacement = new RichEmbed(embed);
+      const replacement = new MessageEmbed(embed);
 
       replacement.setFooter(
-        embed.footer.text +
+        embed.footer?.text +
           `\n(took ${Date.now() - start}ms${
             process.env["DEV"] ? " — DEV MODE" : ""
           })`
@@ -180,6 +192,7 @@ export const Permissions = {
   admin(message: Message) {
     return (
       message.channel.type === "text" &&
+      message.member !== null &&
       message.member.hasPermission("ADMINISTRATOR")
     );
   },

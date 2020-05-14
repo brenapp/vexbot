@@ -31,7 +31,7 @@ export default async function listen(
       if (response) {
         collector.emit("end");
         collector.off("collect", handler);
-        collector.cleanup();
+        collector.stop();
       }
     })
   );
