@@ -6,6 +6,7 @@ import { DEBUG } from "../commands/debug";
 import { code } from "../lib/util";
 import { TextChannel } from "discord.js";
 import probate from "./probation";
+import { config } from "../lib/access";
 
 /**
  * Random behaviors
@@ -51,39 +52,7 @@ addMessageHandler(async (message) => {
   if (message.guild.id != "310820885240217600") return false;
 
   const ID = "546890655398625286";
-  const names = [
-    "jennas-boyfriend",
-    "regret",
-    "bradleys-gay",
-    "tylerbad",
-    "thanos-cube",
-    "gaytanoman",
-    "zach-for-head-ref",
-    "create-some-ass",
-    "bradley-for-head-ref",
-    "leeanna-for-emcee",
-    "leeanna-for-head-ref",
-    "serious-chat",
-    "drow-for-gdc",
-    "sadie",
-    "bradleys-snoring",
-    "admin-chat",
-    "zach-for-gdc",
-    "important-studying-chat",
-    "drink-water",
-    "yamatos-kitchen",
-    "omar-needs-to-hydrate",
-    "joels-autons",
-    "bradleys-hoes",
-    "library",
-    "vtotw-3",
-    "vtotw-2",
-    "a-professional-frat",
-    "a-social-frat",
-    "ding-dong",
-    "tip-in-finals",
-    "averys-cloud-juice",
-  ];
+  const names = config("regret");
 
   const channel = await message.guild.channels.find(
     (channel) => channel.id === ID
