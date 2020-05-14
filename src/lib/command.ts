@@ -147,6 +147,7 @@ export async function handle(message: Message): Promise<boolean> {
     // Archive that resposne
     RESPONSES.set(message, main);
 
+    // Add time to execute on the bottom of the message
     // If there isn't any attached embeds, then edit the message itself
     if (main.embeds.length < 1) {
       main.edit(
@@ -161,7 +162,12 @@ export async function handle(message: Message): Promise<boolean> {
       const embed = main.embeds[0];
 
       const replacement = makeEmbed(main)
-        .setFooter(embed.footer.text)
+        .setFooter(
+          embed.footer.text +
+            `\n(took ${Date.now() - start}ms${
+              process.env["DEV"] ? " — DEV MODE" : ""
+            })`
+        )
         .setTitle(embed.title)
         .setColor(embed.color)
         .setDescription(embed.description)
