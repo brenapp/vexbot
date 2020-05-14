@@ -11,6 +11,7 @@ import { code, escape } from "../lib/util";
 
 import { getLastCommit, Commit } from "git-last-commit";
 import * as os from "os";
+import { resolve } from "path";
 
 const getCommit = () =>
   new Promise<Commit>((res, rej) => {
@@ -120,7 +121,9 @@ export const ShellCommand = Command({
     let response;
     let handler;
     try {
-      const proc = execa.command(params.join(" "), { cwd: process.cwd() });
+      const proc = execa.command(params.join(" "), {
+        cwd: resolve(__dirname, "../../"),
+      });
 
       async function handleChunk(chunk: Buffer) {
         // If the chunk itself is too big, handle it in sections

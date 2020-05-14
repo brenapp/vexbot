@@ -1,5 +1,4 @@
-# Make sure we're in the right spot
-cd ~/vexbot
+
 
 # Reset to origin branch
 git reset --hard
