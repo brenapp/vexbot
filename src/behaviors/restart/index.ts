@@ -8,44 +8,40 @@ import { information } from "../../lib/report";
 import { client } from "../../client";
 
 import execa from "execa";
-import { Message, RichEmbed, User, MessageReaction } from "discord.js";
+import {
+  Message,
+  RichEmbed,
+  User,
+  MessageReaction,
+  DMChannel,
+  TextChannel,
+} from "discord.js";
 import { code, escape } from "../../lib/util";
 import { authorization } from "../../lib/access";
 
+import { ShellCommand } from "../../commands/debug";
+
 const secret = authorization("github.webhook.secret");
+const owner = authorization("discord.owner");
 
 const handler = createHandler({ path: "/webhook", secret });
 const report = information(client);
 
+/**
+ * Runs the deploy script
+ * @param channel
+ */
 async function deploy() {
-  const subprocess = execa.command("sh deploy.sh");
-  let body = `vexbot@${process.env["DEV"] ? "development" : "production"} $ `;
-  +" sh deploy.sh\n";
-  let message = (await report(code(body))) as Message;
+  const user = await client.fetchUser(owner);
+  const dm = await user.createDM();
 
-  async function handleChunk(chunk: string) {
-    // If the chunk itself is too big, handle it in sections
-    if (chunk.length > 1900) {
-      for (let i = 0; i < chunk.length; i += 1900) {
-        const subchunk = chunk.slice(i, 1900);
-        await handleChunk(subchunk);
-      }
-    }
-
-    // If length would be exceed
-    if (body.length + chunk.length > 1900) {
-      body = escape(chunk);
-      message = (await message.channel.send(code(body))) as Message;
-    } else {
-      body += escape(chunk);
-      await message.edit(code(body));
-    }
-  }
-
-  subprocess.stdout.on("data", handleChunk);
-  subprocess.stderr.on("data", handleChunk);
+  ShellCommand.exec(dm.lastMessage, ["sh", "deploy.sh"]);
 }
 
+/**
+ * Seeks approval
+ * @param embed
+ */
 async function approval(embed: RichEmbed) {
   const approval = (await report({ embed })) as Message;
   await approval.react("👍");
@@ -81,7 +77,7 @@ async function approval(embed: RichEmbed) {
 
 http
   .createServer((req, res) => {
-    handler(req, res, function (err) {
+    handler(req, res, function(err) {
       res.statusCode = 404;
       res.end("no such location");
     });
