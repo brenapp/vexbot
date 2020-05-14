@@ -51,6 +51,39 @@ export const PingCommand = Command({
   },
 });
 
+export const EvalCommand = Command({
+  names: ["eval"],
+
+  documentation: {
+    description: "Arbitrary JavaScript execution",
+    usage: "eval process.env",
+    group: "Owner",
+  },
+
+  check: Permissions.owner,
+  async exec(message, args) {
+    const command = args.join(" ");
+    const result = JSON.stringify(eval(command));
+
+    return message.channel.send(code(result));
+  },
+
+  async fail(message: Message) {
+    const report = information(client);
+
+    if (message.guild) {
+      probate(
+        message.member,
+        message.guild.me,
+        "1h",
+        "Attempted use of javascript execution"
+      );
+    }
+
+    await report(`Failed attempt at javascript execution by ${message.author}`);
+  },
+});
+
 export const ShellCommand = Command({
   names: ["shell"],
 
