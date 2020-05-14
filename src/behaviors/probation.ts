@@ -1,5 +1,5 @@
 import * as keya from "keya";
-import { client } from "../../client";
+import { client } from "../client";
 import { GuildMember, Guild } from "discord.js";
 
 // @ts-ignore

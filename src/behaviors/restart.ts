@@ -4,8 +4,8 @@
 
 import createHandler from "github-webhook-handler";
 import http from "http";
-import { information } from "../../lib/report";
-import { client } from "../../client";
+import { information } from "../lib/report";
+import { client } from "../client";
 
 import execa from "execa";
 import {
@@ -16,10 +16,10 @@ import {
   DMChannel,
   TextChannel,
 } from "discord.js";
-import { code, escape } from "../../lib/util";
-import { authorization } from "../../lib/access";
+import { code, escape } from "../lib/util";
+import { authorization } from "../lib/access";
 
-import { ShellCommand } from "../../commands/debug";
+import { ShellCommand } from "../commands/debug";
 
 const secret = authorization("github.webhook.secret");
 const owner = authorization("discord.owner");
