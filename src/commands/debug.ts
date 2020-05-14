@@ -159,7 +159,7 @@ export const MachineCommand = Command({
     const arch = os.arch();
 
     return message.channel.send(
-      `Running on \`${username}@${machine} (${type} ${arch})\``
+      `\`\`\`${username}@${machine} (${type} ${arch})\`\`\``
     );
   },
 });
