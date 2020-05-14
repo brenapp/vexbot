@@ -87,7 +87,7 @@ export const ShellCommand = Command({
     let response;
     let handler;
     try {
-      const process = execa.command(params.join(" "), { cwd: __dirname });
+      const proc = execa.command(params.join(" "), { cwd: process.cwd() });
 
       async function handleChunk(chunk: Buffer) {
         // If the chunk itself is too big, handle it in sections
@@ -108,8 +108,8 @@ export const ShellCommand = Command({
         }
       }
 
-      process.stdout.on("data", handleChunk);
-      process.stderr.on("data", handleChunk);
+      proc.stdout.on("data", handleChunk);
+      proc.stderr.on("data", handleChunk);
 
       // Cancel process
       handler = addOneTimeMessageHandler((m) => {
@@ -121,14 +121,14 @@ export const ShellCommand = Command({
           return false;
         }
 
-        process.kill();
-        process.stdout.off("data", handleChunk);
-        process.stderr.off("data", handleChunk);
+        proc.kill();
+        proc.stdout.off("data", handleChunk);
+        proc.stderr.off("data", handleChunk);
         message.channel.send("Killed");
         return true;
       });
 
-      response = await process;
+      response = await proc;
       removeMessageHandler(handler);
     } catch (error) {
       response = error;
