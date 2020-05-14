@@ -10,6 +10,7 @@ import { addOneTimeMessageHandler, removeMessageHandler } from "../lib/message";
 import { code, escape } from "../lib/util";
 
 import { getLastCommit, Commit } from "git-last-commit";
+import * as os from "os";
 
 const getCommit = () =>
   new Promise<Commit>((res, rej) => {
@@ -137,6 +138,28 @@ export const ShellCommand = Command({
       `${code(body)}EXITED ${
         response.failed ? "UNSUCCESSFULLY" : "SUCCESSFULLY"
       } (${response.exitCode} ${response.exitCodeName})\n`
+    );
+  },
+});
+
+export const MachineCommand = Command({
+  names: ["machine"],
+  documentation: {
+    usage: "machine",
+    description: "Lists the machine vexbot is running on",
+    group: "ADMIN",
+  },
+
+  check: Permissions.admin,
+  exec(message: Message) {
+    const { username } = os.userInfo();
+    const machine = os.hostname();
+
+    const type = os.type();
+    const arch = os.arch();
+
+    return message.channel.send(
+      `Running on \`${username}@${machine} (${type} ${arch})\``
     );
   },
 });
