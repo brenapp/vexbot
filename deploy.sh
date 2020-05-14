@@ -1,5 +1,3 @@
-
-
 # Reset to origin branch
 git reset --hard
 
