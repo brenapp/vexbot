@@ -46,9 +46,11 @@ export const SarcasmCommand = Command({
 
   async exec(message: Message, args: string[]) {
     const channel = message.channel;
-    const content = await channel
-      .fetchMessages({ limit: 2 })
-      .then((messages) => messages.last().content);
+    const content = await channel.messages
+      .fetch({ limit: 2 })
+      .then((messages) => messages.last()?.content);
+
+    if (!content) return;
 
     await message.delete();
 
@@ -87,9 +89,11 @@ export const UWUCommand = Command({
 
   async exec(message: Message, args: string[]) {
     const channel = message.channel;
-    const content = await channel
-      .fetchMessages({ limit: 2 })
-      .then((messages) => messages.last().content);
+    const content = await channel.messages
+      .fetch({ limit: 2 })
+      .then((messages) => messages.last()?.content);
+
+    if (!content) return;
 
     await message.delete();
 

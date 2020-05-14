@@ -10,15 +10,20 @@ export const GrantCommand = Command({
   },
 
   check: Permissions.compose(Permissions.guild, Permissions.admin),
-  exec(message: Message, args: string[]) {
+  async exec(message: Message, args: string[]) {
+    if (!message.mentions.members || !message.guild) {
+      return;
+    }
+
     let name = args.slice(message.mentions.members.size).join(" ");
-    const role = message.guild.roles.find((role) => role.name === name);
+    const roles = await message.guild.roles.fetch();
+    const role = roles.cache.find((r) => r.name === name);
 
     if (!role) {
       return message.channel.send("Can't find that role!");
     }
 
-    message.mentions.members.forEach((member) => member.addRole(role));
+    message.mentions.members.forEach((member) => member.roles.add(role));
   },
 });
 
@@ -32,15 +37,20 @@ export const VanityCommand = Command({
 
   check: Permissions.compose(Permissions.guild, Permissions.admin),
   async exec(message: Message, args: string[]) {
+    if (!message.mentions.members || !message.guild) {
+      return;
+    }
+
     const name = args.join(" ").trim();
-    let role = message.guild.roles.find((role) => role.name === name);
+    const roles = await message.guild.roles.fetch();
+    let role = roles.cache.find((r) => r.name === name);
 
     if (role) {
       return message.channel.send(
         "Cannot create a vanity role with that name! That role already exists"
       );
     } else {
-      role = await message.guild.createRole({
+      role = await message.guild.roles.add({
         name,
         hoist: false,
         mentionable: false,

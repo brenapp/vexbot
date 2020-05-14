@@ -4,26 +4,9 @@ import { GuildMember, Guild } from "discord.js";
 
 // @ts-ignore
 import parse from "parse-duration";
+import report from "../lib/report";
 
 export let TIMEOUTS: { [key: string]: NodeJS.Timeout } = {};
-
-export function updateActivity() {
-  const names = Object.keys(TIMEOUTS).map((ids) => {
-    const [guildid, memberid] = ids.split(":");
-    const guild = client.guilds.get(guildid);
-    if (!guild) return;
-    const member = guild.members.get(memberid);
-    if (!member) return;
-
-    return member.nickname.split(" |")[0];
-  });
-
-  if (names.length == 0) {
-    client.user.setActivity("over the server", { type: "WATCHING" });
-  } else {
-    client.user.setActivity(names.join(", "), { type: "WATCHING" });
-  }
-}
 
 export async function initalize() {
   const store = await keya.store("vexbotprobations");
@@ -46,20 +29,27 @@ export async function initalize() {
       end - Date.now()
     );
   }
-
-  updateActivity();
 }
 
 export const free = (memberid: string, guildid: string) => async () => {
-  const guild = client.guilds.get(guildid) as Guild;
-  const member = guild.members.get(memberid) as GuildMember;
-  const probation = guild.roles.find((role) => role.name === "Probation");
+  const guild = client.guilds.resolve(guildid) as Guild;
+  const member = guild.members.resolve(memberid) as GuildMember;
+  const probation = guild.roles.resolve("Probation");
+
+  if (!probation) {
+    report(client)(
+      new Error(
+        `Could not probate user in ${member.guild.name}, no probation role found`
+      )
+    );
+    return;
+  }
 
   console.log(`Free ${member}`);
 
   const store = await keya.store("vexbotprobations");
 
-  await member.removeRole(probation);
+  await member.roles.remove(probation);
   const dm = await member.createDM();
 
   dm.send(
@@ -70,13 +60,11 @@ export const free = (memberid: string, guildid: string) => async () => {
 
   clearTimeout(TIMEOUTS[`${guild.id}:${member.id}`]);
   delete TIMEOUTS[`${guild.id}:${member.id}`];
-
-  updateActivity();
 };
 
 export default async function probate(
   member: GuildMember,
-  by: GuildMember,
+  by: GuildMember | null,
   time: string,
   reason: string
 ) {
@@ -102,23 +90,28 @@ export default async function probate(
   );
 
   // Actually do the probation
-  const probation = member.guild.roles.find(
-    (role) => role.name === "Probation"
-  );
+  const probation = member.guild.roles.resolve("Probation");
 
-  await member.addRole(
+  if (!probation) {
+    report(client)(
+      new Error(
+        `Could not probate user in ${member.guild.name}, no probation role found`
+      )
+    );
+    return;
+  }
+
+  await member.roles.add(
     probation,
-    `For ${time} by ${by.nickname}; Reason: ${reason}`
+    `For ${time} by ${by === null ? "system" : by.nickname}; Reason: ${reason}`
   );
 
   // Slide into DMs to give warning
   const dm = await member.createDM();
-  const appeals = member.guild.channels.find(
+  const appeals = member.guild.channels.cache.find(
     (channel) => channel.name === "appeals"
   );
   dm.send(
     `You've been put on probation by ${by} for ${time} with the following reason: ${reason}. While you are on probation, you cannot post or speak in any channel. If you believe this is in error, you can communicate with Admins in ${appeals}`
   );
-
-  updateActivity();
 }

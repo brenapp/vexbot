@@ -21,6 +21,11 @@ import "./commands";
 client.on("ready", () => {
   console.log("vexbot#0599 is online!");
 
+  if (!client.user) {
+    console.error("Could not access client user");
+    process.exit(1);
+  }
+
   if (process.env["DEV"]) {
     console.log("DEV MODE ENABLED");
     client.user.setActivity("with VSCode", { type: "PLAYING" });

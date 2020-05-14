@@ -15,6 +15,10 @@ export const PurgeCommand = Command({
 
   check: Permissions.admin,
   async exec(message: Message, [count]: string[]) {
+    if (!message.mentions.members) {
+      return;
+    }
+
     let channel: TextChannel;
 
     // What do we need to clear
@@ -31,7 +35,7 @@ export const PurgeCommand = Command({
     }
 
     // Get recent messages
-    let messages = await channel.fetchMessages({
+    let messages = await channel.messages.fetch({
       before: message.id,
       limit: 100,
     });
@@ -39,13 +43,17 @@ export const PurgeCommand = Command({
     // Run Filters
     if (filters.member) {
       messages = messages.filter(
-        (message) => message.member.id != filters.member.id
+        (message) =>
+          message.member === null || message.member.id != filters.member?.id
       );
     }
 
     if (filters.role) {
-      messages = messages.filter((message) =>
-        message.member.roles.has(filters.role.id)
+      messages = messages.filter(
+        (message) =>
+          message.member === null ||
+          (filters.role !== undefined &&
+            message.member.roles.cache.has(filters.role.id))
       );
     }
 

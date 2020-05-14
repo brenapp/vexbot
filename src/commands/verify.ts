@@ -12,6 +12,11 @@ Command({
 
   check: Permissions.admin,
   exec(message: Message) {
+    // If they didn't mention anyone return
+    if (!message.mentions.members) {
+      return;
+    }
+
     message.mentions.members.forEach((member) => {
       verify(member);
     });

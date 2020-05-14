@@ -72,6 +72,8 @@ export const EvalCommand = Command({
   async fail(message: Message) {
     const report = information(client);
 
+    if (!message.member) return;
+
     if (message.guild) {
       probate(
         message.member,
@@ -99,6 +101,8 @@ export const ShellCommand = Command({
   async fail(message: Message) {
     const report = information(client);
 
+    if (!message.member) return;
+
     if (message.guild) {
       probate(
         message.member,
@@ -112,6 +116,8 @@ export const ShellCommand = Command({
   },
 
   async exec(message: Message, params: string[]) {
+    if (!message.member) return;
+
     const prompt = `vexbot@${
       process.env["DEV"] ? "development" : "production"
     } $ `;

@@ -1,4 +1,4 @@
-import { Message, RichEmbed, MessageReaction } from "discord.js";
+import { Message, MessageEmbed, MessageReaction } from "discord.js";
 import Command, { Permissions } from "../lib/command";
 import { makeEmbed } from "../lib/util";
 import * as vexdb from "vexdb";
@@ -28,7 +28,7 @@ export async function html(url: string) {
 
 function constructFields(
   events: { capacity: string; open: string; event: EventsResponseObject }[],
-  embed: RichEmbed
+  embed: MessageEmbed
 ) {
   events.forEach(({ event, open, capacity }) => {
     embed.addField(
@@ -136,7 +136,7 @@ export const EventsCommand = Command({
       response,
       ["⬇", "⬆"],
       (resp = async (reaction: MessageReaction) => {
-        await response.clearReactions();
+        await response.reactions.removeAll();
 
         console.log(reaction);
 

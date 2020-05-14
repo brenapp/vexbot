@@ -1,4 +1,4 @@
-import { Message } from "discord.js";
+import { Message, GuildManager, GuildMember } from "discord.js";
 import probate from "../behaviors/probation";
 import Command, { Permissions } from "../lib/command";
 import { client } from "../client";
@@ -19,13 +19,16 @@ export const ProbateCommand = Command({
   check: Permissions.compose(
     Permissions.admin,
     (message) =>
-      message.channel.type === "text" && !message.mentions.members.has(owner)
+      message.channel.type === "text" &&
+      message.mentions.members !== null &&
+      message.mentions.members.has(owner)
   ),
 
   fail(message: Message) {
     // First, chastise for trying to put me on probation
     if (
       message.channel.type === "text" &&
+      message.mentions.members !== null &&
       message.mentions.members.has(owner)
     ) {
       message.channel.send("nah fam");
@@ -33,9 +36,13 @@ export const ProbateCommand = Command({
       message.channel.send("no u");
     }
 
+    if (!message.member) {
+      return;
+    }
+
     probate(
       message.member,
-      message.member.guild.me,
+      message.member.guild.me as GuildMember,
       "1m",
       "Unauthorized use of probate"
     );
@@ -43,10 +50,19 @@ export const ProbateCommand = Command({
 
   async exec(message: Message, args: string[]) {
     const victims = message.mentions.members;
+
+    if (!victims) return;
+    if (message.member === null) return;
+
     const [duration, ...reason] = args.slice(victims.size);
 
-    message.mentions.members.forEach((member) => {
-      probate(member, message.member, duration, reason.join(" "));
+    victims.forEach((member) => {
+      probate(
+        member,
+        message.member as GuildMember,
+        duration,
+        reason.join(" ")
+      );
     });
 
     // Update probation records

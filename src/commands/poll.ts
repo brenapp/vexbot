@@ -6,7 +6,13 @@
  *
  */
 
-import { Message, MessageReaction, User, RichEmbed } from "discord.js";
+import {
+  Message,
+  MessageReaction,
+  User,
+  MessageEmbed,
+  Guild,
+} from "discord.js";
 import Command, { Permissions } from "../lib/command";
 import { makeEmbed } from "../lib/util";
 
@@ -29,6 +35,7 @@ export const PollCommand = Command({
 
   check: Permissions.guild,
   async exec(message, [duration, question, ...options]) {
+    if (!message.member) return;
     if (options.length > 10) {
       return message.channel.send("You cannot have more than 10 options!");
     }
@@ -43,7 +50,7 @@ export const PollCommand = Command({
     const invoker = message.member.nickname || message.author.username;
 
     const embed = makeEmbed(message)
-      .setAuthor(invoker, message.author.avatarURL)
+      .setAuthor(invoker, message.author.avatarURL() ?? undefined)
       .setTitle(`Poll: ${question}`);
 
     let description = `This poll ends at ${ends.toLocaleString()}. \n`;
@@ -73,32 +80,31 @@ export const PollCommand = Command({
       { time }
     );
 
-    collector.on("collect", async (reaction, collector) => {
+    collector.on("collect", async (reaction, user) => {
       // If the poll is being ended early, either by the originator, or an admin
       if (
         reaction.emoji.toString() === "✅" &&
-        reaction.users.some(
-          (user) =>
-            message.author.id === user.id ||
-            (message.guild.member(user).hasPermission("ADMINISTRATOR") &&
-              !user.bot)
-        )
+        (user.id === message.author.id ||
+          (reaction.message.guild as Guild)
+            .member(user)
+            ?.hasPermission("ADMINISTRATOR"))
       ) {
-        collector.stop();
       }
 
-      const voter = reaction.users.last();
+      const voter = reaction.users.cache.last();
       const votes = collector.collected;
+
+      if (!voter) return;
 
       // Get all their other votes and delete them
       const otherVotes = votes.filter(
         (choice) =>
-          choice.users.has(voter.id) && choice.emoji !== reaction.emoji
+          choice.users.cache.has(voter.id) && choice.emoji !== reaction.emoji
       );
 
       // Remove all their other votes
       for (const choice of otherVotes.values()) {
-        choice.remove(voter);
+        choice.users.remove(voter);
       }
     });
 
@@ -107,9 +113,10 @@ export const PollCommand = Command({
 
       description += "**Time's Up!** \nThe winner of the poll is...\n";
 
-      let winner: MessageReaction = collected.first();
+      let winner: MessageReaction = collected.first() as MessageReaction;
       for (const reaction of collected.values()) {
-        if (reaction.count > winner.count) {
+        if (reaction.partial) continue;
+        if ((reaction.count as number) > (winner.count as number)) {
           winner = reaction;
         }
       }
@@ -117,7 +124,7 @@ export const PollCommand = Command({
       const opt = options[emoji.indexOf(winner.emoji.toString())];
       description += opt;
 
-      const replacement = new RichEmbed(embed);
+      const replacement = new MessageEmbed(embed);
       replacement.setDescription(description);
 
       poll.edit({ embed: replacement });

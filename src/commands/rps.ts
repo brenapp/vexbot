@@ -26,8 +26,10 @@ export const RockPaperScissorsCommand = Command({
 
     await message.react("🔥");
 
-    listen(message, ["🔥"], (reaction) => {
-      if (reaction.users.has(challenged.id)) {
+    listen(message, ["🔥"], async (reaction) => {
+      const users = await reaction.users.fetch();
+
+      if (users.has(challenged.id)) {
         message.channel.send("Competitors check DMs!");
 
         message.delete();
@@ -78,8 +80,10 @@ export const RockPaperScissorsCommand = Command({
       out = out[0];
     }
 
-    listen(out, ["🔥"], (fire) => {
-      if (fire.users.has(challenger.id) && fire.users.has(challenged.id)) {
+    listen(out, ["🔥"], async (fire) => {
+      const users = await fire.users.fetch();
+
+      if (users.has(challenger.id) && users.has(challenged.id)) {
         this.doGame(output, challenger, challenged);
       }
     });

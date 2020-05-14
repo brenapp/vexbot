@@ -18,7 +18,7 @@ export const LockCommand = Command({
   exec(message: Message, args: string[]) {
     const channel = message.channel as TextChannel;
 
-    channel.overwritePermissions(channel.guild.defaultRole, {
+    channel.createOverwrite(channel.guild.roles.everyone, {
       SEND_MESSAGES: false,
     });
 
@@ -43,7 +43,7 @@ export const UnlockCommand = Command({
   exec(message: Message) {
     const channel = message.channel as TextChannel;
 
-    channel.overwritePermissions(channel.guild.defaultRole, {
+    channel.createOverwrite(channel.guild.roles.everyone, {
       SEND_MESSAGES: undefined,
     });
 

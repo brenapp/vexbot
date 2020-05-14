@@ -10,7 +10,7 @@ import { client } from "../client";
 import execa from "execa";
 import {
   Message,
-  RichEmbed,
+  MessageEmbed,
   User,
   MessageReaction,
   DMChannel,
@@ -32,17 +32,17 @@ const report = information(client);
  * @param channel
  */
 async function deploy() {
-  const user = await client.fetchUser(owner);
+  const user = await client.users.fetch(owner);
   const dm = await user.createDM();
 
-  ShellCommand.exec(dm.lastMessage, ["sh", "deploy.sh"]);
+  ShellCommand.exec(dm.lastMessage as Message, ["sh", "deploy.sh"]);
 }
 
 /**
  * Seeks approval
  * @param embed
  */
-async function approval(embed: RichEmbed) {
+async function approval(embed: MessageEmbed) {
   const approval = (await report({ embed })) as Message;
   await approval.react("👍");
 
@@ -57,7 +57,7 @@ async function approval(embed: RichEmbed) {
     collector.on(
       "collect",
       (handleReaction = (vote) => {
-        const approver = vote.users.last();
+        const approver = vote.users.cache.last();
 
         if (vote.emoji.name === "👍") {
           if (collector.off) {
@@ -87,7 +87,7 @@ http
 handler.on("push", async (event) => {
   if (process.env["DEV"]) return;
 
-  const embed = new RichEmbed();
+  const embed = new MessageEmbed();
   embed
     .setTitle("Push Recieved")
     .setDescription(
