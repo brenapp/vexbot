@@ -87,7 +87,7 @@ export const ShellCommand = Command({
     let response;
     let handler;
     try {
-      const process = execa.command(params.join(" "));
+      const process = execa.command(params.join(" "), { cwd: __dirname });
 
       async function handleChunk(chunk: Buffer) {
         // If the chunk itself is too big, handle it in sections
