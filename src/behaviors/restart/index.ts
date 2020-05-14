@@ -35,7 +35,7 @@ async function deploy() {
   const user = await client.fetchUser(owner);
   const dm = await user.createDM();
 
-  ShellCommand.exec(dm.lastMessage, ["sh", "deploy.sh"]);
+  ShellCommand.exec(dm.lastMessage, ["sh", "~/vexbot/deploy.sh"]);
 }
 
 /**

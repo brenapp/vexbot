@@ -2,7 +2,6 @@
   "apps": [
     {
       "name": "vexbot",
-      "cwd": "~/vexbot",
       "script": "yarn",
       "args": "start"
     }
