@@ -171,7 +171,11 @@ export async function handle(message: Message): Promise<boolean> {
         .setURL(embed.url);
 
       if (embed.author) {
-        replacement.setAuthor(embed.author);
+        replacement.setAuthor(
+          embed.author.name,
+          embed.author.iconURL,
+          embed.author.url
+        );
       }
 
       replacement.fields = embed.fields;
