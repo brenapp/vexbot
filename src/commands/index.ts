@@ -10,3 +10,4 @@ import "./dumb";
 import "./purge";
 import "./control";
 import "./rps";
+import "./poll";
