@@ -5,6 +5,8 @@ import { client } from "./client";
 
 import { DEBUG } from "./commands/debug";
 
+import "./lib/handlers";
+
 // Behaviors
 import "./behaviors/log";
 import "./behaviors/random";
@@ -15,7 +17,7 @@ import "./behaviors/nickname";
 import * as probation from "./behaviors/probation";
 
 // Commands and message handlers
-import "./lib/handlers";
+
 import "./commands";
 
 client.on("ready", () => {
@@ -28,7 +30,7 @@ client.on("ready", () => {
 
   if (process.env["DEV"]) {
     console.log("DEV MODE ENABLED");
-    client.user.setActivity("with VSCode", { type: "PLAYING" });
+    client.user.setActivity("for changes", { type: "WATCHING" });
   } else {
     client.user.setActivity("over the server", { type: "WATCHING" });
   }
