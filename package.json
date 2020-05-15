@@ -39,6 +39,7 @@
   },
   "scripts": {
     "start": "tsc && node out/main.js",
+    "build": "tsc",
     "dev": "node ./node_modules/nodemon/bin/nodemon.js",
     "snyk-protect": "snyk protect",
     "prepublish": "npm run snyk-protect"
