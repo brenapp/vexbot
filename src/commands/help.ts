@@ -57,8 +57,6 @@ export const HelpCommand = Command({
       }
     }
 
-    body += "\nRemember to keep most bot usage in the appropriate channel!";
-
     // If the body is too big, we need to handle it in chunks
     async function postMessage(chunk: string) {
       if (chunk.length > 1900) {

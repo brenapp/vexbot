@@ -47,10 +47,13 @@ async function clean(message: Message) {
 }
 
 addMessageHandler(async (message) => {
+  if (message.author.bot) return false;
   if (message.channel.type === "dm") {
     return false;
   }
-  let log = message.guild?.channels.resolve("server-log") as TextChannel;
+  let log = message.guild?.channels.cache.find(
+    (ch) => ch.name === "server-log"
+  ) as TextChannel;
   if (!log) {
     report(client)(new Error("Could not find server log channel"));
   }
@@ -79,16 +82,16 @@ client.on("messageUpdate", async (old, current) => {
   if (current.partial) {
     current = await current.fetch();
   }
-
+  if (old.author.bot) return true;
   if (old.channel.type === "dm") {
     return false;
   }
-  let log = old.guild?.channels.resolve("server-log") as TextChannel;
+  let log = old.guild?.channels.cache.find(
+    (ch) => ch.name === "server-log"
+  ) as TextChannel;
   if (!log) {
     report(client)(new Error("Could not find server log channel"));
   }
-
-  if (old.author.bot) return true;
 
   if (process.env["DEV"] && !DEBUG) return false;
 

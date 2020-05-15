@@ -4,6 +4,15 @@ import "./command";
 import { handle, isCommand, RESPONSES } from "./command";
 import { client } from "../client";
 import { Message } from "discord.js";
+import { config } from "./access";
+
+const prod: string[] = config("prefix.prod");
+
+// Dismiss production commands when in DEV mode
+addMessageHandler(
+  (message) =>
+    process.env["DEV"] !== undefined && prod.includes(message.content[0])
+);
 
 // Dismiss messages from a bot, we don't take their kind around here!
 addMessageHandler((message) => message.author.bot);
