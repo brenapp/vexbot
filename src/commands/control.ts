@@ -20,7 +20,7 @@ export const LockCommand = Command({
 
     channel.createOverwrite(channel.guild.roles.everyone, {
       SEND_MESSAGES: false,
-      VIEW_CHANNEL: false,
+      VIEW_CHANNEL: null,
     });
 
     return message.channel.send("Channel locked");
