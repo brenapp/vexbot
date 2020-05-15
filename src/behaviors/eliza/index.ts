@@ -23,7 +23,9 @@ async function goEliza(user: User) {
   let response = eliza.getInitial();
   let input = "";
 
-  information(user.client)(`Eliza Initialized for ${user.id}`);
+  information(user.client)(
+    `Eliza Initialized for ${user.username}#${user.discriminator}`
+  );
 
   while (!eliza.quit) {
     input = await askString(response, dm);
