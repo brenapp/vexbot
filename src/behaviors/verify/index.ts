@@ -114,8 +114,17 @@ export default async function verify(member: GuildMember | PartialGuildMember) {
     member.setNickname(`${name} | ${team}`);
     member.roles.add(roles);
   } else {
+    const invites = await member.guild.fetchInvites();
+    const invite = invites.find(
+      (invite) => invite.expiresAt === null && invite.maxUses == null
+    );
+
     dm.send(
-      "Your verification was denied. If you believe this to be incorrect, you can rejoin below. https://discord.gg/Jnqry6b"
+      `Your verification was denied. ${
+        invite
+          ? `If you believe this to be incorrect, join below ${invite.url}`
+          : ""
+      }`
     );
   }
 }
