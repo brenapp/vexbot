@@ -4,7 +4,7 @@ import { client } from "../client";
 import { PREFIX, isCommand } from "../lib/command";
 import { DEBUG } from "../commands/debug";
 import { code } from "../lib/util";
-import { TextChannel } from "discord.js";
+import { TextChannel, ClientUser } from "discord.js";
 import probate from "./probation";
 import { config } from "../lib/access";
 
@@ -13,9 +13,11 @@ import { config } from "../lib/access";
  */
 
 addMessageHandler((message) => {
-  if (!message.mentions.users.has(client.user.id)) return false;
+  if (!client.user || !message.mentions.users.has(client.user.id)) return false;
 
-  const ping = client.emojis.find((emoji) => emoji.name === "ping");
+  const ping = client.emojis.cache.find((emoji) => emoji.name === "ping");
+  if (!ping) return false;
+
   message.react(ping);
 
   return true;
@@ -27,9 +29,13 @@ addMessageHandler((message) => {
     return false;
   }
 
+  if (!message.mentions.members) {
+    return false;
+  }
+
   if (
     !message.mentions.members.some(
-      (member) => member.user.id === client.user.id
+      (member) => member.user.id === (client.user as ClientUser).id
     )
   ) {
     return false;
@@ -51,12 +57,14 @@ addMessageHandler(async (message) => {
   if (!message.guild) return false;
   if (message.guild.id != "310820885240217600") return false;
 
-  const ID = "546890655398625286";
-  const names = config("regret");
+  const ID = config("regret.id");
+  const names = config("regret.names");
 
-  const channel = await message.guild.channels.find(
+  const channel = await message.guild.channels.cache.find(
     (channel) => channel.id === ID
   );
+
+  if (!channel) return false;
 
   const name = names[Math.round(Math.random() * (names.length - 1))];
   channel.setName(name);
@@ -84,6 +92,8 @@ addMessageHandler(async (message) => {
 addMessageHandler(async (message) => {
   if (!message.guild) return false;
   if (message.guild.id != "310820885240217600") return false;
+
+  if (!message.mentions.members) return false;
 
   if (message.mentions.members.has("396821025687601153")) {
     await message.channel.send("Polo!");
