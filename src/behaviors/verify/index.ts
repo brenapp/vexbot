@@ -1,6 +1,6 @@
 import { addMessageHandler } from "../../lib/message";
 
-import { Guild, GuildMember, PartialGuildMember } from "discord.js";
+import { Guild, GuildMember, PartialGuildMember, ClientUser } from "discord.js";
 import { client } from "../../client";
 import { askString, choose, questionValidate } from "../../lib/prompt";
 
@@ -114,10 +114,15 @@ export default async function verify(member: GuildMember | PartialGuildMember) {
     member.setNickname(`${name} | ${team}`);
     member.roles.add(roles);
   } else {
-    const invites = await member.guild.fetchInvites();
-    const invite = invites.find(
-      (invite) => invite.expiresAt === null && invite.maxUses == null
-    );
+    const invite = await member.guild.channels.cache
+      .sort((a, b) => b.calculatedPosition - a.calculatedPosition)
+      .first()
+      ?.createInvite({
+        reason: `Invite for ${name} | ${team} (${member.user.username}#${member.user.discriminator})`,
+        maxUses: 1,
+        maxAge: 300,
+        temporary: true,
+      });
 
     dm.send(
       `Your verification was denied. ${
