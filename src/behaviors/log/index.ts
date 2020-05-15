@@ -5,6 +5,7 @@ import { client } from "../../client";
 import "./important";
 import "./images";
 import { DEBUG } from "../../commands/debug";
+import report from "../../lib/report";
 
 function matchAll(str: string, re: RegExp) {
   return (str.match(re) || [])
@@ -18,13 +19,17 @@ async function clean(message: Message) {
   const roles = await Promise.all(
     matchAll(content, /\<\@\&([0-9]+)\>/g).map(async (match) => ({
       key: (match as RegExpExecArray)[0],
-      role: message.guild.roles.get((match as RegExpExecArray)[1]),
+      role: (message.guild as Guild).roles.cache.get(
+        (match as RegExpExecArray)[1]
+      ),
     }))
   );
   const members = await Promise.all(
     matchAll(content, /\<\@\!([0-9]+)\>/g).map(async (match) => ({
       key: (match as RegExpExecArray)[0],
-      member: message.guild.members.get((match as RegExpExecArray)[1]),
+      member: (message.guild as Guild).members.cache.get(
+        (match as RegExpExecArray)[1]
+      ),
     }))
   );
 
@@ -42,24 +47,22 @@ async function clean(message: Message) {
 }
 
 addMessageHandler(async (message) => {
-  let log: TextChannel;
   if (message.channel.type === "dm") {
     return false;
-  } else {
-    log = message.guild.channels.find(
-      (channel) => channel.name === "server-log"
-    ) as TextChannel;
+  }
+  let log = message.guild?.channels.resolve("server-log") as TextChannel;
+  if (!log) {
+    report(client)(new Error("Could not find server log channel"));
   }
 
   if (message.author.bot) return true;
 
-  if (!log) return false;
   if (process.env["DEV"] && !DEBUG) return false;
 
   log.send(
-    `${message.member.user.username}#${message.member.user.discriminator} in ${
-      message.type === "dm" ? "DM" : message.channel.toString()
-    }: ${await clean(message)}`,
+    `${message.author.username}#${
+      message.author.discriminator
+    } in ${message.channel.toString()}: ${await clean(message)}`,
     {
       files: message.attachments.map((attach) => attach.url),
     }
@@ -68,59 +71,30 @@ addMessageHandler(async (message) => {
   return false;
 });
 
-client.on("messageUpdate", (old, current) => {
-  let log;
+client.on("messageUpdate", async (old, current) => {
+  if (old.partial) {
+    old = await old.fetch();
+  }
+
+  if (current.partial) {
+    current = await current.fetch();
+  }
+
   if (old.channel.type === "dm") {
     return false;
-  } else {
-    log = old.guild.channels.find(
-      (channel) => channel.name === "server-log"
-    ) as TextChannel;
+  }
+  let log = old.guild?.channels.resolve("server-log") as TextChannel;
+  if (!log) {
+    report(client)(new Error("Could not find server log channel"));
   }
 
-  if (!log) return false;
-  if (old.author.bot) return false;
+  if (old.author.bot) return true;
+
+  if (process.env["DEV"] && !DEBUG) return false;
 
   log.send(
-    `${old.member.user.username}#${old.member.user.discriminator} in ${
-      old.type === "dm" ? "DM" : old.channel.toString()
-    }: ${old.content.toString()} => ${current.content.toString()}`
+    `${old.author.username}#${
+      old.author.discriminator
+    } in ${old.channel.toString()}: ${old.content.toString()} => ${current.content.toString()}`
   );
-});
-
-client.on("voiceStateUpdate", (old, current) => {
-  let log = old.guild.channels.find(
-    (channel) => channel.name === "server-log"
-  ) as TextChannel;
-
-  if (!log) return false;
-  if (old.user.bot) return false;
-
-  let changed = "";
-
-  if (!old.voiceChannel) {
-    changed = `connected to ${current.voiceChannel.name}`;
-  } else if (!current.voiceChannel) {
-    changed = `disconnected from ${old.voiceChannel.name}`;
-  } else if (old.voiceChannel.id != current.voiceChannel.id) {
-    changed = `moved from ${old.voiceChannel.name} to ${current.voiceChannel.name}`;
-  } else if (!old.selfDeaf && current.selfDeaf) {
-    changed = `Deafened themself`;
-  } else if (old.selfDeaf && !current.selfDeaf) {
-    changed = `undeafened themself`;
-  } else if (!old.selfMute && current.selfMute) {
-    changed = `muted themself`;
-  } else if (old.selfMute && !current.selfMute) {
-    changed = `unmuted themself`;
-  } else if (!old.serverDeaf && current.serverDeaf) {
-    changed = `was server deafend`;
-  } else if (old.serverDeaf && !current.serverDeaf) {
-    changed = `was server undeafened`;
-  } else if (!old.serverMute && current.serverMute) {
-    changed = `was server muted`;
-  } else if (old.serverMute && !current.serverMute) {
-    changed = `was server unmuted`;
-  }
-
-  log.send(`${old.user.username}#${old.user.discriminator} ${changed}`);
 });

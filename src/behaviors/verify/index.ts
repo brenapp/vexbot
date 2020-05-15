@@ -1,17 +1,6 @@
 import { addMessageHandler } from "../../lib/message";
 
-import {
-  Guild,
-  GuildMember,
-  TextChannel,
-  DMChannel,
-  GroupDMChannel,
-  GuildChannel,
-  Message,
-  MessageReaction,
-  RichEmbed,
-  Channel
-} from "discord.js";
+import { Guild, GuildMember, PartialGuildMember } from "discord.js";
 import { client } from "../../client";
 import { askString, choose, questionValidate } from "../../lib/prompt";
 
@@ -19,13 +8,17 @@ import * as vexdb from "vexdb";
 import approve from "./approve";
 
 export function findOrMakeRole(name: string, guild: Guild) {
-  let role = guild.roles.find(role => role.name === name);
+  let role = guild.roles.resolve(name);
   return role
     ? Promise.resolve(role)
-    : guild.createRole({ name, mentionable: true });
+    : guild.roles.create({ data: { name, mentionable: true } });
 }
 
-export default async function verify(member: GuildMember) {
+export default async function verify(member: GuildMember | PartialGuildMember) {
+  if (member.partial) {
+    member = await member.fetch();
+  }
+
   // Slide into DMs
   const dm = await member.createDM();
 
@@ -37,7 +30,7 @@ export default async function verify(member: GuildMember) {
   let team = await questionValidate(
     "What team are you *primarily* a part of?",
     dm,
-    async team =>
+    async (team) =>
       team === "OVERRIDE" || !!(await vexdb.size("teams", { team })),
     "There doesn't appear to be a team with that number. Make sure you are listing a registered team that has gone to an event. If you need a manual override, please enter `OVERRIDE`"
   );
@@ -57,7 +50,7 @@ export default async function verify(member: GuildMember) {
     [
       ["MEMBER", "COMPETITOR", "TEAM MEMBER"],
       ["ALUMNI", "GRADUATED", "ALUMNUS", "ALUM"],
-      ["MENTOR", "COACH", "ADVISOR"]
+      ["MENTOR", "COACH", "ADVISOR"],
     ]
   );
 
@@ -65,7 +58,10 @@ export default async function verify(member: GuildMember) {
   const additional = await choose(
     "Do you have any other teams you are/were involved with? (yes/no)",
     dm,
-    [["YES", "Y"], ["NO", "N"]]
+    [
+      ["YES", "Y"],
+      ["NO", "N"],
+    ]
   );
 
   let teams = additional;
@@ -116,7 +112,7 @@ export default async function verify(member: GuildMember) {
   if (approved) {
     dm.send("Your verification has been approved!");
     member.setNickname(`${name} | ${team}`);
-    member.addRoles(roles);
+    member.roles.add(roles);
   } else {
     dm.send(
       "Your verification was denied. If you believe this to be incorrect, you can rejoin below. https://discord.gg/Jnqry6b"

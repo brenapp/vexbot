@@ -9,16 +9,16 @@ import {
   Message,
   MessageReaction,
   Collector,
-  RichEmbed,
+  MessageEmbed,
+  PartialUser,
+  PartialGuildMember,
 } from "discord.js";
 import { makeEmbed } from "../../lib/util";
 import listen from "../../lib/reactions";
 
 // Notify #event-log about important events
 function serverlog(guild: Guild): TextChannel {
-  return guild.channels.find(
-    (channel) => channel.name === "event-log" && channel.type === "text"
-  ) as TextChannel;
+  return guild.channels.resolve("event-log") as TextChannel;
 }
 
 function changedRoles(
@@ -33,7 +33,7 @@ function changedRoles(
 
 async function handleVeto(
   message: Message,
-  embed: RichEmbed,
+  embed: MessageEmbed,
   callback: (
     vote: MessageReaction,
     collector: Collector<string, MessageReaction>
@@ -52,7 +52,7 @@ async function handleVeto(
     await callback(reaction, collector);
     embed.addField(
       "Veto",
-      reaction.users
+      reaction.users.cache
         .filter((user) => !user.bot)
         .map((user) => user)
         .join(", ")
@@ -62,13 +62,21 @@ async function handleVeto(
 }
 
 // Administrative
-client.on("guildBanAdd", async (guild: Guild, user: User) => {
+client.on("guildBanAdd", async (guild: Guild, user: User | PartialUser) => {
   if (process.env["DEV"]) return;
+  if (user.partial) {
+    user = await user.fetch();
+  }
+
+  user = user as User;
+
   const log = serverlog(guild);
 
   const embed = makeEmbed();
 
-  embed.setAuthor(user.username, user.avatarURL).setTitle("Member Banned");
+  embed
+    .setAuthor(user.username, user.avatarURL() ?? undefined)
+    .setTitle("Member Banned");
 
   // Establish original actor
   const entry = await guild
@@ -76,7 +84,7 @@ client.on("guildBanAdd", async (guild: Guild, user: User) => {
     .then((audit) => audit.entries.first());
 
   // Ignore vetos
-  if (entry.executor.bot) {
+  if (!entry || entry.executor.bot) {
     return;
   }
 
@@ -84,21 +92,25 @@ client.on("guildBanAdd", async (guild: Guild, user: User) => {
 
   const message = (await log.send({ embed })) as Message;
 
-  handleVeto(message, embed, (reaction) =>
-    guild.unban(
-      user,
-      `Vetoed by ${reaction.users.map((user) => user.username).join(", ")}`
-    )
-  );
+  handleVeto(message, embed, (reaction) => {
+    guild.members.unban(user as User, `Vetoed by ${reaction.users}`);
+  });
 });
 
-client.on("guildBanRemove", async (guild: Guild, user: User) => {
+client.on("guildBanRemove", async (guild: Guild, user: User | PartialUser) => {
   if (process.env["DEV"]) return;
+
+  if (user.partial) {
+    user = await user.fetch();
+  }
+
   const log = serverlog(guild);
 
   const embed = makeEmbed();
 
-  embed.setAuthor(user.username, user.avatarURL).setTitle("Member Unbanned");
+  embed
+    .setAuthor(user.username, user.avatarURL() ?? undefined)
+    .setTitle("Member Unbanned");
 
   // Establish original actor
   const entry = await guild
@@ -106,7 +118,7 @@ client.on("guildBanRemove", async (guild: Guild, user: User) => {
     .then((audit) => audit.entries.first());
 
   // Ignore vetos
-  if (entry.executor.bot) {
+  if (!entry || entry.executor.bot) {
     return;
   }
 
@@ -115,32 +127,43 @@ client.on("guildBanRemove", async (guild: Guild, user: User) => {
   const message = (await log.send({ embed })) as Message;
   await message.react("👎");
 
-  handleVeto(message, embed, (reaction) =>
-    guild.ban(
-      user,
-      `Vetoed by ${reaction.users.map((user) => user.username).join(", ")}`
-    )
-  );
+  handleVeto(message, embed, (reaction) => guild.members.ban(user as User));
 });
 
-client.on("guildMemberRemove", (member: GuildMember) => {
-  if (process.env["DEV"]) return;
-  const log = serverlog(member.guild);
+client.on(
+  "guildMemberRemove",
+  async (member: GuildMember | PartialGuildMember) => {
+    if (process.env["DEV"]) return;
 
-  const embed = makeEmbed();
+    if (member.partial) {
+      member = await member.fetch();
+    }
 
-  embed
-    .setAuthor(member.user.username, member.user.avatarURL)
-    .setTitle("Member Removed")
-    .setDescription("This user was kicked, or left the server voluntarily");
+    const log = serverlog(member.guild);
 
-  log.send({ embed });
-});
+    const embed = makeEmbed();
+
+    embed
+      .setAuthor(member.user.username, member.user.avatarURL() ?? undefined)
+      .setTitle("Member Removed")
+      .setDescription("This user was kicked, or left the server voluntarily");
+
+    log.send({ embed });
+  }
+);
 
 // User changes/actions
 client.on("guildMemberUpdate", async (old, current) => {
   if (process.env["DEV"]) return;
   const log = serverlog(old.guild);
+
+  if (old.partial) {
+    old = await old.fetch();
+  }
+
+  if (current.partial) {
+    current = await current.fetch();
+  }
 
   const embed = makeEmbed();
 
@@ -148,7 +171,7 @@ client.on("guildMemberUpdate", async (old, current) => {
   let entry;
 
   embed
-    .setAuthor(old.user.username, old.user.avatarURL)
+    .setAuthor(old.user.username, old.user.avatarURL() ?? undefined)
     .setTitle("Member Updated");
 
   if (old.nickname !== current.nickname) {
@@ -162,7 +185,7 @@ client.on("guildMemberUpdate", async (old, current) => {
     );
   }
 
-  const { added, removed } = changedRoles(old.roles, current.roles);
+  const { added, removed } = changedRoles(old.roles.cache, current.roles.cache);
 
   if (added.size > 0 || removed.size > 0) {
     entry = await current.guild
@@ -194,15 +217,15 @@ client.on("guildMemberUpdate", async (old, current) => {
   const message = (await log.send({ embed })) as Message;
   handleVeto(message, embed, (reaction) => {
     if (old.nickname !== current.nickname) {
-      return current.setNickname(old.nickname);
+      return current.setNickname(old.nickname ?? "");
     }
 
     if (added.size > 0) {
-      return current.removeRoles(added);
+      return current.roles.remove(added);
     }
 
     if (removed.size > 0) {
-      return current.removeRoles(removed);
+      return current.roles.add(removed);
     }
   });
 });

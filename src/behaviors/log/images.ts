@@ -1,13 +1,11 @@
 import { addMessageHandler } from "../../lib/message";
-import { TextChannel, Guild, Message, Attachment } from "discord.js";
+import { TextChannel, Guild, Message } from "discord.js";
 import { client } from "../../client";
 
-import { DEBUG } from "../../commands/debug";
-
 addMessageHandler(async (message: Message) => {
-  const channel = client.channels.get("613961623866179585") as TextChannel;
+  const channel = client.channels.resolve("613961623866179585") as TextChannel;
 
-  if (!message.guild) {
+  if (!message.guild || message.member === null) {
     return false;
   }
 
@@ -16,9 +14,9 @@ addMessageHandler(async (message: Message) => {
   if (message.attachments.size < 1) return false;
 
   channel.send(
-    `${message.member.user.username}#${message.member.user.discriminator} in ${
-      message.type === "dm" ? "DM" : message.channel.toString()
-    }: ${message.cleanContent}`,
+    `${message.member.user.username}#${
+      message.member.user.discriminator
+    } in ${message.channel.toString()}: ${message.cleanContent}`,
     {
       files: message.attachments.map((attach) => attach.url),
     }
