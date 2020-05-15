@@ -157,7 +157,7 @@ export const ShellCommand = Command({
       handler = addOneTimeMessageHandler((m) => {
         if (
           m.channel.id !== message.channel.id ||
-          m.member.id !== message.member.id ||
+          m.author.id !== message.author.id ||
           m.content !== "exit"
         ) {
           return false;
@@ -232,7 +232,7 @@ export const ServersCommand = Command({
 
   check: Permissions.owner,
   async exec(message: Message) {
-    const content = client.guilds
+    const content = client.guilds.cache
       .map((guild) => `${guild.id}: ${guild.name}`)
       .join("\n");
     message.channel.send(content);
@@ -249,13 +249,13 @@ export const ChannelsCommand = Command({
 
   check: Permissions.owner,
   async exec(message: Message, args) {
-    const server = client.guilds.get(args[0]);
+    const server = client.guilds.resolve(args[0]);
     if (!server) {
       return message.channel.send("Can't access that server!");
     }
 
     // Get channels
-    const channels = server.channels
+    const channels = server.channels.cache
       .map((channel) => `\`${channel.id}\`: ${channel.name} (${channel.type})`)
       .join("\n");
     message.channel.send(channels);
@@ -272,7 +272,7 @@ export const MessagesCommand = Command({
 
   check: Permissions.owner,
   async exec(message: Message, args) {
-    const channel = client.channels.get(args[0]);
+    const channel = client.channels.resolve(args[0]);
     if (!channel) {
       return message.channel.send("Can't access that channel!");
     }
@@ -282,14 +282,14 @@ export const MessagesCommand = Command({
     }
 
     // Get channels
-    const messages = await (channel as TextChannel).fetchMessages({
+    const messages = await (channel as TextChannel).messages.fetch({
       limit: 50,
     });
     for (let [, m] of messages) {
       message.channel.send(
-        `${m.member.user.username}#${m.member.user.discriminator} in ${
-          m.type === "dm" ? "DM" : m.channel.toString()
-        }: ${m.cleanContent}`,
+        `${m.author.username}#${
+          m.author.discriminator
+        } in ${m.channel.toString()}: ${m.cleanContent}`,
         {
           files: m.attachments.map((attach) => attach.url),
         }

@@ -9,7 +9,7 @@ import { addMessageHandler } from "../lib/message";
 import { config } from "../lib/access";
 
 async function fetchAll(channel: TextChannel) {
-  let messages = await channel.fetchMessages({ limit: 100 });
+  let messages = await channel.messages.fetch({ limit: 100 });
   let pointer = messages.lastKey();
   let batch;
 
@@ -17,7 +17,7 @@ async function fetchAll(channel: TextChannel) {
 
   do {
     batch = (
-      await channel.fetchMessages({
+      await channel.messages.fetch({
         limit: 100,
         before: pointer,
       })
@@ -35,9 +35,9 @@ async function fetchAll(channel: TextChannel) {
 }
 
 async function getTotals(store: SQLiteStore, message: Message) {
-  const guild = message.guild;
+  const guild = message.guild as Guild;
 
-  const text = guild.channels.filter(
+  const text = guild.channels.cache.filter(
     (channel) => channel.type === "text"
   ) as Collection<string, TextChannel>;
 
@@ -72,7 +72,7 @@ async function getTotals(store: SQLiteStore, message: Message) {
   // Set totals for everyone
   await Promise.all(
     Object.keys(totals).map(async (id) =>
-      store.set(`${message.guild.id}-${id}`, {
+      store.set(`${(message.guild as Guild).id}-${id}`, {
         total: totals[id],
         oof: oofs[id],
       })
@@ -80,7 +80,7 @@ async function getTotals(store: SQLiteStore, message: Message) {
   );
 }
 
-(async function () {
+(async function() {
   const store = await keya.store(`vexbotleaderboard`);
 
   const leaderboard = Command({
@@ -93,7 +93,7 @@ async function getTotals(store: SQLiteStore, message: Message) {
 
     check: Permissions.all,
 
-    async exec(message: Message, args: string[]) {
+    async exec(message: Message & { guild: Guild }, args: string[]) {
       const titles = config("leaderboard.titles");
 
       const all = (await store.all()).filter(({ key }: { key: string }) =>
@@ -106,7 +106,7 @@ async function getTotals(store: SQLiteStore, message: Message) {
 
       const leaderboard = top
         .slice(0, +args[0] || 10)
-        .map((v) => client.users.get(v.key.split("-")[1]));
+        .map((v) => client.users.cache.get(v.key.split("-")[1]));
 
       const total = all.reduce((a, b) => a + b.value.total, 0) as number;
       const oof = all.reduce((a, b) => a + (b.value.oof || 0), 0) as number;
