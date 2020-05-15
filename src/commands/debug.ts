@@ -311,7 +311,7 @@ export const VersionCommand = Command({
   async exec(message: Message, args: string[]) {
     const commit = await getCommit();
     return message.channel.send(
-      `\`\`\`\ncommit ${commit.hash}\n${commit.sanitizedSubject}\n\`\`\``
+      code(`Commit ${commit.hash} (${commit.branch})\n${commit.subject}`)
     );
   },
 });
