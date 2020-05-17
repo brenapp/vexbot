@@ -48,7 +48,7 @@ export const HelpCommand = Command({
 
     // List all of the command channels
     for (const [name, commands] of Object.entries(groups)) {
-      body += `\n\n**${name}**\n`;
+      body += `\n**${name}**\n`;
 
       for (const command of commands) {
         body += command.names.map((n) => `__${n}__`).join(" or ");
