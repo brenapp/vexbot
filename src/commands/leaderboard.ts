@@ -104,8 +104,12 @@ async function getTotals(store: SQLiteStore, message: Message) {
       }[];
       const top = all.sort((a, b) => b.value.total - a.value.total);
 
+      const index = all.findIndex((record) => message.author.id === record.key);
+      const min = Math.max(0, index - 5);
+      const max = Math.min(all.length - 1, min + 10);
+
       const leaderboard = top
-        .slice(0, +args[0] || 10)
+        .slice(min, max)
         .map((v) => client.users.cache.get(v.key.split("-")[1]));
 
       const total = all.reduce((a, b) => a + b.value.total, 0) as number;
@@ -124,7 +128,7 @@ async function getTotals(store: SQLiteStore, message: Message) {
           ).toPrecision(3)}% oof)\n\n${leaderboard
             .map(
               (k, i) =>
-                `${i + 1}. ${k} — ${top[i].value.total} ${titles[title]}`
+                `${min + i + 1}. ${k} — ${top[i].value.total} ${titles[title]}`
             )
             .join("\n")}`
         );
