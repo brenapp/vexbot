@@ -116,8 +116,6 @@ export const ShellCommand = Command({
   },
 
   async exec(message: Message, params: string[]) {
-    if (!message.member) return;
-
     const prompt = `vexbot@${
       process.env["DEV"] ? "development" : "production"
     } $ `;
