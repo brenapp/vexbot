@@ -55,7 +55,7 @@ addMessageHandler(async (message) => {
     (ch) => ch.name === "server-log"
   ) as TextChannel;
   if (!log) {
-    report(client)(new Error("Could not find server log channel"));
+    return false;
   }
 
   if (message.author.bot) return true;
@@ -90,7 +90,7 @@ client.on("messageUpdate", async (old, current) => {
     (ch) => ch.name === "server-log"
   ) as TextChannel;
   if (!log) {
-    report(client)(new Error("Could not find server log channel"));
+    return false;
   }
 
   if (process.env["DEV"] && !DEBUG) return false;
