@@ -16,7 +16,7 @@ const LatexCommand = Command({
   async exec(message, args) {
     const equation = args.join(" ");
     const url = encodeURI(
-      `https://latex.codecogs.com/png.latex?\\inline&space;\\dpi{300}&space;\\small&space;{\\color{White}&space;${equation}}`
+      `https://latex.codecogs.com/png.latex?\\inline&space;\\dpi{300}&space;\\tiny&space;{\\color{White}&space;${equation}}`
     );
 
     return message.channel.send(url);

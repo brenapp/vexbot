@@ -12,3 +12,4 @@ import "./control";
 import "./rps";
 import "./poll";
 import "./roll";
+import "./latex";
