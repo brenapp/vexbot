@@ -20,7 +20,7 @@ export const RollCommand = Command({
 
   check: Permissions.all,
   exec(message, args) {
-    let match = args[0].match(/([0-9]+)?d([0-9]+)([+-] ?[0-9]+)?/);
+    let match = args[0].match(/([0-9]+)?d([0-9]+)([+-][0-9]+)?/);
 
     if (!match) {
       return message.channel.send(
