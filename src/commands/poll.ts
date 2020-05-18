@@ -30,7 +30,7 @@ export const PollCommand = Command({
   documentation: {
     usage: `poll "What Should I Name My Dog" Spot, Murphy, Alice, "I don't care"`,
     description: "Simple Option Polling",
-    group: "META",
+    group: "HELPER",
   },
 
   check: Permissions.guild,

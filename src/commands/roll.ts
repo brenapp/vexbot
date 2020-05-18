@@ -15,7 +15,7 @@ export const RollCommand = Command({
     usage: "roll 4d6",
     description:
       "Rolls dice (4d6 find the sum of a 6-sided dice rolled 4 times)",
-    group: "META",
+    group: "HELPER",
   },
 
   check: Permissions.all,
