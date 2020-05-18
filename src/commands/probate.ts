@@ -1,9 +1,7 @@
 import { Message, GuildManager, GuildMember } from "discord.js";
 import probate from "../behaviors/probation";
 import Command, { Permissions } from "../lib/command";
-import { client } from "../client";
 import { authorization } from "../lib/access";
-import SQLiteStore from "keya/out/node/sqlite";
 import * as keya from "keya";
 
 const owner = authorization("discord.owner");
@@ -18,19 +16,16 @@ export const ProbateCommand = Command({
 
   check: Permissions.compose(
     Permissions.admin,
-    (message) =>
-      message.channel.type === "text" &&
-      message.mentions.members !== null &&
-      message.mentions.members.has(owner)
+
+    // Don't allow owner DQ
+    (message) => !message.mentions.members?.has(owner)
   ),
 
   fail(message: Message) {
+    if (!message.guild) return;
+
     // First, chastise for trying to put me on probation
-    if (
-      message.channel.type === "text" &&
-      message.mentions.members !== null &&
-      message.mentions.members.has(owner)
-    ) {
+    if (message.mentions.members?.has(owner)) {
       message.channel.send("nah fam");
     } else {
       message.channel.send("no u");

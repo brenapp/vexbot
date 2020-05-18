@@ -34,7 +34,11 @@ export async function initalize() {
 export const free = (memberid: string, guildid: string) => async () => {
   const guild = client.guilds.resolve(guildid) as Guild;
   const member = guild.members.resolve(memberid) as GuildMember;
-  const probation = guild.roles.resolve("Probation");
+
+  // Actually do the probation
+  const probation = member.guild.roles.cache.find(
+    (role) => role.name.toLowerCase() === "probation"
+  );
 
   if (!probation) {
     report(client)(
@@ -90,7 +94,9 @@ export default async function probate(
   );
 
   // Actually do the probation
-  const probation = member.guild.roles.resolve("Probation");
+  const probation = member.guild.roles.cache.find(
+    (role) => role.name.toLowerCase() === "probation"
+  );
 
   if (!probation) {
     report(client)(
