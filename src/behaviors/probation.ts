@@ -8,8 +8,15 @@ import report from "../lib/report";
 
 export let TIMEOUTS: { [key: string]: NodeJS.Timeout } = {};
 
+interface Probation {
+  start: number;
+  end: number;
+  reason: string;
+  guild: string;
+}
+
 export async function initalize() {
-  const store = await keya.store("vexbotprobations");
+  const store = await keya.store<Probation>("probations");
 
   // Get all active probations (covers for bot shutdowns), note shutdown parameters looks like { start: timestamp, end: timestamp, reason: string }
   const probations = await store.all();
@@ -17,12 +24,7 @@ export async function initalize() {
   console.log(`Restoring ${probations.length} probations...`);
 
   for (let probation of probations) {
-    const { start, end, reason, guild } = probation.value as {
-      start: number;
-      end: number;
-      reason: string;
-      guild: string;
-    };
+    const { end, guild } = probation.value;
 
     TIMEOUTS[`${guild}:${probation.key}`] = setTimeout(
       free(probation.key, guild),
@@ -51,7 +53,7 @@ export const free = (memberid: string, guildid: string) => async () => {
 
   console.log(`Free ${member}`);
 
-  const store = await keya.store("vexbotprobations");
+  const store = await keya.store<Probation>("probations");
 
   await member.roles.remove(probation);
   const dm = await member.createDM();
@@ -77,7 +79,7 @@ export default async function probate(
   );
 
   // Create record in keya
-  const store = await keya.store("vexbotprobations");
+  const store = await keya.store<Probation>("probations");
   const end = Date.now() + parse(time);
 
   await store.set(member.id, {

@@ -25,7 +25,7 @@
     "git-last-commit": "^1.0.0",
     "github-webhook-handler": "^0.7.1",
     "googleapis": "^40.0.0",
-    "keya": "^1.1.2",
+    "keya": "2.0.0",
     "markov": "^0.0.7",
     "parse-duration": "^0.1.1",
     "snyk": "^1.316.1",
