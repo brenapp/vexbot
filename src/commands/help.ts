@@ -55,20 +55,9 @@ export const HelpCommand = Command({
         body += " " + command.documentation.description + " ";
         body += `\`${PREFIX[0]}${command.documentation.usage}\`\n`;
       }
-    }
 
-    // If the body is too big, we need to handle it in chunks
-    async function postMessage(chunk: string) {
-      if (chunk.length > 1900) {
-        for (let i = 0; i < chunk.length; i += 1900) {
-          const subchunk = chunk.slice(i, i + 1900);
-          await postMessage(subchunk);
-        }
-      } else {
-        return message.channel.send(chunk);
-      }
+      await message.channel.send(body);
+      body = "";
     }
-
-    return postMessage(body);
   },
 });
