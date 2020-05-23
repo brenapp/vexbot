@@ -127,7 +127,7 @@ export async function handle(
     .split(" ")
     .slice(1)
     .join(" ");
-  let argv = argstring.match(/"([^"]+)"|'([^']+)'|([^\s]+)/g);
+  let argv = argstring.match(/“([^“”]+)”|"([^"]+)"|'([^']+)'|([^\s]+)/g);
 
   // If we didn't get passed any, make argv just an empty array
   if (!argv) {
