@@ -2321,7 +2321,7 @@ jws@^3.1.5:
     jwa "^1.4.1"
     safe-buffer "^5.0.1"
 
-keya@2.0.0:
+keya@2.0.0, keya@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/keya/-/keya-2.0.0.tgz#facb63fa46aefb7ec65e3f1193621ffc689a1f31"
   integrity sha512-Q2nKPQHh3lJeIFXOoM0gztp+M+6pvpoHCQxGxUSPXs+ksxEy/ZVbZ4U7una+rGtG15C/XML2r+68EeeVXr7CYg==
@@ -2331,13 +2331,6 @@ keya@2.0.0:
     better-sqlite3 "^7.0.1"
     sqlite "^4.0.7"
     sqlite3 "^4.2.0"
-
-keya@^1.1.2:
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/keya/-/keya-1.1.3.tgz#9a6d2a2e38085f22ca3c59f6f2bae0d9c79f4d74"
-  integrity sha512-A/b251GzsAwcTsHJkuMGO0f3Z97DXsio9o7udFuy19/laiN+5aCI0Rm/jjQKWBS+oTaj3lNbJxsAkQwRSj9dDw==
-  dependencies:
-    sqlite "^3.0.3"
 
 kind-of@^3.0.2, kind-of@^3.0.3, kind-of@^3.2.0:
   version "3.2.2"
@@ -4474,12 +4467,13 @@ verror@1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
-vexdb@^2.1.8:
-  version "2.1.9"
-  resolved "https://registry.yarnpkg.com/vexdb/-/vexdb-2.1.9.tgz#0524800b8f632312d6f7ea92a2470fb04bcd6128"
+vexdb@^2.2.4:
+  version "2.2.4"
+  resolved "https://registry.yarnpkg.com/vexdb/-/vexdb-2.2.4.tgz#ca9fb1d392c6b6865e23ec6cb6045d3ce7d9d147"
+  integrity sha512-VCBy3e1ctPQ/usq4pwUf/SohPFOGzkAxHy6wpwdlrUEgYrEalFSsUJAY1DO5FZU6q+sNQfIqWUYq2Lc84MKBFQ==
   dependencies:
     isomorphic-fetch "^2.2.1"
-    keya "^1.1.2"
+    keya "^2.0.0"
 
 vscode-languageserver-types@^3.5.0:
   version "3.14.0"

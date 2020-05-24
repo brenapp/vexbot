@@ -1,5 +1,4 @@
 import * as keya from "keya";
-import FileSystemStore from "keya/out/node/filesystem";
 import { Guild, Collection, TextChannel, Message } from "discord.js";
 import Command, { Permissions } from "../lib/command";
 import { makeEmbed } from "../lib/util";
@@ -34,7 +33,12 @@ async function fetchAll(channel: TextChannel) {
   return messages;
 }
 
-async function getTotals(store: SQLiteStore, message: Message) {
+interface MessageTotals {
+  oof: number;
+  total: number;
+}
+
+async function getTotals(store: SQLiteStore<MessageTotals>, message: Message) {
   const guild = message.guild as Guild;
 
   const text = guild.channels.cache.filter(

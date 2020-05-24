@@ -3,6 +3,7 @@ import * as vexdb from "vexdb";
 import { MatchesResponseObject } from "vexdb/out/constants/ResponseObjects";
 import Command, { Permissions } from "../lib/command";
 import { makeEmbed } from "../lib/util";
+import { Seasons } from "vexdb/out/constants/RequestObjects";
 
 enum MatchOutcome {
   WIN,
@@ -65,7 +66,7 @@ export const TeamCommand = Command({
   check: Permissions.all,
   async exec(message: Message, args: string[]) {
     const team = args[0].toUpperCase();
-    const season = args.slice(1).join(" ") || "current";
+    const season = (args.slice(1).join(" ") as Seasons) || "current";
 
     if (!team) {
       message.reply(
