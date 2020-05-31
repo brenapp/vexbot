@@ -84,8 +84,13 @@ async function getTotals(store: SQLiteStore<MessageTotals>, message: Message) {
   );
 }
 
+interface LeaderboardRecord {
+  total: number;
+  oof: number;
+}
+
 (async function() {
-  const store = await keya.store(`vexbotleaderboard`);
+  const store = await keya.store<LeaderboardRecord>(`vexbotleaderboard`);
 
   const leaderboard = Command({
     names: ["leaderboard"],
@@ -98,44 +103,60 @@ async function getTotals(store: SQLiteStore<MessageTotals>, message: Message) {
     check: Permissions.guild,
 
     async exec(message: Message & { guild: Guild }, args: string[]) {
-      const titles = config("leaderboard.titles");
+      // Gets all records for the relevant guild
+      const all = (await store.all()).filter((record) =>
+        record.key.startsWith(message.guild.id)
+      );
 
-      const all = (await store.all()).filter(({ key }: { key: string }) =>
-        key.startsWith(message.guild.id)
-      ) as {
-        key: string;
-        value: { total: number; oof: number };
-      }[];
+      // Sorts by the top
       const top = all.sort((a, b) => b.value.total - a.value.total);
 
-      const index = all.findIndex((record) => message.author.id === record.key);
+      // Determines which user to center about, this is usually the message author but we will also allow them to pass another user
+      const center =
+        message.mentions.users.size > 0
+          ? message.mentions.users.first()?.id ?? message.author.id
+          : message.author.id;
+
+      // Make the bounds from that index
+      const index = all.findIndex(
+        (record) => `${message.guild.id}-${center}` === record.key
+      );
       const min = Math.max(0, index - 5);
       const max = Math.min(all.length - 1, min + 10);
 
+      // Constructs the leaderboard in the relevant section
       const leaderboard = top
         .slice(min, max)
         .map((v) => client.users.cache.get(v.key.split("-")[1]));
 
+      // Total message and oof counts
       const total = all.reduce((a, b) => a + b.value.total, 0) as number;
       const oof = all.reduce((a, b) => a + (b.value.oof || 0), 0) as number;
 
+      // Randomized titles from config file
+      const titles = config("leaderboard.titles");
       const title = Object.keys(titles)[
         Math.round(Object.keys(titles).length * Math.random())
       ];
 
+      // Format it into a string
+      const description = [
+        "**Stats**",
+        `Total Messages Sent: ${total.toLocaleString()}`,
+        `Oof Count: ${oof.toLocaleString()} (${(
+          (100 * oof) /
+          total
+        ).toPrecision(3)}% oof)`,
+
+        ...leaderboard.map(
+          (k, i) =>
+            `${min + i + 1}. ${k} — ${top[i].value.total} ${titles[title]}`
+        ),
+      ].join("\n");
+
       const embed = makeEmbed(message)
         .setTitle(title)
-        .setDescription(
-          `**Stats**\nTotal Messages Sent: ${total.toLocaleString()}\nOof Count: ${oof.toLocaleString()} (${(
-            (oof * 100) /
-            total
-          ).toPrecision(3)}% oof)\n\n${leaderboard
-            .map(
-              (k, i) =>
-                `${min + i + 1}. ${k} — ${top[i].value.total} ${titles[title]}`
-            )
-            .join("\n")}`
-        );
+        .setDescription(description);
 
       return message.channel.send(embed);
     },
