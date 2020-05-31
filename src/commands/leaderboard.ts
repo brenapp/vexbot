@@ -95,7 +95,7 @@ async function getTotals(store: SQLiteStore<MessageTotals>, message: Message) {
       group: "META",
     },
 
-    check: Permissions.all,
+    check: Permissions.guild,
 
     async exec(message: Message & { guild: Guild }, args: string[]) {
       const titles = config("leaderboard.titles");
