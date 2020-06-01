@@ -6,6 +6,24 @@ import Command, {
 } from "../lib/command";
 import { Message } from "discord.js";
 
+function commandDocumentation(command: CommandConfiguration) {
+  let body = "";
+
+  body += command.names.map((n) => `__${n}__`).join(" or ");
+  body += " " + command.documentation.description + " ";
+  body += `\`${PREFIX[0]}${command.documentation.usage}\`\n`;
+
+  if (command.subcommands) {
+    for (const subcommand of command.subcommands) {
+      body += " - " + subcommand.names.map((n) => `__${n}__`).join(" or ");
+      body += " " + subcommand.documentation.description + " ";
+      body += `\`${PREFIX[0]}${command.names[0]} ${subcommand.documentation.usage}\`\n`;
+    }
+  }
+
+  return body + "\n";
+}
+
 export const HelpCommand = Command({
   names: ["help"],
   documentation: {
@@ -15,11 +33,17 @@ export const HelpCommand = Command({
   },
 
   check: Permissions.all,
-  async exec(message: Message) {
+  async exec(message: Message, [command]) {
     // Let's organize the commands into their group
     const groups: {
       [group: string]: CommandConfiguration[];
     } = {};
+
+    if (command && REGISTRY.has(command)) {
+      return message.channel.send(
+        commandDocumentation(REGISTRY.get(command) as CommandConfiguration)
+      );
+    }
 
     // Go through each command
     for (const [name, command] of REGISTRY) {
@@ -51,20 +75,7 @@ export const HelpCommand = Command({
       body += `\n**${name}**\n`;
 
       for (const command of commands) {
-        body += command.names.map((n) => `__${n}__`).join(" or ");
-        body += " " + command.documentation.description + " ";
-        body += `\`${PREFIX[0]}${command.documentation.usage}\`\n`;
-
-        if (command.subcommands) {
-          for (const subcommand of command.subcommands) {
-            body +=
-              " - " + subcommand.names.map((n) => `__${n}__`).join(" or ");
-            body += " " + subcommand.documentation.description + " ";
-            body += `\`${PREFIX[0]}${command.names[0]} ${subcommand.documentation.usage}\`\n`;
-          }
-        }
-
-        body += "\n";
+        body += commandDocumentation(command);
       }
 
       await message.channel.send(body);
