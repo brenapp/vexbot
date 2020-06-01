@@ -166,13 +166,7 @@ export const SearchQNACommand = Subcommand({
         question.tags.map((tag) => "`" + tag + "`").join(", "),
       ].join("\n");
 
-      body +=
-        "\n*" +
-        question.body
-          .split(". ")
-          .slice(0, 2)
-          .join(". ") +
-        "*...\n\n";
+      body += "\n*" + question.body.split(".")[0] + "*...\n\n";
     }
 
     if (questions.length < 1) {
