@@ -207,7 +207,7 @@ export const MoniterQNACommand = Subcommand({
 
   documentation: {
     description: "Notifies you whenever a Q&A gets answered",
-    usage: ".qna moniter vexu 613",
+    usage: "moniter vexu 613",
     group: "QNA",
   },
 
