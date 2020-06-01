@@ -15,11 +15,8 @@ export function escape(text: string) {
 export function makeEmbed(message?: Message) {
   const embed = new MessageEmbed().setTimestamp();
 
-  if (message && message.member) {
-    const invoker =
-      message.channel.type === "text"
-        ? message.member.displayName
-        : message.author.username;
+  if (message) {
+    const invoker = message?.member?.displayName ?? message.author.username;
     embed.setFooter(`Invoked by ${invoker}`);
   }
 
