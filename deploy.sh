@@ -7,7 +7,7 @@ echo "Downloading changes..."
 git pull;
 
 # Download any new dependencies
-npm i;
+npm install --no-scripts;
 
 echo "Compiling..."
 # Compile
