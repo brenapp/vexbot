@@ -249,6 +249,8 @@ export const MoniterQNACommand = Subcommand({
 });
 
 setInterval(async () => {
+  console.log("Checking for Q&A answers");
+
   const store = await getStore();
   const records = await store.all();
 
