@@ -97,6 +97,12 @@ export async function handle(
 
   if (!isCommand(message)) return false;
 
+  // Only let owners use commands in dev mode
+  const owner = config("owner");
+  if (process.env["DEV"] && message.author.id !== owner) {
+    return false;
+  }
+
   // Get the appropriate command, if it exists
   const command = matchCommand(message);
   if (!command) {
