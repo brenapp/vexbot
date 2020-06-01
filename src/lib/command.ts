@@ -108,6 +108,15 @@ export function Group(
 
     for (const command of commands) {
       if (command.names.includes(subcommand)) {
+        // See if permissions valid
+        const valid = await command.check(message);
+        if (!valid) {
+          if (command.fail) {
+            command.fail(message);
+          }
+          return;
+        }
+
         return command.exec(message, arg);
       }
     }
@@ -119,8 +128,6 @@ export function Group(
       return message.channel.send(
         `Unknown subcommand \`${subcommand}\`. Use \`help\` for list of valid commands`
       );
-
-      return;
     }
   };
 }
