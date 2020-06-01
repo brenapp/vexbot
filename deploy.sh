@@ -7,7 +7,7 @@ echo "Downloading changes..."
 git pull;
 
 # Download any new dependencies
-yarn;
+npm i;
 
 echo "Compiling..."
 # Compile
