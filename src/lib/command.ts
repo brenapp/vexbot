@@ -33,6 +33,8 @@ export interface CommandConfiguration {
     usage: string;
     group: string;
     hidden?: boolean;
+
+    subcommand?: boolean;
   };
 
   // Lifecycle methods
@@ -51,6 +53,8 @@ export interface CommandConfiguration {
 
   // Error handling
   error?(error: any, message: Message, args: string[]): void;
+
+  subcommands?: CommandConfiguration[];
 }
 
 // Holds all the registered commands (with each name being mapped)
@@ -70,12 +74,55 @@ export function matchCommand(message: Message) {
  * Adds new commands to the registry
  * @param config
  */
-export default function makeCommand(config: CommandConfiguration) {
+export default function registerCommand(config: CommandConfiguration) {
   for (const name of config.names) {
     REGISTRY.set(name, config);
   }
 
   return config;
+}
+
+/**
+ * Subcommand registration
+ * @param config
+ */
+export function Subcommand(config: CommandConfiguration) {
+  config.documentation.subcommand = true;
+
+  return config;
+}
+
+/**
+ * Function to replace (or compose with) CommandConfiguration.exec() for when commands need to be grouped together
+ * @param commands
+ */
+export function Group(
+  commands: CommandConfiguration[],
+  defaultMatch?: (
+    message: Message,
+    argv: string[]
+  ) => Promise<Message | Message[] | void> | void
+) {
+  return async (message: Message, args: string[]) => {
+    const [subcommand, ...arg] = args;
+
+    for (const command of commands) {
+      if (command.names.includes(subcommand)) {
+        return command.exec(message, arg);
+      }
+    }
+
+    // If we couldn't find a subcommand, use the default match
+    if (defaultMatch) {
+      return defaultMatch(message, args);
+    } else {
+      return message.channel.send(
+        `Unknown subcommand \`${subcommand}\`. Use \`help\` for list of valid commands`
+      );
+
+      return;
+    }
+  };
 }
 
 // Handles all of the commands we've already executed

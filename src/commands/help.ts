@@ -54,6 +54,17 @@ export const HelpCommand = Command({
         body += command.names.map((n) => `__${n}__`).join(" or ");
         body += " " + command.documentation.description + " ";
         body += `\`${PREFIX[0]}${command.documentation.usage}\`\n`;
+
+        if (command.subcommands) {
+          for (const subcommand of command.subcommands) {
+            body +=
+              " - " + subcommand.names.map((n) => `__${n}__`).join(" or ");
+            body += " " + subcommand.documentation.description + " ";
+            body += `\`${PREFIX[0]}${command.names[0]} ${subcommand.documentation.usage}\`\n`;
+          }
+        }
+
+        body += "\n";
       }
 
       await message.channel.send(body);
