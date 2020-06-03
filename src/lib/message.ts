@@ -45,7 +45,7 @@ async function handleMessage(message: Message): Promise<boolean> {
   for (const handler of handlers) {
     const result = await handler(message);
 
-    return result;
+    if (result) return true;
   }
 
   return false;
