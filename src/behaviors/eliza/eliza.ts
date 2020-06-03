@@ -51,36 +51,36 @@ export default class ElizaBot {
     this.quit = false;
     this.mem = [];
     this.lastchoice = [];
-    for (var k = 0; k < elizaKeywords.length; k++) {
+    for (let k = 0; k < elizaKeywords.length; k++) {
       this.lastchoice[k] = [];
-      var rules = elizaKeywords[k][2] as any;
-      for (var i = 0; i < rules.length; i++) this.lastchoice[k][i] = -1;
+      const rules = elizaKeywords[k][2] as any;
+      for (let i = 0; i < rules.length; i++) this.lastchoice[k][i] = -1;
     }
   }
 
   _init() {
     // parse data and convert it from canonical form to internal use
     // Produce synonym list
-    for (let x in elizaSynons)
+    for (const x in elizaSynons)
       this.synPatterns[x] = "(" + x + "|" + elizaSynons[x].join("|") + ")";
 
     // 1st convert rules to regexps
     // expand synonyms and insert asterisk expressions for backtracking
-    var sre = /@(\S+)/;
-    var are = /(\S)\s*\*\s*(\S)/;
-    var are1 = /^\s*\*\s*(\S)/;
-    var are2 = /(\S)\s*\*\s*$/;
-    var are3 = /^\s*\*\s*$/;
-    var wsre = /\s+/g;
+    const sre = /@(\S+)/;
+    const are = /(\S)\s*\*\s*(\S)/;
+    const are1 = /^\s*\*\s*(\S)/;
+    const are2 = /(\S)\s*\*\s*$/;
+    const are3 = /^\s*\*\s*$/;
+    const wsre = /\s+/g;
 
-    for (var k = 0; k < elizaKeywords.length; k++) {
-      var rules = elizaKeywords[k][2] as any;
+    for (let k = 0; k < elizaKeywords.length; k++) {
+      const rules = elizaKeywords[k][2] as any;
       elizaKeywords[k][3] = k; // save original index for sorting
       for (var i = 0; i < rules.length; i++) {
-        var r = rules[i];
+        const r = rules[i];
         // check mem flag and store it as decomp's element 2
         if (r[0].charAt(0) == "$") {
-          var ofs = 1;
+          let ofs = 1;
           while (r[0].charAt[ofs] == " ") ofs++;
           r[0] = r[0].substring(ofs);
           r[2] = true;
@@ -88,9 +88,9 @@ export default class ElizaBot {
           r[2] = false;
         }
         // expand synonyms (v.1.1: work around lambda function)
-        var m = sre.exec(r[0]);
+        let m = sre.exec(r[0]);
         while (m) {
-          var sp = this.synPatterns[m[1]] ? this.synPatterns[m[1]] : m[1];
+          const sp = this.synPatterns[m[1]] ? this.synPatterns[m[1]] : m[1];
           r[0] =
             r[0].substring(0, m.index) +
             sp +
@@ -104,7 +104,7 @@ export default class ElizaBot {
           m = are.exec(r[0]);
           if (m) {
             var lp = "";
-            var rp = r[0];
+            let rp = r[0];
             while (m) {
               lp += rp.substring(0, m.index + 1);
               if (m[1] != ")") lp += "\\b";
@@ -124,7 +124,7 @@ export default class ElizaBot {
           }
           m = are2.exec(r[0]);
           if (m) {
-            var lps = r[0].substring(0, m.index + 1);
+            let lps = r[0].substring(0, m.index + 1);
             if (m[1] != "(") lps += "\\b";
             r[0] = lps + "\\s*(.*)\\s*";
           }
@@ -139,14 +139,14 @@ export default class ElizaBot {
     elizaKeywords.sort(this._sortKeywords);
 
     // and compose regexps and refs for pres and posts
-    var a = new Array();
+    const a = [];
     for (var i = 0; i < elizaPres.length; i += 2) {
       a.push(elizaPres[i]);
       this.pres[elizaPres[i]] = elizaPres[i + 1];
     }
     this.preExp = new RegExp("\\b(" + a.join("|") + ")\\b");
 
-    var b = new Array();
+    const b = [];
     for (var i = 0; i < elizaPosts.length; i += 2) {
       b.push(elizaPosts[i]);
       this.posts[elizaPosts[i]] = elizaPosts[i + 1];
@@ -168,7 +168,7 @@ export default class ElizaBot {
   };
 
   transform(text: string) {
-    var rpl = "";
+    let rpl = "";
     this.quit = false;
     // unify text string
     text = text.toLowerCase();
@@ -178,22 +178,22 @@ export default class ElizaBot {
     text = text.replace(/\s*\bbut\b\s*/g, ".");
     text = text.replace(/\s{2,}/g, " ");
     // split text in part sentences and loop through them
-    var parts = text.split(".");
-    for (var i = 0; i < parts.length; i++) {
-      var part = parts[i];
+    const parts = text.split(".");
+    for (let i = 0; i < parts.length; i++) {
+      let part = parts[i];
       if (part != "") {
         // check for quit expression
-        for (var q = 0; q < elizaQuits.length; q++) {
+        for (let q = 0; q < elizaQuits.length; q++) {
           if (elizaQuits[q] == part) {
             this.quit = true;
             return this.getFinal();
           }
         }
         // preprocess (v.1.1: work around lambda function)
-        var m = this.preExp.exec(part);
+        let m = this.preExp.exec(part);
         if (m) {
-          var lp = "";
-          var rp = part;
+          let lp = "";
+          let rp = part;
           while (m) {
             lp += rp.substring(0, m.index) + this.pres[m[1]];
             rp = rp.substring(m.index + m[0].length);
@@ -237,15 +237,15 @@ export default class ElizaBot {
   }
 
   _execRule(k: number) {
-    var rule = elizaKeywords[k];
-    var decomps = rule[2] as any;
-    var paramre = /\(([0-9]+)\)/;
-    for (var i = 0; i < decomps.length; i++) {
-      var m = this.sentence.match(decomps[i][0]);
+    const rule = elizaKeywords[k];
+    const decomps = rule[2] as any;
+    const paramre = /\(([0-9]+)\)/;
+    for (let i = 0; i < decomps.length; i++) {
+      const m = this.sentence.match(decomps[i][0]);
       if (m != null) {
-        var reasmbs = decomps[i][1];
-        var memflag = decomps[i][2];
-        var ri = this.noRandom ? 0 : Math.floor(Math.random() * reasmbs.length);
+        const reasmbs = decomps[i][1];
+        const memflag = decomps[i][2];
+        let ri = this.noRandom ? 0 : Math.floor(Math.random() * reasmbs.length);
         if (
           (this.noRandom && this.lastchoice[k][i] > ri) ||
           this.lastchoice[k][i] == ri
@@ -258,23 +258,23 @@ export default class ElizaBot {
         } else {
           this.lastchoice[k][i] = ri;
         }
-        var rpl = reasmbs[ri];
+        let rpl = reasmbs[ri];
         if (rpl.search("^goto ", "i") == 0) {
-          var ki = this._getRuleIndexByKey(rpl.substring(5));
+          const ki = this._getRuleIndexByKey(rpl.substring(5));
           if (ki >= 0) return this._execRule(ki);
         }
         // substitute positional params (v.1.1: work around lambda function)
-        var m1 = paramre.exec(rpl);
+        let m1 = paramre.exec(rpl);
         if (m1) {
-          var lp = "";
-          var rp = rpl;
+          let lp = "";
+          let rp = rpl;
           while (m1) {
-            var param = m[parseInt(m1[1])];
+            let param = m[parseInt(m1[1])];
             // postprocess param
-            var m2 = this.postExp.exec(param);
+            let m2 = this.postExp.exec(param);
             if (m2) {
-              var lp2 = "";
-              var rp2 = param;
+              let lp2 = "";
+              let rp2 = param;
               while (m2) {
                 lp2 += rp2.substring(0, m2.index) + this.posts[m2[1]];
                 rp2 = rp2.substring(m2.index + m2[0].length);
@@ -300,7 +300,7 @@ export default class ElizaBot {
     // final cleanings
     s = s.replace(/\s{2,}/g, " ");
     s = s.replace(/\s+\./g, ".");
-    for (var i = 0; i < elizaPostTransforms.length; i += 2) {
+    for (let i = 0; i < elizaPostTransforms.length; i += 2) {
       s = s.replace(
         elizaPostTransforms[i],
         (elizaPostTransforms as any)[i + 1]
@@ -309,15 +309,15 @@ export default class ElizaBot {
     }
     // capitalize first char (v.1.1: work around lambda function)
     if (this.capitalizeFirstLetter) {
-      var re = /^([a-z])/;
-      var m = re.exec(s);
+      const re = /^([a-z])/;
+      const m = re.exec(s);
       if (m) s = m[0].toUpperCase() + s.substring(1);
     }
     return s;
   }
 
   _getRuleIndexByKey = function(key: any) {
-    for (var k = 0; k < elizaKeywords.length; k++) {
+    for (let k = 0; k < elizaKeywords.length; k++) {
       if (elizaKeywords[k][0] == key) return k;
     }
     return -1;
@@ -332,9 +332,9 @@ export default class ElizaBot {
     if (this.mem.length) {
       if (this.noRandom) return this.mem.shift();
       else {
-        var n = Math.floor(Math.random() * this.mem.length);
-        var rpl = this.mem[n];
-        for (var i = n + 1; i < this.mem.length; i++)
+        const n = Math.floor(Math.random() * this.mem.length);
+        const rpl = this.mem[n];
+        for (let i = n + 1; i < this.mem.length; i++)
           this.mem[i - 1] = this.mem[i];
         this.mem.length--;
         return rpl;

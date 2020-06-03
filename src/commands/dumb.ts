@@ -20,7 +20,7 @@ function upper(char: string): boolean {
 }
 
 function toSarcasmCase(text: string) {
-  let lowercase = text.toLocaleLowerCase().split("");
+  const lowercase = text.toLocaleLowerCase().split("");
 
   return lowercase
     .map((char, index) =>

@@ -4,7 +4,7 @@
 
 import Command, { Permissions } from "../lib/command";
 
-function randomRange(max: number, min: number = 1) {
+function randomRange(max: number, min = 1) {
   return Math.round(Math.random() * (max - min) + min);
 }
 
@@ -20,7 +20,7 @@ export const RollCommand = Command({
 
   check: Permissions.all,
   exec(message, args) {
-    let match = args[0].match(/([0-9]+)?d([0-9]+)([+-][0-9]+)?/);
+    const match = args[0].match(/([0-9]+)?d([0-9]+)([+-][0-9]+)?/);
 
     if (!match) {
       return message.channel.send(
@@ -44,7 +44,7 @@ export const RollCommand = Command({
     let mod = 0;
 
     if (modifier) {
-      let symbol = modifier[0];
+      const symbol = modifier[0];
       mod = +modifier.slice(1);
 
       if (symbol === "-") {

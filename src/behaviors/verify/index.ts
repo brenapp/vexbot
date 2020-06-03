@@ -8,7 +8,7 @@ import * as vexdb from "vexdb";
 import approve from "./approve";
 
 export function findOrMakeRole(name: string, guild: Guild) {
-  let role = guild.roles.resolve(name);
+  const role = guild.roles.resolve(name);
   return role
     ? Promise.resolve(role)
     : guild.roles.create({ data: { name, mentionable: true } });
@@ -90,7 +90,7 @@ export default async function verify(member: GuildMember | PartialGuildMember) {
     }
 
     if (teaminfo.region === "South Carolina") {
-      let teamRole = await findOrMakeRole(team.toUpperCase(), member.guild);
+      const teamRole = await findOrMakeRole(team.toUpperCase(), member.guild);
       roles.push(teamRole.id); // Team Role
     } else {
       roles.push("387074517408808970"); // Not SC Team

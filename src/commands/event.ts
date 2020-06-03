@@ -12,7 +12,7 @@ import listen from "../lib/reactions";
 
 export async function html(url: string) {
   const store = await keya.store("fetched");
-  let record = await store.get(url);
+  const record = await store.get(url);
 
   if (record) {
     return record as string;
@@ -72,7 +72,7 @@ async function getCapacityInformation(
       ).text()
     )
     .then((text) => {
-      let [capacity, open] = text.split(" / ").map((t) => t.split(": ")[1]);
+      const [capacity, open] = text.split(" / ").map((t) => t.split(": ")[1]);
       return { capacity, open };
     });
 }
@@ -86,7 +86,7 @@ export const EventsCommand = Command({
   },
   check: Permissions.all,
   async exec(message: Message, args: string[]) {
-    let region = args
+    const region = args
       .map((word) => `${word[0].toUpperCase()}${word.slice(1).toLowerCase()}`)
       .join(" ");
 
@@ -129,7 +129,7 @@ export const EventsCommand = Command({
     await response.react("⬇");
 
     let page = 0;
-    let lastPage = Math.ceil(events.length / 5);
+    const lastPage = Math.ceil(events.length / 5);
 
     let resp: (reaction: MessageReaction) => void;
     listen(

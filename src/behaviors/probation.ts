@@ -6,7 +6,7 @@ import { GuildMember, Guild } from "discord.js";
 import parse from "parse-duration";
 import report from "../lib/report";
 
-export let TIMEOUTS: { [key: string]: NodeJS.Timeout } = {};
+export const TIMEOUTS: { [key: string]: NodeJS.Timeout } = {};
 
 interface Probation {
   start: number;
@@ -23,7 +23,7 @@ export async function initalize() {
 
   console.log(`Restoring ${probations.length} probations...`);
 
-  for (let probation of probations) {
+  for (const probation of probations) {
     const { end, guild } = probation.value;
 
     TIMEOUTS[`${guild}:${probation.key}`] = setTimeout(

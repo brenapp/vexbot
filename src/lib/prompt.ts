@@ -42,7 +42,7 @@ function questionValidate(
   failureMessage: string
 ): Promise<string> {
   return askString(question, channel).then(async response => {
-    let corrected = await validate(response);
+    const corrected = await validate(response);
     // If the validator explicity returns true, then return the original resposne
     if (corrected === true) {
       return response;
@@ -62,7 +62,7 @@ function choose(question: string, channel: DMChannel, options: string[][]) {
     question,
     channel,
     response => {
-      let index = options.findIndex(opt =>
+      const index = options.findIndex(opt =>
         opt.includes(response.toUpperCase())
       );
       if (index < 0) return false;

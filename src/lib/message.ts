@@ -28,8 +28,8 @@ function removeMessageHandler(index: number) {
  * This can easily be done by having conditional returns at the top of the function, and returning true at the end
  */
 function addOneTimeMessageHandler(handler: MessageHandler) {
-  let index = addMessageHandler(async function(message: Message) {
-    let res = await handler(message);
+  const index = addMessageHandler(async function(message: Message) {
+    const res = await handler(message);
     if (res) removeMessageHandler(index);
     return res;
   });

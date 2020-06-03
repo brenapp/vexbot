@@ -36,7 +36,7 @@ export default async function approve(
   await Promise.all([approval.react("👍"), approval.react("👎")]);
 
   return new Promise((resolve, reject) => {
-    let collector = approval.createReactionCollector(
+    const collector = approval.createReactionCollector(
       (vote, usr: User) =>
         (vote.emoji.name === "👎" || vote.emoji.name === "👍") && !usr.bot
     );

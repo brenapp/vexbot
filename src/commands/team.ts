@@ -37,7 +37,7 @@ function buildRecord(team: string, matches: MatchesResponseObject[]) {
     matches: 0,
   };
 
-  for (let match of matches) {
+  for (const match of matches) {
     const result = outcome(team, match);
 
     record.matches++;
@@ -75,7 +75,7 @@ export const TeamCommand = Command({
       return;
     }
 
-    let record = await vexdb.get("teams", { team }).then((res) => res[0]);
+    const record = await vexdb.get("teams", { team }).then((res) => res[0]);
 
     if (!record) {
       message.reply("There doesn't appear to be a team with that number!");
@@ -114,7 +114,7 @@ export const TeamCommand = Command({
         ).toFixed(2)}% WR)`
       );
 
-    for (let event of events) {
+    for (const event of events) {
       const localAwards = awards.filter((award) => award.sku === event.sku);
       const ranking = rankings.find((rank) => rank.sku === event.sku);
       const eventRecord = buildRecord(

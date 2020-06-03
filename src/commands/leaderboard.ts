@@ -45,10 +45,10 @@ async function getTotals(store: SQLiteStore<MessageTotals>, message: Message) {
     (channel) => channel.type === "text"
   ) as Collection<string, TextChannel>;
 
-  let totals: { [key: string]: number } = {};
-  let oofs: { [key: string]: number } = {};
+  const totals: { [key: string]: number } = {};
+  const oofs: { [key: string]: number } = {};
 
-  for (let [id, channel] of text) {
+  for (const [id, channel] of text) {
     console.log(`Tallying #${channel.name}...`);
     const messages = await fetchAll(channel);
     messages.forEach((message) => {
@@ -172,7 +172,7 @@ interface LeaderboardRecord {
 
     check: Permissions.admin,
     async exec(message: Message) {
-      let mess = (await message.channel.send(
+      const mess = (await message.channel.send(
         "Recalculating totals..."
       )) as Message;
       await getTotals(store, mess);

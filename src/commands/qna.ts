@@ -61,7 +61,7 @@ interface QNAQuestion {
 }
 
 async function parseQNA(link: string) {
-  let question = { link } as QNAQuestion;
+  const question = { link } as QNAQuestion;
 
   const response = await fetch(link);
 

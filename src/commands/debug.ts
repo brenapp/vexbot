@@ -283,7 +283,7 @@ export const MessagesCommand = Command({
     const messages = await (channel as TextChannel).messages.fetch({
       limit: 50,
     });
-    for (let [, m] of messages) {
+    for (const [, m] of messages) {
       message.channel.send(
         `${m.author.username}#${
           m.author.discriminator

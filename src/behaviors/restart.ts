@@ -47,9 +47,9 @@ async function approval(embed: MessageEmbed) {
   await approval.react("👍");
 
   return new Promise((resolve, reject) => {
-    let timeout = setTimeout(() => resolve(false), 5 * 60 * 1000);
+    const timeout = setTimeout(() => resolve(false), 5 * 60 * 1000);
 
-    let collector = approval.createReactionCollector(
+    const collector = approval.createReactionCollector(
       (vote, usr: User) =>
         (vote.emoji.name === "👎" || vote.emoji.name === "👍") && !usr.bot
     );
@@ -99,7 +99,7 @@ handler.on("push", async (event) => {
       event.payload.repository.url
     );
 
-  for (let commit of event.payload.commits) {
+  for (const commit of event.payload.commits) {
     embed.addField(
       code(escape(commit.message)),
       `${commit.added

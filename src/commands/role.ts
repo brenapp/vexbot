@@ -15,7 +15,7 @@ export const GrantCommand = Command({
       return;
     }
 
-    let name = args.slice(message.mentions.members.size).join(" ");
+    const name = args.slice(message.mentions.members.size).join(" ");
     const roles = await message.guild.roles.fetch();
     const role = roles.cache.find((r) => r.name === name);
 

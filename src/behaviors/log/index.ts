@@ -51,7 +51,7 @@ addMessageHandler(async (message) => {
   if (message.channel.type === "dm") {
     return false;
   }
-  let log = message.guild?.channels.cache.find(
+  const log = message.guild?.channels.cache.find(
     (ch) => ch.name === "server-log"
   ) as TextChannel;
   if (!log) {
@@ -86,7 +86,7 @@ client.on("messageUpdate", async (old, current) => {
   if (old.channel.type === "dm") {
     return false;
   }
-  let log = old.guild?.channels.cache.find(
+  const log = old.guild?.channels.cache.find(
     (ch) => ch.name === "server-log"
   ) as TextChannel;
   if (!log) {
