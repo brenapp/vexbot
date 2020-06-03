@@ -21,7 +21,7 @@ function commandDocumentation(command: CommandConfiguration) {
     }
   }
 
-  return body + "\n";
+  return body;
 }
 
 export const HelpCommand = Command({
@@ -68,7 +68,7 @@ export const HelpCommand = Command({
     }
 
     // Build the output
-    let body = "Here's what I can do!";
+    let body = "";
 
     // List all of the command channels
     for (const [name, commands] of Object.entries(groups)) {
