@@ -30,7 +30,7 @@ export const DebugCommand = Command({
     group: "Owner",
   },
 
-  exec(message: Message, args: string[]) {
+  exec(message: Message) {
     DEBUG = !DEBUG;
     return message.channel.send(`Debug ${DEBUG ? "ENABLED" : "DISABLED"}`);
   },
@@ -45,9 +45,7 @@ export const PingCommand = Command({
   },
 
   check: Permissions.all,
-  async exec(message: Message, args: string[]) {
-    const user = message.member;
-
+  async exec(message: Message) {
     return message.channel.send("pong");
   },
 });
@@ -129,6 +127,7 @@ export const ShellCommand = Command({
         cwd: resolve(__dirname, "../../"),
       });
 
+      // eslint-disable-next-line no-inner-declarations
       async function handleChunk(chunk: Buffer) {
         // If the chunk itself is too big, handle it in sections
         if (chunk.length > 1900) {
@@ -138,7 +137,7 @@ export const ShellCommand = Command({
           }
         }
 
-        // If length would be exceed
+        // If length would be exceeded
         if (body.length + chunk.length > 1900) {
           body = escape(chunk.toString());
           resp = (await message.channel.send(code(body))) as Message;
@@ -306,7 +305,7 @@ export const VersionCommand = Command({
   },
 
   check: Permissions.owner,
-  async exec(message: Message, args: string[]) {
+  async exec(message: Message) {
     const commit = await getCommit();
     return message.channel.send(
       code(`Commit ${commit.hash} (${commit.branch})\n${commit.subject}`)

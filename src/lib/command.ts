@@ -1,12 +1,5 @@
-import {
-  Message,
-  Guild,
-  MessageEmbed,
-  TextChannel,
-  PartialMessage,
-} from "discord.js";
+import { Message, MessageEmbed, TextChannel, PartialMessage } from "discord.js";
 import { authorization, config } from "./access";
-import { makeEmbed } from "./util";
 import report from "./report";
 
 const owner = authorization("discord.owner");
@@ -18,14 +11,13 @@ export const PREFIX: string[] = process.env["DEV"]
  * Identifies if a passed message is a commmand
  * @param message
  */
-export function isCommand(message: Message) {
+export function isCommand(message: Message): boolean {
   return PREFIX.includes(message.content[0]);
 }
 
-export interface CommandConfiguration {
-  // Allow the user to add other properties for state or whatever
-  [key: string]: any;
+export type CommandResult = Promise<Message | Message[] | void> | void;
 
+export interface CommandConfiguration {
   names: string[];
 
   documentation: {
@@ -46,13 +38,10 @@ export interface CommandConfiguration {
   fail?: (message: Message) => void;
 
   // Execute the command
-  exec(
-    message: Message,
-    args: string[]
-  ): Promise<Message | Message[] | void> | void;
+  exec(message: Message, args: string[]): CommandResult;
 
   // Error handling
-  error?(error: any, message: Message, args: string[]): void;
+  error?(error: string, message: Message, args: string[]): void;
 
   subcommands?: CommandConfiguration[];
 }
@@ -60,21 +49,23 @@ export interface CommandConfiguration {
 // Holds all the registered commands (with each name being mapped)
 export const REGISTRY = new Map<string, CommandConfiguration>();
 
-export function matchCommand(message: Message) {
+export function matchCommand(message: Message): null | CommandConfiguration {
   const name = message.content.slice(1).split(" ")[0];
 
   if (!REGISTRY.has(name)) {
     return null;
   }
 
-  return REGISTRY.get(name);
+  return REGISTRY.get(name) as CommandConfiguration;
 }
 
 /**
  * Adds new commands to the registry
  * @param config
  */
-export default function registerCommand(config: CommandConfiguration) {
+export default function registerCommand(
+  config: CommandConfiguration
+): CommandConfiguration {
   for (const name of config.names) {
     REGISTRY.set(name, config);
   }
@@ -86,7 +77,7 @@ export default function registerCommand(config: CommandConfiguration) {
  * Subcommand registration
  * @param config
  */
-export function Subcommand(config: CommandConfiguration) {
+export function Subcommand(config: CommandConfiguration): CommandConfiguration {
   config.documentation.subcommand = true;
 
   return config;
@@ -98,12 +89,12 @@ export function Subcommand(config: CommandConfiguration) {
  */
 export function Group(
   commands: CommandConfiguration[],
-  defaultMatch?: (
-    message: Message,
-    argv: string[]
-  ) => Promise<Message | Message[] | void> | void
+  defaultMatch?: (message: Message, argv: string[]) => CommandResult
 ) {
-  return async (message: Message, args: string[]) => {
+  return async (
+    message: Message,
+    args: string[]
+  ): Promise<Message | Message[] | void> => {
     const [subcommand, ...arg] = args;
 
     for (const command of commands) {
@@ -249,7 +240,7 @@ export async function handle(
 }
 
 export const Permissions = {
-  admin(message: Message) {
+  admin(message: Message): boolean {
     return (
       message.channel.type === "text" &&
       message.member !== null &&
@@ -257,37 +248,38 @@ export const Permissions = {
     );
   },
 
-  owner(message: Message) {
+  owner(message: Message): boolean {
     return message.author.id === owner;
   },
 
-  guild(message: Message) {
+  guild(message: Message): boolean {
     return message.channel.type == "text";
   },
 
-  dm(message: Message) {
+  dm(message: Message): boolean {
     return message.channel.type === "dm";
   },
 
-  env(parameter: string, value: any) {
-    return (message: Message) => process.env[parameter] === value;
+  env(parameter: string, value: string) {
+    return (): boolean => process.env[parameter] === value;
   },
 
   channel(name: string) {
-    return (message: Message) => (message.channel as TextChannel).name === name;
+    return (message: Message): boolean =>
+      (message.channel as TextChannel).name === name;
   },
 
-  all() {
+  all(): boolean {
     return true;
   },
 
   compose(...checks: ((message: Message) => boolean)[]) {
-    return (message: Message) =>
+    return (message: Message): boolean =>
       checks.map((check) => check(message)).every((resp) => resp);
   },
 
   any(...checks: ((message: Message) => boolean)[]) {
-    return (message: Message) =>
+    return (message: Message): boolean =>
       checks.map((check) => check(message)).some((resp) => resp);
   },
 };

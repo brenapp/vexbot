@@ -6,7 +6,6 @@ import {
   User,
   MessageReaction,
 } from "discord.js";
-import { client } from "../../client";
 
 export default async function approve(
   member: GuildMember,
@@ -35,7 +34,7 @@ export default async function approve(
   const approval = (await channel.send(embed)) as Message;
   await Promise.all([approval.react("👍"), approval.react("👎")]);
 
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const collector = approval.createReactionCollector(
       (vote, usr: User) =>
         (vote.emoji.name === "👎" || vote.emoji.name === "👍") && !usr.bot
@@ -74,6 +73,5 @@ export default async function approve(
         resolve(false);
       })
     );
-    collector.on("end", () => {});
   }) as Promise<boolean>;
 }

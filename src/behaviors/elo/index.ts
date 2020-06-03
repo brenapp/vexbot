@@ -11,6 +11,7 @@ import * as keya from "keya";
 import "./commands";
 import SQLiteStore from "keya/out/node/sqlite";
 import { Seasons } from "vexdb/out/constants/RequestObjects";
+import { MatchesResponseObject } from "vexdb/out/constants/ResponseObjects";
 
 // DEFAULTS
 const DEFAULT = 1000;
@@ -31,14 +32,16 @@ export interface StoredEloRanking {
   ties: number;
 }
 
-export async function getAllMatches(season: Seasons) {
+export async function getAllMatches(
+  season: Seasons
+): Promise<MatchesResponseObject[]> {
   return vexdb.get("matches", { season, scored: 1 });
 }
 
 export async function ensureTeam(
   store: SQLiteStore<StoredEloRanking>,
   number: string
-) {
+): Promise<StoredEloRanking> {
   let team: StoredEloRanking | null = await store.get(number);
 
   if (!team) {
@@ -60,9 +63,7 @@ export async function ensureTeam(
     // Get the average elo for the teams above
     let elo =
       all
-        .map(
-          ({ key, value }: { key: string; value: StoredEloRanking }) => value
-        )
+        .map(({ value }: { value: StoredEloRanking }) => value)
         .reduce((a, b) => a + b.elo, 0) / all.length;
 
     // Set the default average
@@ -90,7 +91,7 @@ export async function ensureTeam(
   return team;
 }
 
-export async function updateElo(season: Seasons) {
+export async function updateElo(season: Seasons): Promise<void> {
   const store = await keya.store(
     `elo${season.toLowerCase().replace(/ /g, "")}`
   );
@@ -128,7 +129,6 @@ export async function updateElo(season: Seasons) {
 
     // Compare to the result
     let actualBlue: number;
-    let actualRed: number;
 
     if (match.bluescore > match.redscore) {
       actualBlue = 1;
@@ -156,7 +156,7 @@ export async function updateElo(season: Seasons) {
       blue2.ties++;
     }
 
-    actualRed = 1 - actualBlue;
+    const actualRed = 1 - actualBlue;
 
     // Changes from output
     const deltaBlue = KFACTOR * (actualBlue - predictedBlue);

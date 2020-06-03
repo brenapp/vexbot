@@ -1,10 +1,4 @@
-import {
-  Message,
-  ReactionEmoji,
-  User,
-  MessageReaction,
-  Collector,
-} from "discord.js";
+import { Message, User, MessageReaction, Collector } from "discord.js";
 
 /**
  * Reaction utilites
@@ -17,7 +11,7 @@ export default async function listen(
     vote: MessageReaction,
     collector: Collector<string, MessageReaction>
   ) => boolean | void | Promise<boolean> | Promise<void>
-) {
+): Promise<void> {
   const collector = message.createReactionCollector(
     (reaction: MessageReaction, user: User) =>
       emojis.includes(reaction.emoji.name) && !user.bot

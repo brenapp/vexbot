@@ -6,20 +6,13 @@
  *
  */
 
-import {
-  Message,
-  MessageReaction,
-  User,
-  MessageEmbed,
-  Guild,
-} from "discord.js";
+import { Message, MessageReaction, MessageEmbed, Guild } from "discord.js";
 import Command, { Permissions } from "../lib/command";
 import { makeEmbed } from "../lib/util";
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import parse from "parse-duration";
-import listen from "../lib/reactions";
-import { client } from "../client";
 
 // Reactions
 const emoji = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"];
@@ -39,9 +32,6 @@ export const PollCommand = Command({
     if (options.length > 10) {
       return message.channel.send("You cannot have more than 10 options!");
     }
-
-    // Record the votes for all the options
-    const votes = new Map<User, number>();
 
     // Poll duration
     const time = parse(duration);
@@ -74,7 +64,7 @@ export const PollCommand = Command({
 
     // Custom listener
     const collector = poll.createReactionCollector(
-      (reaction: MessageReaction, user: User) =>
+      (reaction: MessageReaction) =>
         emoji.includes(reaction.emoji.toString()) ||
         reaction.emoji.toString() === "✅",
       { time }
@@ -89,6 +79,7 @@ export const PollCommand = Command({
             .member(user)
             ?.hasPermission("ADMINISTRATOR"))
       ) {
+        collector.emit("end");
       }
 
       const voter = reaction.users.cache.last();

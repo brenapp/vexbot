@@ -28,7 +28,7 @@ export const RollCommand = Command({
       );
     }
 
-    const [expression, amount, sides, modifier] = match;
+    const [, amount, sides, modifier] = match;
 
     let sum = 0;
     let body = `Rolling ${args[0]}...\n`;

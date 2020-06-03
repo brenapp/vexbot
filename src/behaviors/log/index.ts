@@ -5,7 +5,6 @@ import { client } from "../../client";
 import "./important";
 import "./images";
 import { DEBUG } from "../../commands/debug";
-import report from "../../lib/report";
 
 function matchAll(str: string, re: RegExp) {
   return (str.match(re) || [])
@@ -17,7 +16,7 @@ async function clean(message: Message) {
   let content = message.content;
 
   const roles = await Promise.all(
-    matchAll(content, /\<\@\&([0-9]+)\>/g).map(async (match) => ({
+    matchAll(content, /<@&([0-9]+)>/g).map(async (match) => ({
       key: (match as RegExpExecArray)[0],
       role: (message.guild as Guild).roles.cache.get(
         (match as RegExpExecArray)[1]
@@ -25,7 +24,7 @@ async function clean(message: Message) {
     }))
   );
   const members = await Promise.all(
-    matchAll(content, /\<\@\!([0-9]+)\>/g).map(async (match) => ({
+    matchAll(content, /<@!([0-9]+)>/g).map(async (match) => ({
       key: (match as RegExpExecArray)[0],
       member: (message.guild as Guild).members.cache.get(
         (match as RegExpExecArray)[1]

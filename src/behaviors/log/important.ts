@@ -37,7 +37,7 @@ async function handleVeto(
   callback: (
     vote: MessageReaction,
     collector: Collector<string, MessageReaction>
-  ) => any
+  ) => void
 ) {
   await message.react("👎");
   listen(message, ["👎"], async (reaction, collector) => {
@@ -127,7 +127,7 @@ client.on("guildBanRemove", async (guild: Guild, user: User | PartialUser) => {
   const message = (await log.send({ embed })) as Message;
   await message.react("👎");
 
-  handleVeto(message, embed, (reaction) => guild.members.ban(user as User));
+  handleVeto(message, embed, () => guild.members.ban(user as User));
 });
 
 client.on(
@@ -215,7 +215,7 @@ client.on("guildMemberUpdate", async (old, current) => {
   embed.addField("Executor", entry.executor);
 
   const message = (await log.send({ embed })) as Message;
-  handleVeto(message, embed, (reaction) => {
+  handleVeto(message, embed, () => {
     if (old.nickname !== current.nickname) {
       return current.setNickname(old.nickname ?? "");
     }

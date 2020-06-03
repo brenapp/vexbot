@@ -1,20 +1,20 @@
-import { addMessageHandler } from "../../lib/message";
-
-import { Guild, GuildMember, PartialGuildMember, ClientUser } from "discord.js";
+import { Guild, GuildMember, PartialGuildMember, Role } from "discord.js";
 import { client } from "../../client";
 import { askString, choose, questionValidate } from "../../lib/prompt";
 
 import * as vexdb from "vexdb";
 import approve from "./approve";
 
-export function findOrMakeRole(name: string, guild: Guild) {
+export function findOrMakeRole(name: string, guild: Guild): Promise<Role> {
   const role = guild.roles.resolve(name);
   return role
     ? Promise.resolve(role)
     : guild.roles.create({ data: { name, mentionable: true } });
 }
 
-export default async function verify(member: GuildMember | PartialGuildMember) {
+export default async function verify(
+  member: GuildMember | PartialGuildMember
+): Promise<void> {
   if (member.partial) {
     member = await member.fetch();
   }

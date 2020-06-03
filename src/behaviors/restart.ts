@@ -7,15 +7,7 @@ import http from "http";
 import { information } from "../lib/report";
 import { client } from "../client";
 
-import execa from "execa";
-import {
-  Message,
-  MessageEmbed,
-  User,
-  MessageReaction,
-  DMChannel,
-  TextChannel,
-} from "discord.js";
+import { Message, MessageEmbed, User, MessageReaction } from "discord.js";
 import { code, escape } from "../lib/util";
 import { authorization } from "../lib/access";
 
@@ -46,7 +38,7 @@ async function approval(embed: MessageEmbed) {
   const approval = (await report({ embed })) as Message;
   await approval.react("👍");
 
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const timeout = setTimeout(() => resolve(false), 5 * 60 * 1000);
 
     const collector = approval.createReactionCollector(
@@ -57,8 +49,6 @@ async function approval(embed: MessageEmbed) {
     collector.on(
       "collect",
       (handleReaction = (vote) => {
-        const approver = vote.users.cache.last();
-
         if (vote.emoji.name === "👍") {
           if (collector.off) {
             collector.off("collect", handleReaction);
@@ -71,13 +61,12 @@ async function approval(embed: MessageEmbed) {
         resolve(false);
       })
     );
-    collector.on("end", () => {});
   }) as Promise<boolean>;
 }
 
 http
   .createServer((req, res) => {
-    handler(req, res, function(err) {
+    handler(req, res, function() {
       res.statusCode = 404;
       res.end("no such location");
     });

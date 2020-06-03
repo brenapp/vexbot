@@ -2,13 +2,11 @@
  * Eliza conversation engine implementation
  */
 import { addMessageHandler } from "../../lib/message";
-import { client } from "../../client";
 import { User } from "discord.js";
 import { askString } from "../../lib/prompt";
 import ElizaBot from "./eliza";
 
 import { information } from "../../lib/report";
-import e = require("express");
 
 async function wait(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));

@@ -48,7 +48,7 @@ async function getTotals(store: SQLiteStore<MessageTotals>, message: Message) {
   const totals: { [key: string]: number } = {};
   const oofs: { [key: string]: number } = {};
 
-  for (const [id, channel] of text) {
+  for (const [, channel] of text) {
     console.log(`Tallying #${channel.name}...`);
     const messages = await fetchAll(channel);
     messages.forEach((message) => {
@@ -102,7 +102,7 @@ interface LeaderboardRecord {
 
     check: Permissions.guild,
 
-    async exec(message: Message & { guild: Guild }, args: string[]) {
+    async exec(message: Message & { guild: Guild }) {
       // Gets all records for the relevant guild
       const all = (await store.all()).filter((record) =>
         record.key.startsWith(message.guild.id)

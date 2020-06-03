@@ -2,6 +2,7 @@ import * as keya from "keya";
 import { client } from "../client";
 import { GuildMember, Guild } from "discord.js";
 
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import parse from "parse-duration";
 import report from "../lib/report";
@@ -15,7 +16,7 @@ interface Probation {
   guild: string;
 }
 
-export async function initalize() {
+export async function initalize(): Promise<void> {
   const store = await keya.store<Probation>("probations");
 
   // Get all active probations (covers for bot shutdowns), note shutdown parameters looks like { start: timestamp, end: timestamp, reason: string }
@@ -33,7 +34,9 @@ export async function initalize() {
   }
 }
 
-export const free = (memberid: string, guildid: string) => async () => {
+export const free = (memberid: string, guildid: string) => async (): Promise<
+  void
+> => {
   const guild = client.guilds.resolve(guildid) as Guild;
   const member = guild.members.resolve(memberid) as GuildMember;
 
@@ -73,7 +76,7 @@ export default async function probate(
   by: GuildMember | null,
   time: string,
   reason: string
-) {
+): Promise<void> {
   console.log(
     `Probate ${member} by ${by} for ${parse(time)}ms with reason ${reason}`
   );

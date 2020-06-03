@@ -1,5 +1,5 @@
 import { addMessageHandler } from "../../lib/message";
-import { TextChannel, Guild, Message } from "discord.js";
+import { TextChannel, Message } from "discord.js";
 import { client } from "../../client";
 
 addMessageHandler(async (message: Message) => {

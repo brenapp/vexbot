@@ -1,4 +1,3 @@
-import discord from "discord.js";
 import { handleMessage } from "./lib/message";
 import report, { information } from "./lib/report";
 import { client } from "./client";

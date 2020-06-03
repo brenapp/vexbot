@@ -1,4 +1,4 @@
-import { Message, GuildManager, GuildMember } from "discord.js";
+import { Message, GuildMember } from "discord.js";
 import probate from "../behaviors/probation";
 import Command, { Permissions } from "../lib/command";
 import { authorization } from "../lib/access";
@@ -71,10 +71,7 @@ export const ProbateCommand = Command({
       citations: 0,
       executed: 0,
     };
-    const citations: {
-      citations: number;
-      executed: number;
-    }[] = await Promise.all(
+    await Promise.all(
       victims.map((victim) =>
         store
           .get(victim.id)

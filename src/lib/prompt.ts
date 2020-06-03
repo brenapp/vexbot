@@ -12,10 +12,10 @@ import { DMChannel, Message } from "discord.js";
  * @param channel Channel to ask in ()
  * @returns The response message
  */
-function ask(question: string, channel: DMChannel) {
+function ask(question: string, channel: DMChannel): Promise<Message> {
   channel.send(question);
-  return new Promise<Message>(resolve => {
-    addOneTimeMessageHandler(message => {
+  return new Promise<Message>((resolve) => {
+    addOneTimeMessageHandler((message) => {
       if (channel.id !== message.channel.id) return false;
       resolve(message);
       return true;
@@ -28,8 +28,11 @@ function ask(question: string, channel: DMChannel) {
  * @param question Question to ask
  * @param channel Channel to ask in ()
  */
-export function askString(question: string, channel: DMChannel) {
-  return ask(question, channel).then(message => message.content);
+export function askString(
+  question: string,
+  channel: DMChannel
+): Promise<string> {
+  return ask(question, channel).then((message) => message.content);
 }
 
 type ValidatorFunction = (
@@ -41,7 +44,7 @@ function questionValidate(
   validate: ValidatorFunction,
   failureMessage: string
 ): Promise<string> {
-  return askString(question, channel).then(async response => {
+  return askString(question, channel).then(async (response) => {
     const corrected = await validate(response);
     // If the validator explicity returns true, then return the original resposne
     if (corrected === true) {
@@ -57,12 +60,16 @@ function questionValidate(
   });
 }
 
-function choose(question: string, channel: DMChannel, options: string[][]) {
+function choose(
+  question: string,
+  channel: DMChannel,
+  options: string[][]
+): Promise<string> {
   return questionValidate(
     question,
     channel,
-    response => {
-      const index = options.findIndex(opt =>
+    (response) => {
+      const index = options.findIndex((opt) =>
         opt.includes(response.toUpperCase())
       );
       if (index < 0) return false;

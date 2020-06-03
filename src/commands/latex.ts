@@ -4,7 +4,7 @@
 
 import Command, { Permissions } from "../lib/command";
 
-const LatexCommand = Command({
+export const LatexCommand = Command({
   names: ["latex", "math"],
   documentation: {
     description: "Outputs latex images from the given input",

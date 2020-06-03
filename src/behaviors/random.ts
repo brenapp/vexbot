@@ -1,11 +1,8 @@
 import { addMessageHandler } from "../lib/message";
 import { client } from "../client";
 
-import { PREFIX, isCommand } from "../lib/command";
-import { DEBUG } from "../commands/debug";
-import { code } from "../lib/util";
+import { isCommand } from "../lib/command";
 import { TextChannel, ClientUser } from "discord.js";
-import probate from "./probation";
 import { config } from "../lib/access";
 
 /**

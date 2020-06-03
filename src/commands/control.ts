@@ -15,7 +15,7 @@ export const LockCommand = Command({
     group: "admin",
   },
 
-  exec(message: Message, args: string[]) {
+  exec(message: Message) {
     const channel = message.channel as TextChannel;
 
     channel.createOverwrite(channel.guild.roles.everyone, {

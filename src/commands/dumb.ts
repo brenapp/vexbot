@@ -15,10 +15,6 @@ function alphanumeric(char: string): boolean {
   return /[A-z]/gi.test(char);
 }
 
-function upper(char: string): boolean {
-  return char === char.toLocaleUpperCase();
-}
-
 function toSarcasmCase(text: string) {
   const lowercase = text.toLocaleLowerCase().split("");
 
@@ -44,7 +40,7 @@ export const SarcasmCommand = Command({
 
   check: Permissions.all,
 
-  async exec(message: Message, args: string[]) {
+  async exec(message: Message) {
     const channel = message.channel;
     const content = await channel.messages
       .fetch({ limit: 2 })
@@ -87,7 +83,7 @@ export const UWUCommand = Command({
 
   check: Permissions.all,
 
-  async exec(message: Message, args: string[]) {
+  async exec(message: Message) {
     const channel = message.channel;
     const content = await channel.messages
       .fetch({ limit: 2 })
@@ -169,7 +165,7 @@ export const SCFactCommand = Command({
     hidden: false,
   },
 
-  async exec(message: Message, args: string[]) {
+  async exec(message: Message) {
     const facts = [
       `The oldest living organism this side of the Mississippi is the Angel Oak located on John's Island. It's estimated to be over 500 years old, and has a shady area of over 17,000 square feet.`,
       `Clemson University used to grow blue cheese in a civil-war era tunnel north of the campus called the Stumphouse Tunnel.`,
