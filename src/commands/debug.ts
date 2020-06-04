@@ -62,7 +62,12 @@ export const EvalCommand = Command({
   check: Permissions.owner,
   async exec(message, args) {
     const command = args.join(" ");
-    const result = JSON.stringify(eval(command));
+    let result: string;
+    try {
+      result = JSON.stringify(eval(command));
+    } catch (e) {
+      result = e.toString();
+    }
 
     return message.channel.send(code(result));
   },
