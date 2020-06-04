@@ -31,7 +31,7 @@ client.on("ready", () => {
     console.log("DEV MODE ENABLED");
     client.user.setActivity("for changes", { type: "WATCHING" });
   } else {
-    client.user.setActivity("over the server", { type: "WATCHING" });
+    client.user.setActivity("joincampaignzero.org", { type: "CUSTOM_STATUS" });
   }
 
   probation.initalize();
