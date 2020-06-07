@@ -43,6 +43,7 @@ export interface CommandConfiguration {
   // Error handling
   error?(error: string, message: Message, args: string[]): void;
 
+  // Holds subcommands (for help configuration)
   subcommands?: CommandConfiguration[];
 }
 
@@ -124,6 +125,7 @@ export function Group(
 }
 
 // Handles all of the commands we've already executed
+// Command (from user) => Response (from vexbot)
 export const RESPONSES = new Map<Message, Message>();
 
 // Commands that are disabled go here
