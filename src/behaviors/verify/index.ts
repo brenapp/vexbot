@@ -45,28 +45,25 @@ export default async function verify(
   }
 
   const role = await choose(
-    "What is your relationship with your primary team? *(Member, Alumni, Mentor)*",
-    dm,
-    [
-      ["MEMBER", "COMPETITOR", "TEAM MEMBER"],
-      ["ALUMNI", "GRADUATED", "ALUMNUS", "ALUM"],
-      ["MENTOR", "COACH", "ADVISOR"],
-    ]
+    "What is your primary role on your team?",
+    ["Member", "Alumnus", "Mentor"],
+    dm
   );
+
+  const roleString = ["MEMBER", "ALUMNI", "MENTOR"][role];
 
   // Add additional teams
   const additional = await choose(
-    "Do you have any other teams you are/were involved with? (yes/no)",
-    dm,
-    [
-      ["YES", "Y"],
-      ["NO", "N"],
-    ]
+    "Do you have any other teams you are/were involved with? ",
+    ["Y", "N"],
+    dm
   );
 
-  let teams = additional;
-  if (additional === "YES") {
+  let teams;
+  if (additional) {
     teams = await askString("Please list all of these below", dm);
+  } else {
+    teams = "No extra";
   }
 
   await dm.send(
@@ -78,7 +75,7 @@ export default async function verify(
 
   if (!override) {
     const teaminfo = (await vexdb.get("teams", { team }))[0];
-    if (role !== "ALUMNI") {
+    if (roleString !== "ALUMNI") {
       // Program
       if (teaminfo.program == "VEXU") {
         roles.push("377219725442154526"); // VEXU
@@ -97,7 +94,7 @@ export default async function verify(
     }
   }
 
-  switch (role) {
+  switch (roleString) {
     case "MEMBER":
       break;
     case "ALUMNI":

@@ -4,7 +4,7 @@
  */
 
 import { addOneTimeMessageHandler } from "./message";
-import { DMChannel, Message } from "discord.js";
+import { Message, DMChannel } from "discord.js";
 
 /**
  * Asks a user in their respective DMChannel
@@ -60,23 +60,23 @@ function questionValidate(
   });
 }
 
-function choose(
+async function choose(
   question: string,
+  options: string[],
   channel: DMChannel,
-  options: string[][]
-): Promise<string> {
-  return questionValidate(
-    question,
-    channel,
-    (response) => {
-      const index = options.findIndex((opt) =>
-        opt.includes(response.toUpperCase())
-      );
-      if (index < 0) return false;
-      return options[index][0];
-    },
-    "I'm not sure I understand what you mean"
-  );
+  failure = "I don't understand what you mean"
+): Promise<number> {
+  options = options.map((o) => o.toUpperCase());
+  const prompt = `${question} *(${options.join(", ")})*`;
+
+  const response = await askString(prompt, channel);
+
+  if (options.includes(response)) {
+    return options.indexOf(response);
+  } else {
+    await channel.send(failure);
+    return choose(question, options, channel, failure);
+  }
 }
 
 export { ask, askString as question, questionValidate, choose };
