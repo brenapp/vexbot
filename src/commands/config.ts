@@ -106,4 +106,10 @@ export const ConfigCommand = Command({
   check,
   exec: Group(subcommands),
   subcommands,
+
+  fail(message: Message) {
+    return message.channel.send(
+      "Only administrators are allowed to update server configuration"
+    );
+  },
 });
