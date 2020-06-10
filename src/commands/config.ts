@@ -1,18 +1,20 @@
-import Command, { Permissions } from "../lib/command";
+import Command, { Permissions, Subcommand, Group } from "../lib/command";
 import { Message } from "discord.js";
 import { behavior } from "../lib/access";
 import { makeEmbed } from "../lib/util";
 
-export const ConfigCommand = Command({
-  names: ["config"],
-  check: Permissions.any(
-    Permissions.admin,
-    Permissions.compose(Permissions.owner, Permissions.guild)
-  ),
+const check = Permissions.any(
+  Permissions.admin,
+  Permissions.compose(Permissions.owner, Permissions.guild)
+);
+
+export const ConfigListCommand = Subcommand({
+  names: ["list"],
+  check,
 
   documentation: {
     description: "Shows this servers configuration",
-    usage: "config",
+    usage: "config list",
     group: "META",
   },
 
@@ -56,4 +58,20 @@ export const ConfigCommand = Command({
 
     return message.channel.send({ embed });
   },
+});
+
+const subcommands = [ConfigListCommand];
+
+export const ConfigCommand = Command({
+  names: ["config"],
+
+  documentation: {
+    description: "Utilites for managing the server configuration",
+    usage: "config",
+    group: "META",
+  },
+
+  check,
+  exec: Group(subcommands),
+  subcommands,
 });
