@@ -54,8 +54,6 @@ export const ConfigListCommand = Subcommand({
 
     embed.setDescription(body);
 
-    console.log(body);
-
     return message.channel.send({ embed });
   },
 });
