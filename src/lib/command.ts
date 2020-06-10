@@ -3,9 +3,9 @@ import { authorization, config } from "./access";
 import report from "./report";
 
 const owner = authorization("discord.owner");
-export const PREFIX: string[] = process.env["DEV"]
+export const PREFIX = (process.env["DEV"]
   ? config("prefix.dev")
-  : config("prefix.prod");
+  : config("prefix.prod")) as string[];
 
 /**
  * Identifies if a passed message is a commmand

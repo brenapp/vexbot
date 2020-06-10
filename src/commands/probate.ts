@@ -1,10 +1,16 @@
 import { Message, GuildMember } from "discord.js";
 import probate from "../behaviors/probation";
 import Command, { Permissions } from "../lib/command";
-import { authorization } from "../lib/access";
+import { authorization, behavior } from "../lib/access";
 import * as keya from "keya";
 
-const owner = authorization("discord.owner");
+const owner = authorization("discord.owner") as string;
+
+function enabled(guild: string) {
+  const server = behavior(guild);
+
+  return !!server && !!server.probation;
+}
 
 export const ProbateCommand = Command({
   names: ["probate", "dq"],
@@ -18,11 +24,18 @@ export const ProbateCommand = Command({
     Permissions.admin,
 
     // Don't allow owner DQ
-    (message) => !message.mentions.members?.has(owner)
+    (message) => !message.mentions.members?.has(owner),
+
+    // Don't allow on disabled servers
+    (message) => enabled(message.guild?.id ?? "")
   ),
 
   fail(message: Message) {
     if (!message.guild) return;
+
+    if (!enabled(message.guild?.id ?? "")) {
+      message.channel.send("Probation isn't enabled here");
+    }
 
     // First, chastise for trying to put me on probation
     if (message.mentions.members?.has(owner)) {

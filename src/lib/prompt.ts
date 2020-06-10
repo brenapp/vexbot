@@ -67,9 +67,11 @@ async function choose(
   failure = "I don't understand what you mean"
 ): Promise<number> {
   options = options.map((o) => o.toUpperCase());
-  const prompt = `${question} *(${options.join(", ")})*`;
+  const prompt = `${question} *(${options.join("/")})*`;
 
-  const response = await askString(prompt, channel);
+  const response = await askString(prompt, channel).then((o) =>
+    o.toUpperCase()
+  );
 
   if (options.includes(response)) {
     return options.indexOf(response);

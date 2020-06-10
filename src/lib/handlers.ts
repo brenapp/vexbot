@@ -6,7 +6,7 @@ import { client } from "../client";
 import { Message } from "discord.js";
 import { config } from "./access";
 
-const prod: string[] = config("prefix.prod");
+const prod = config("prefix.prod") as string[];
 
 // Dismiss production commands when in DEV mode
 addMessageHandler(
