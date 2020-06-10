@@ -162,7 +162,7 @@ export const SCFactCommand = Command({
     group: "Meta",
     description: "Lists a random fact about SC",
     usage: "scfacts",
-    hidden: false,
+    hidden: true,
   },
 
   async exec(message: Message) {
