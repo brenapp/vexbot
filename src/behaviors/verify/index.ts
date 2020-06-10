@@ -21,7 +21,7 @@ export default async function verify(
   }
 
   // Get the specific server behavior
-  const server = behavior(member.guild.id);
+  const server = await behavior(member.guild.id);
 
   // Check if it's valid
   if (!server || !server.verify) {

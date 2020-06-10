@@ -51,7 +51,7 @@ addMessageHandler(async (message) => {
     return false;
   }
 
-  const server = behavior(message.guild?.id ?? "");
+  const server = await behavior(message.guild?.id ?? "");
   if (!server || !server["server-log"]) {
     return false;
   }

@@ -23,7 +23,7 @@ function serverlog(guild: Guild): TextChannel {
 }
 
 function enabled(guild: string) {
-  const server = behavior(guild);
+  const server = await behavior(guild);
 
   return server && server["event-log"];
 }

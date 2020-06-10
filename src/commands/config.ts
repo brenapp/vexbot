@@ -14,7 +14,7 @@ export const ConfigListCommand = Subcommand({
 
   documentation: {
     description: "Shows this servers configuration",
-    usage: "config list",
+    usage: "list",
     group: "META",
   },
 
@@ -25,7 +25,7 @@ export const ConfigListCommand = Subcommand({
 
     const guild = message.guild;
 
-    const server = behavior(guild.id);
+    const server = await behavior(guild.id);
 
     if (!server) {
       return message.channel.send(

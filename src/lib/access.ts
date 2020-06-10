@@ -22,6 +22,6 @@ const behaviors = config("behaviors") as {
 }[];
 
 // Get custom behavior for the specified guild
-export function behavior(guild: string) {
+export async function behavior(guild: string) {
   return behaviors.find((b) => b.server === guild);
 }

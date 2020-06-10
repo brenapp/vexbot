@@ -6,8 +6,8 @@ import * as keya from "keya";
 
 const owner = authorization("discord.owner") as string;
 
-function enabled(guild: string) {
-  const server = behavior(guild);
+async function enabled(guild: string) {
+  const server = await behavior(guild);
 
   return !!server && !!server.probation;
 }

@@ -79,7 +79,7 @@ export default async function probate(
   reason: string
 ): Promise<void> {
   // Check if this behavior is enabled
-  const server = behavior(member.guild.id);
+  const server = await behavior(member.guild.id);
   if (!server || !server.probation) {
     return;
   }
