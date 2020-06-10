@@ -22,7 +22,7 @@ function serverlog(guild: Guild): TextChannel {
   return guild.channels.resolve("event-log") as TextChannel;
 }
 
-function enabled(guild: string) {
+async function enabled(guild: string) {
   const server = await behavior(guild);
 
   return server && server["event-log"];
@@ -71,7 +71,7 @@ async function handleVeto(
 // Administrative
 client.on("guildBanAdd", async (guild: Guild, user: User | PartialUser) => {
   if (process.env["DEV"]) return;
-  if (!enabled(guild.id)) return;
+  if (!(await enabled(guild.id))) return;
 
   if (user.partial) {
     user = await user.fetch();
@@ -108,7 +108,7 @@ client.on("guildBanAdd", async (guild: Guild, user: User | PartialUser) => {
 
 client.on("guildBanRemove", async (guild: Guild, user: User | PartialUser) => {
   if (process.env["DEV"]) return;
-  if (!enabled(guild.id)) return;
+  if (!(await enabled(guild.id))) return;
 
   if (user.partial) {
     user = await user.fetch();
@@ -149,7 +149,7 @@ client.on(
       member = await member.fetch();
     }
 
-    if (!enabled(member.guild.id)) return;
+    if (!(await enabled(member.guild.id))) return;
 
     const log = serverlog(member.guild);
 
@@ -177,7 +177,7 @@ client.on("guildMemberUpdate", async (old, current) => {
     current = await current.fetch();
   }
 
-  if (!enabled(current.guild.id)) return;
+  if (!(await enabled(current.guild.id))) return;
 
   const embed = makeEmbed();
 
