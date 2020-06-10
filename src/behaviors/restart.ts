@@ -13,8 +13,8 @@ import { authorization } from "../lib/access";
 
 import { ShellCommand } from "../commands/debug";
 
-const secret = authorization("github.webhook.secret");
-const owner = authorization("discord.owner");
+const secret = authorization("github.webhook.secret") as string;
+const owner = authorization("discord.owner") as string;
 
 const handler = createHandler({ path: "/webhook", secret });
 const report = information(client);

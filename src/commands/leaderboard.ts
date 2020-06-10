@@ -134,7 +134,7 @@ interface LeaderboardRecord {
       const oof = all.reduce((a, b) => a + (b.value.oof || 0), 0) as number;
 
       // Randomized titles from config file
-      const titles = config("leaderboard.titles");
+      const titles = config("leaderboard.titles") as { [key: string]: string };
       const title = Object.keys(titles)[
         Math.round(Object.keys(titles).length * Math.random())
       ];
