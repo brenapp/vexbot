@@ -77,7 +77,7 @@ export const ConfigSetCommand = Subcommand({
     const settings = ["server-log", "probation", "event-log", "verify"];
     const guild = message.guild;
 
-    if (!setting || settings.includes(setting)) {
+    if (!setting || !settings.includes(setting)) {
       return message.channel.send(
         `Unknown setting ${setting}. Valid settings are ${settings.join(", ")}.`
       );
@@ -89,7 +89,8 @@ export const ConfigSetCommand = Subcommand({
       );
     }
 
-    const set = await setBehavior(guild.id, { [setting]: value });
+    await setBehavior(guild.id, { [setting]: value });
+    return ConfigListCommand.exec(message, []);
   },
 });
 

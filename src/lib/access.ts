@@ -33,7 +33,12 @@ export async function setBehavior(
 ) {
   const store = await keya.store<ServerConfiguration>("serverconfig");
 
-  const old = (await store.get(guild)) ?? {};
+  const old = (await store.get(guild)) ?? {
+    "server-log": false,
+    probation: false,
+    "event-log": false,
+    verify: false,
+  };
   const updated = { ...old, ...config };
 
   return store.set(guild, updated);
