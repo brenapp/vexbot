@@ -275,13 +275,17 @@ export const Permissions = {
     return true;
   },
 
-  compose(...checks: ((message: Message) => boolean)[]) {
-    return (message: Message): boolean =>
-      checks.map((check) => check(message)).every((resp) => resp);
+  compose(...checks: ((message: Message) => boolean | Promise<boolean>)[]) {
+    return (message: Message): Promise<boolean> =>
+      Promise.all(checks.map((check) => check(message))).then((resp) =>
+        resp.every((r) => r)
+      );
   },
 
-  any(...checks: ((message: Message) => boolean)[]) {
-    return (message: Message): boolean =>
-      checks.map((check) => check(message)).some((resp) => resp);
+  any(...checks: ((message: Message) => boolean | Promise<boolean>)[]) {
+    return (message: Message): Promise<boolean> =>
+      Promise.all(checks.map((check) => check(message))).then((resp) =>
+        resp.some((r) => r)
+      );
   },
 };
