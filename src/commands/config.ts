@@ -1,6 +1,6 @@
 import Command, { Permissions, Subcommand, Group } from "../lib/command";
 import { Message } from "discord.js";
-import { behavior } from "../lib/access";
+import { behavior, setBehavior } from "../lib/access";
 import { makeEmbed } from "../lib/util";
 
 const check = Permissions.any(
@@ -60,7 +60,40 @@ export const ConfigListCommand = Subcommand({
   },
 });
 
-const subcommands = [ConfigListCommand];
+export const ConfigSetCommand = Subcommand({
+  names: ["set"],
+  check,
+
+  documentation: {
+    description: "Set a configuration for this server",
+    usage: "set server-log true",
+    group: "META",
+  },
+
+  async exec(message: Message, [setting, value]: [string, string]) {
+    if (!message.guild) {
+      return;
+    }
+    const settings = ["server-log", "probation", "event-log", "verify"];
+    const guild = message.guild;
+
+    if (!setting || settings.includes(setting)) {
+      return message.channel.send(
+        `Unknown setting ${setting}. Valid settings are ${settings.join(", ")}.`
+      );
+    }
+
+    if (value !== "true" && value !== "false") {
+      return message.channel.send(
+        `Unknown setting value. Use true to enable or false to disable`
+      );
+    }
+
+    const set = await setBehavior(guild.id, { [setting]: value });
+  },
+});
+
+const subcommands = [ConfigListCommand, ConfigSetCommand];
 
 export const ConfigCommand = Command({
   names: ["config"],

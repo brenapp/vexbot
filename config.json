@@ -54,15 +54,5 @@
       "averys-cloud-juice",
       "drink-soup"
     ]
-  },
-
-  "behaviors": [
-    {
-      "server": "310820885240217600",
-      "server-log": true,
-      "probation": true,
-      "event-log": true,
-      "verify": true
-    }
-  ]
+  }
 }

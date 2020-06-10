@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/no-var-requires */
 import delve from "dlv";
+import * as keya from "keya";
 
 export function authorization(access: string | string[]) {
   const file = require("../../authorization.json");
@@ -12,16 +13,28 @@ export function config(access: string | string[]) {
   return delve(file, access) as unknown;
 }
 
-// Only use verifications on servers that enable it
-const behaviors = config("behaviors") as {
+interface ServerConfiguration {
   "server-log"?: boolean;
   probation?: boolean;
   "event-log"?: boolean;
   verify?: boolean;
-  server: string;
-}[];
+}
 
 // Get custom behavior for the specified guild
 export async function behavior(guild: string) {
-  return behaviors.find((b) => b.server === guild);
+  const store = await keya.store<ServerConfiguration>("serverconfig");
+
+  return store.get(guild);
+}
+
+export async function setBehavior(
+  guild: string,
+  config: Partial<ServerConfiguration>
+) {
+  const store = await keya.store<ServerConfiguration>("serverconfig");
+
+  const old = (await store.get(guild)) ?? {};
+  const updated = { ...old, ...config };
+
+  return store.set(guild, updated);
 }
