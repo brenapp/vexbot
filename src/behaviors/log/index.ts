@@ -4,6 +4,7 @@ import { client } from "../../client";
 
 import "./important";
 import { DEBUG } from "../../commands/debug";
+import { behavior } from "../../lib/access";
 
 function matchAll(str: string, re: RegExp) {
   return (str.match(re) || [])
@@ -49,6 +50,12 @@ addMessageHandler(async (message) => {
   if (message.channel.type === "dm") {
     return false;
   }
+
+  const server = behavior(message.guild?.id ?? "");
+  if (!server || !server["server-log"]) {
+    return false;
+  }
+
   const log = message.guild?.channels.cache.find(
     (ch) => ch.name === "server-log"
   ) as TextChannel;

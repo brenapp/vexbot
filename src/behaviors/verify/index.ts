@@ -4,6 +4,7 @@ import { askString, choose, questionValidate } from "../../lib/prompt";
 
 import * as vexdb from "vexdb";
 import approve from "./approve";
+import { behavior } from "../../lib/access";
 
 export function findOrMakeRole(name: string, guild: Guild): Promise<Role> {
   const role = guild.roles.resolve(name);
@@ -19,19 +20,34 @@ export default async function verify(
     member = await member.fetch();
   }
 
+  // Get the specific server behavior
+  const server = behavior(member.guild.id);
+
+  // Check if it's valid
+  if (!server || !server.verify) {
+    return;
+  }
+
   // Slide into DMs
   const dm = await member.createDM();
 
   const name = await askString(
-    "Welcome to VEX Teams of South Carolina! In order to participate, you'll need to verify some basic information with us. What should we call you? **(Your Name/Nickname)**",
+    `Welcome to ${member.guild.name}! In order to participate, you'll need to verify some basic information with us. What should we call you? **(Your Name/Nickname)**`,
     dm
   );
 
   let team = await questionValidate(
     "What team are you *primarily* a part of?",
     dm,
-    async (team) =>
-      team === "OVERRIDE" || !!(await vexdb.size("teams", { team })),
+    async (team) => {
+      if (team === "OVERRIDE") {
+        return true;
+      }
+
+      const data = await vexdb.get("teams", { team });
+
+      return data.length > 0;
+    },
     "There doesn't appear to be a team with that number. Make sure you are listing a registered team that has gone to an event. If you need a manual override, please enter `OVERRIDE`"
   );
 
@@ -46,7 +62,7 @@ export default async function verify(
 
   const role = await choose(
     "What is your primary role on your team?",
-    ["Member", "Alumnus", "Mentor"],
+    ["Member", "Alum", "Mentor"],
     dm
   );
 
@@ -54,13 +70,13 @@ export default async function verify(
 
   // Add additional teams
   const additional = await choose(
-    "Do you have any other teams you are/were involved with? ",
+    "Do you have any other teams you are/were involved with?",
     ["Y", "N"],
     dm
   );
 
   let teams;
-  if (additional) {
+  if (additional === 0) {
     teams = await askString("Please list all of these below", dm);
   } else {
     teams = "No extra";

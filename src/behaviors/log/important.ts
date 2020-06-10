@@ -15,10 +15,17 @@ import {
 } from "discord.js";
 import { makeEmbed } from "../../lib/util";
 import listen from "../../lib/reactions";
+import { behavior } from "../../lib/access";
 
 // Notify #event-log about important events
 function serverlog(guild: Guild): TextChannel {
   return guild.channels.resolve("event-log") as TextChannel;
+}
+
+function enabled(guild: string) {
+  const server = behavior(guild);
+
+  return server && server["event-log"];
 }
 
 function changedRoles(
@@ -64,6 +71,8 @@ async function handleVeto(
 // Administrative
 client.on("guildBanAdd", async (guild: Guild, user: User | PartialUser) => {
   if (process.env["DEV"]) return;
+  if (!enabled(guild.id)) return;
+
   if (user.partial) {
     user = await user.fetch();
   }
@@ -99,6 +108,7 @@ client.on("guildBanAdd", async (guild: Guild, user: User | PartialUser) => {
 
 client.on("guildBanRemove", async (guild: Guild, user: User | PartialUser) => {
   if (process.env["DEV"]) return;
+  if (!enabled(guild.id)) return;
 
   if (user.partial) {
     user = await user.fetch();
@@ -139,6 +149,8 @@ client.on(
       member = await member.fetch();
     }
 
+    if (!enabled(member.guild.id)) return;
+
     const log = serverlog(member.guild);
 
     const embed = makeEmbed();
@@ -164,6 +176,8 @@ client.on("guildMemberUpdate", async (old, current) => {
   if (current.partial) {
     current = await current.fetch();
   }
+
+  if (!enabled(current.guild.id)) return;
 
   const embed = makeEmbed();
 

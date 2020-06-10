@@ -54,8 +54,8 @@ addMessageHandler(async (message) => {
   if (!message.guild) return false;
   if (message.guild.id != "310820885240217600") return false;
 
-  const ID = config("regret.id");
-  const names = config("regret.names");
+  const ID = config("regret.id") as string;
+  const names = config("regret.names") as string[];
 
   const channel = await message.guild.channels.cache.find(
     (channel) => channel.id === ID

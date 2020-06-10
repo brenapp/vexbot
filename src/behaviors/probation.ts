@@ -6,6 +6,7 @@ import { GuildMember, Guild } from "discord.js";
 // @ts-ignore
 import parse from "parse-duration";
 import report from "../lib/report";
+import { behavior } from "../lib/access";
 
 export const TIMEOUTS: { [key: string]: NodeJS.Timeout } = {};
 
@@ -77,6 +78,12 @@ export default async function probate(
   time: string,
   reason: string
 ): Promise<void> {
+  // Check if this behavior is enabled
+  const server = behavior(member.guild.id);
+  if (!server || !server.probation) {
+    return;
+  }
+
   console.log(
     `Probate ${member} by ${by} for ${parse(time)}ms with reason ${reason}`
   );
