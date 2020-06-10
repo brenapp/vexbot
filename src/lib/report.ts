@@ -1,7 +1,7 @@
 import { Client, Message, MessageOptions } from "discord.js";
 import { authorization } from "../lib/access";
 
-const owner = authorization("discord.owner");
+const owner = authorization("discord.owner") as string;
 
 export default function report(client: Client) {
   return async (error: Error): Promise<Message> => {
