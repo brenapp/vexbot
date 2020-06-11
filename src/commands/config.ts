@@ -54,7 +54,7 @@ export const ConfigListCommand = Subcommand({
 
     for (const [behavior, value] of Object.entries(server)) {
       body += `**${behavior}**\n`;
-      body += value instanceof Array ? value.join("") : value + "\n";
+      body += (value instanceof Array ? value.join("") : value) + "\n";
     }
 
     embed.setDescription(body);
