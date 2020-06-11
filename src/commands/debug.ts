@@ -194,7 +194,7 @@ export const MachineCommand = Command({
     group: "ADMIN",
   },
 
-  check: Permissions.admin,
+  check: Permissions.owner,
   exec(message: Message) {
     const { username } = os.userInfo();
     const machine = os.hostname();
