@@ -70,7 +70,7 @@ export const TeamCommand = Command({
 
     if (!team) {
       message.reply(
-        "You didn't specify a team! Usage: `!team BCUZ` or `!team 3796B`. Optionally list a season after to get records for that seaosn"
+        "You didn't specify a team! Usage: `!team BCUZ` or `!team 3796B`. Optionally list a season after to get records for that season."
       );
       return;
     }
