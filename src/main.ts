@@ -31,7 +31,7 @@ client.on("ready", () => {
     console.log("DEV MODE ENABLED");
     client.user.setActivity("for changes", { type: "WATCHING" });
   } else {
-    client.user.setActivity("over the server", { type: "WATCHING" });
+    client.user.setActivity("for /help", { type: "WATCHING" });
   }
 
   probation.initalize();
@@ -61,6 +61,6 @@ client.on("guildCreate", async (guild) => {
   information(client)(`Added to ${guild.name}`);
 
   dm.send(
-    `Hi! I just got added onto ${guild.name}! You can use the \`/config\` command to set me up. For more information, refer to https://vexbot.bren.app/docs/ `
+    `Hi! I just got added onto ${guild.name}! You can use the \`/config\` command to set me up, and \`/help\` to see what I can do. For more information, refer to https://vexbot.bren.app/docs/ `
   );
 });
