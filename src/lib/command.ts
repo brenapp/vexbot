@@ -135,7 +135,7 @@ export function Group(
 export const RESPONSES = new Map<Message, Message>();
 
 // Commands that are disabled go here
-export const DISABLED = new Map<Guild, CommandConfiguration[]>();
+export const DISABLED = new Map<Guild, Set<CommandConfiguration>>();
 
 /**
  * Actually handles the commands we send
@@ -180,10 +180,7 @@ export async function handle(
   if (message.guild) {
     const disabledCommands = DISABLED.get(message.guild);
 
-    if (
-      disabledCommands &&
-      disabledCommands.find((cmd) => cmd.names.includes(command.names[0]))
-    ) {
+    if (disabledCommands && disabledCommands.has(command)) {
       return false;
     }
   }

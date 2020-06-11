@@ -1,4 +1,9 @@
-import Command, { DISABLED, Permissions, REGISTRY } from "../lib/command";
+import Command, {
+  DISABLED,
+  Permissions,
+  REGISTRY,
+  CommandConfiguration,
+} from "../lib/command";
 import { Message, TextChannel } from "discord.js";
 
 /**
@@ -65,6 +70,14 @@ export const DisableCommand = Command({
   },
 
   exec(message: Message, commands: string[]) {
+    if (!message.guild) return;
+
+    let disabled = DISABLED.get(message.guild);
+    if (!disabled) {
+      disabled = new Set<CommandConfiguration>();
+      DISABLED.set(message.guild, disabled);
+    }
+
     for (const command of commands) {
       const config = REGISTRY.get(command);
 
@@ -72,7 +85,7 @@ export const DisableCommand = Command({
         return message.channel.send(`Could not find command \`${command}\`!`);
       }
 
-      DISABLED.add(config);
+      disabled.add(config);
     }
 
     return message.channel.send(`Disabled ${commands.length} command(s)!`);
@@ -90,6 +103,14 @@ export const EnableCommand = Command({
   },
 
   exec(message: Message, commands: string[]) {
+    if (!message.guild) return;
+
+    let disabled = DISABLED.get(message.guild);
+    if (!disabled) {
+      disabled = new Set<CommandConfiguration>();
+      DISABLED.set(message.guild, disabled);
+    }
+
     for (const command of commands) {
       const config = REGISTRY.get(command);
 
@@ -97,7 +118,7 @@ export const EnableCommand = Command({
         return message.channel.send(`Could not find command \`${command}\`!`);
       }
 
-      DISABLED.delete(config);
+      disabled.delete(config);
     }
 
     return message.channel.send(`Enabled ${commands.length} command(s)!`);
