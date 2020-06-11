@@ -1,5 +1,6 @@
 import Command, { Permissions } from "../lib/command";
 import { Message } from "discord.js";
+import { findOrMakeRole } from "../behaviors/verify";
 
 export const GrantCommand = Command({
   names: ["grant"],
@@ -16,12 +17,7 @@ export const GrantCommand = Command({
     }
 
     const name = args.slice(message.mentions.members.size).join(" ");
-    const roles = await message.guild.roles.fetch();
-    const role = roles.cache.find((r) => r.name === name);
-
-    if (!role) {
-      return message.channel.send("Can't find that role!");
-    }
+    const role = await findOrMakeRole(name, message.guild);
 
     message.mentions.members.forEach((member) => member.roles.add(role));
   },

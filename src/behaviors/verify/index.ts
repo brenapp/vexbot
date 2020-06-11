@@ -10,7 +10,8 @@ export async function findOrMakeRole(
   name: string,
   guild: Guild
 ): Promise<Role> {
-  const role = guild.roles.cache.find((role) => role.name === name);
+  const roles = await guild.roles.fetch();
+  const role = roles.cache.find((role) => role.name === name);
 
   return role
     ? Promise.resolve(role)
