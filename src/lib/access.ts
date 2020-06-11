@@ -24,8 +24,23 @@ export interface ServerConfiguration {
 // Get custom behavior for the specified guild
 export async function behavior(guild: string) {
   const store = await keya.store<ServerConfiguration>("serverconfig");
+  const defaultConfig: ServerConfiguration = {
+    "event-log": false,
+    prefixes: ["!", "/"],
+    verify: false,
+    "server-log": false,
+    probation: false,
+  };
 
-  return store.get(guild);
+  // Make sure the configuration exists and has all of the requisite settings
+  const current = await store.get(guild);
+  const updated: ServerConfiguration = { ...defaultConfig, ...current };
+
+  if (JSON.stringify(current) !== JSON.stringify(updated)) {
+    await store.set(guild, updated);
+  }
+
+  return updated;
 }
 
 export async function setBehavior(
