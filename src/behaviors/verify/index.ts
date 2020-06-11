@@ -6,8 +6,12 @@ import * as vexdb from "vexdb";
 import approve from "./approve";
 import { behavior } from "../../lib/access";
 
-export function findOrMakeRole(name: string, guild: Guild): Promise<Role> {
-  const role = guild.roles.resolve(name);
+export async function findOrMakeRole(
+  name: string,
+  guild: Guild
+): Promise<Role> {
+  const role = guild.roles.cache.find((role) => role.name === name);
+
   return role
     ? Promise.resolve(role)
     : guild.roles.create({ data: { name, mentionable: true } });
