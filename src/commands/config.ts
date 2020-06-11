@@ -57,6 +57,9 @@ export const ConfigListCommand = Subcommand({
       body += (value instanceof Array ? value.join("") : value) + "\n";
     }
 
+    body +=
+      "\nFor more information about these properties, go to https://vexbot.bren.app/docs/";
+
     embed.setDescription(body);
 
     return message.channel.send({ embed });
@@ -114,7 +117,7 @@ export const ConfigSetCommand = Subcommand({
       }
 
       return message.channel.send(
-        `Invalid setting value. Refer to documentation at https://vexbot.bren.app`
+        `Invalid setting value. Refer to documentation at https://vexbot.bren.app/docs/`
       );
     }
 
