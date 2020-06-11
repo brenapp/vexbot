@@ -94,7 +94,10 @@ export const ConfigSetCommand = Subcommand({
     group: "META",
   },
 
-  async exec(message: Message, [setting, value]: [string, string]) {
+  async exec(
+    message: Message,
+    [setting, value]: [keyof ServerConfiguration, string]
+  ) {
     if (!message.guild) {
       return;
     }
@@ -121,7 +124,15 @@ export const ConfigSetCommand = Subcommand({
       );
     }
 
-    await setBehavior(guild.id, { [setting]: value });
+    // Final processing
+    let set: string | boolean = value;
+
+    // Turn boolean strings into just booleans
+    if (validators[setting] === booleanValue) {
+      set = value === "true";
+    }
+
+    await setBehavior(guild.id, { [setting]: set });
     return ConfigListCommand.exec(message, []);
   },
 });
