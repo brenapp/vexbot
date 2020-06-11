@@ -1,4 +1,10 @@
-import { Message, MessageEmbed, TextChannel, PartialMessage } from "discord.js";
+import {
+  Message,
+  MessageEmbed,
+  TextChannel,
+  PartialMessage,
+  Guild,
+} from "discord.js";
 import { authorization, config, behavior } from "./access";
 import report from "./report";
 
@@ -129,7 +135,7 @@ export function Group(
 export const RESPONSES = new Map<Message, Message>();
 
 // Commands that are disabled go here
-export const DISABLED = new Set<CommandConfiguration>();
+export const DISABLED = new Map<Guild, CommandConfiguration[]>();
 
 /**
  * Actually handles the commands we send
@@ -149,7 +155,8 @@ export async function handle(
   if (
     !process.env["DEV"] &&
     server &&
-    !server.prefixes.includes(message.content[0])
+    !server.prefixes.includes(message.content[0]) &&
+    message.content[0] !== PREFIX[0]
   )
     return false;
 
@@ -170,10 +177,15 @@ export async function handle(
     return false;
   }
 
-  // Check if the command is disabled
-  const disabled = DISABLED.has(command);
-  if (disabled && !Permissions.owner(message)) {
-    return false;
+  if (message.guild) {
+    const disabledCommands = DISABLED.get(message.guild);
+
+    if (
+      disabledCommands &&
+      disabledCommands.find((cmd) => cmd.names.includes(command.names[0]))
+    ) {
+      return false;
+    }
   }
 
   // See if the command is allowed to be used by the permission system
