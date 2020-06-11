@@ -1,6 +1,11 @@
 import Command, { Permissions, Subcommand, Group } from "../lib/command";
 import { Message } from "discord.js";
-import { behavior, setBehavior } from "../lib/access";
+import {
+  behavior,
+  setBehavior,
+  ServerConfiguration,
+  config,
+} from "../lib/access";
 import { makeEmbed } from "../lib/util";
 
 const check = Permissions.any(
@@ -49,7 +54,7 @@ export const ConfigListCommand = Subcommand({
 
     for (const [behavior, value] of Object.entries(server)) {
       body += `**${behavior}**\n`;
-      body += value + "\n";
+      body += value instanceof Array ? value.join("") : value + "\n";
     }
 
     embed.setDescription(body);
@@ -57,6 +62,20 @@ export const ConfigListCommand = Subcommand({
     return message.channel.send({ embed });
   },
 });
+
+const validPrefixes = config("prefix.prod") as string[];
+
+const bool = (setting: string) => setting === "true" || setting === "false";
+const validators: {
+  [P in keyof ServerConfiguration]: (setting: string) => boolean;
+} = {
+  "event-log": bool,
+  "server-log": bool,
+  verify: bool,
+  probation: bool,
+  prefixes: (setting) =>
+    setting.split("").every((s) => validPrefixes.includes(s)),
+};
 
 export const ConfigSetCommand = Subcommand({
   names: ["set"],
@@ -72,7 +91,7 @@ export const ConfigSetCommand = Subcommand({
     if (!message.guild) {
       return;
     }
-    const settings = ["server-log", "probation", "event-log", "verify"];
+    const settings = Object.keys(validators);
     const guild = message.guild;
 
     if (!setting || !settings.includes(setting)) {
@@ -81,9 +100,17 @@ export const ConfigSetCommand = Subcommand({
       );
     }
 
-    if (value !== "true" && value !== "false") {
+    const valid = validators[setting as keyof ServerConfiguration](value);
+
+    if (!valid) {
+      if (setting === "prefixes") {
+        return message.channel.send(
+          `Acceptable possible prefixes are ${validPrefixes.join("")}`
+        );
+      }
+
       return message.channel.send(
-        `Unknown setting value. Use true to enable or false to disable`
+        `Invalid setting value. Refer to documentation at https://vexbot.bren.app`
       );
     }
 

@@ -13,11 +13,12 @@ export function config(access: string | string[]) {
   return delve(file, access) as unknown;
 }
 
-interface ServerConfiguration {
-  "server-log"?: boolean;
-  probation?: boolean;
-  "event-log"?: boolean;
-  verify?: boolean;
+export interface ServerConfiguration {
+  "server-log": boolean;
+  probation: boolean;
+  "event-log": boolean;
+  verify: boolean;
+  prefixes: string[];
 }
 
 // Get custom behavior for the specified guild
@@ -38,6 +39,7 @@ export async function setBehavior(
     probation: false,
     "event-log": false,
     verify: false,
+    prefixes: ["!", "/"],
   };
   const updated = { ...old, ...config };
 

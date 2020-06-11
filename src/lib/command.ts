@@ -1,5 +1,5 @@
 import { Message, MessageEmbed, TextChannel, PartialMessage } from "discord.js";
-import { authorization, config } from "./access";
+import { authorization, config, behavior } from "./access";
 import report from "./report";
 
 const owner = authorization("discord.owner");
@@ -143,6 +143,15 @@ export async function handle(
   }
 
   if (!isCommand(message)) return false;
+
+  // Only respond to specific prefixes for this server (or any for DMs)
+  const server = await behavior(message.guild?.id ?? "");
+  if (
+    !process.env["DEV"] &&
+    server &&
+    !server.prefixes.includes(message.content[0])
+  )
+    return false;
 
   // Only let owners use commands in dev mode
   const owner = config("owner");
