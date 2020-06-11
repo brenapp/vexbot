@@ -105,7 +105,7 @@ export const ConfigSetCommand = Subcommand({
     if (!valid) {
       if (setting === "prefixes") {
         return message.channel.send(
-          `Acceptable possible prefixes are ${validPrefixes.join("")}`
+          `Acceptable vexbot prefixes are \`${validPrefixes.join("")}\``
         );
       }
 
