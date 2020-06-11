@@ -65,15 +65,15 @@ export const TeamCommand = Command({
 
   check: Permissions.all,
   async exec(message: Message, args: string[]) {
-    const team = args[0].toUpperCase();
-    const season = (args.slice(1).join(" ") as Seasons) || "current";
-
-    if (!team) {
+    if (!args[0]) {
       message.reply(
         "You didn't specify a team! Usage: `!team BCUZ` or `!team 3796B`. Optionally list a season after to get records for that season."
       );
       return;
     }
+
+    const team = args[0].toUpperCase();
+    const season = (args.slice(1).join(" ") as Seasons) || "current";
 
     const record = await vexdb.get("teams", { team }).then((res) => res[0]);
 
