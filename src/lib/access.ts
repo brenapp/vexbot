@@ -17,20 +17,25 @@ export interface ServerConfiguration {
   "server-log": boolean;
   probation: boolean;
   "event-log": boolean;
-  verify: boolean;
   prefixes: string[];
+
+  // Verification Settings
+  verify: boolean;
+  "team-roles": boolean;
 }
+
+const defaultConfig: ServerConfiguration = {
+  "event-log": false,
+  prefixes: ["!", "/"],
+  verify: false,
+  "team-roles": false,
+  "server-log": false,
+  probation: false,
+};
 
 // Get custom behavior for the specified guild
 export async function behavior(guild: string) {
   const store = await keya.store<ServerConfiguration>("serverconfig");
-  const defaultConfig: ServerConfiguration = {
-    "event-log": false,
-    prefixes: ["!", "/"],
-    verify: false,
-    "server-log": false,
-    probation: false,
-  };
 
   // Make sure the configuration exists and has all of the requisite settings
   const current = await store.get(guild);
@@ -49,13 +54,7 @@ export async function setBehavior(
 ) {
   const store = await keya.store<ServerConfiguration>("serverconfig");
 
-  const old = (await store.get(guild)) ?? {
-    "server-log": false,
-    probation: false,
-    "event-log": false,
-    verify: false,
-    prefixes: ["!", "/"],
-  };
+  const old = (await store.get(guild)) ?? defaultConfig;
   const updated = { ...old, ...config };
 
   return store.set(guild, updated);

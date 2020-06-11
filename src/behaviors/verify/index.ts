@@ -87,38 +87,47 @@ export default async function verify(
   );
 
   // Actual verification process
-  const roles = ["310902227160137730"]; // Verified
+  const roles = [await findOrMakeRole("Verified", member.guild)]; // Verified
 
   if (!override) {
     const teaminfo = (await vexdb.get("teams", { team }))[0];
     if (roleString !== "ALUMNI") {
       // Program
       if (teaminfo.program == "VEXU") {
-        roles.push("377219725442154526"); // VEXU
+        roles.push(await findOrMakeRole("VEXU", member.guild)); // VEXU
       } else if (teaminfo.grade == "Middle School") {
-        roles.push("376489822598201347"); // Middle School
+        roles.push(await findOrMakeRole("Middle School", member.guild)); // Middle School
       } else {
-        roles.push("376489878700949515"); // High School
+        roles.push(await findOrMakeRole("High School", member.guild)); // High School
       }
     }
 
-    if (teaminfo.region === "South Carolina") {
+    // Team Roles (VTOSC specific)
+    if (member.guild.id === "310820885240217600" && server["team-roles"]) {
+      if (teaminfo.region === "South Carolina") {
+        const teamRole = await findOrMakeRole(team.toUpperCase(), member.guild);
+        roles.push(teamRole); // Team Role
+      } else {
+        roles.push(await findOrMakeRole("Not SC Team", member.guild)); // Not SC Team
+      }
+
+      // General Team Roles (other servers if enabled)
+    } else if (server["team-roles"]) {
       const teamRole = await findOrMakeRole(team.toUpperCase(), member.guild);
-      roles.push(teamRole.id); // Team Role
-    } else {
-      roles.push("387074517408808970"); // Not SC Team
+      roles.push(teamRole);
     }
   }
 
+  // Additional roles for Alum/Mentor
   switch (roleString) {
     case "MEMBER":
       break;
     case "ALUMNI":
-      roles.push("329760448020873229");
-      break; // Alumnus
+      roles.push(await findOrMakeRole("Alumni", member.guild));
+      break;
     case "MENTOR":
-      roles.push("329760518334054402");
-      break; // Mentor
+      roles.push(await findOrMakeRole("Mentor", member.guild));
+      break;
   }
 
   const approved = await approve(member, name, team, teams, roles);
@@ -127,6 +136,7 @@ export default async function verify(
     member.setNickname(`${name} | ${team}`);
     member.roles.add(roles);
   } else {
+    // Make a new invite for them to join back
     const invite = await member.guild.channels.cache
       .sort((a, b) => b.calculatedPosition - a.calculatedPosition)
       .first()

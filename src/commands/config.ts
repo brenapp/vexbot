@@ -65,14 +65,18 @@ export const ConfigListCommand = Subcommand({
 
 const validPrefixes = config("prefix.prod") as string[];
 
-const bool = (setting: string) => setting === "true" || setting === "false";
+const booleanValue = (setting: string) =>
+  setting === "true" || setting === "false";
+
 const validators: {
   [P in keyof ServerConfiguration]: (setting: string) => boolean;
 } = {
-  "event-log": bool,
-  "server-log": bool,
-  verify: bool,
-  probation: bool,
+  "event-log": booleanValue,
+  "server-log": booleanValue,
+  verify: booleanValue,
+  "team-roles": booleanValue,
+  probation: booleanValue,
+
   prefixes: (setting) =>
     setting.split("").every((s) => validPrefixes.includes(s)),
 };

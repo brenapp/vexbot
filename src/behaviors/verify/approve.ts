@@ -5,6 +5,7 @@ import {
   Message,
   User,
   MessageReaction,
+  Role,
 } from "discord.js";
 
 export default async function approve(
@@ -12,14 +13,14 @@ export default async function approve(
   name: string,
   team: string,
   additionalTeams: string,
-  roles: string[]
+  roles: Role[]
 ): Promise<boolean> {
   const embed = new MessageEmbed()
     .setAuthor(member.user.username, member.user.avatarURL() ?? undefined)
     .setTitle(`Verification for ${name}`)
     .setDescription(
       `${member} \n Requested Roles: ${roles
-        .map((role) => member.guild.roles.cache.get(role)?.toString())
+        .map((role) => role.toString())
         .join(", ")}`
     )
     .addField("Primary Team", team)
