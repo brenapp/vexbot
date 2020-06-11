@@ -1,22 +1,67 @@
 <div align="center">
   <br />
   <p>
-    <a href="https://discord.gg/W9EcfQW"><img src="https://cdn.discordapp.com/icons/310820885240217600/5c40b50a159efa10dfff51f99e14a2e0.png" width="130" alt="vexbot" style="border-radius: 100%"/></a>
+    <a href="https://vexbot.bren.app/"><img src="./vexbot.png" width="130" alt="vexbot" style="border-radius: 100%"/></a>
   </p>
   <p>
     <a href="https://discord.gg/W9EcfQW"><img src="https://discordapp.com/api/guilds/310820885240217600/embed.png" alt="VEX Teams of South Carolina" /></a>
   </p>
 </div>
 
-`vexbot` is a Discord bot to help VEX Teams of South Carolina with various mundane admin tasks, as well as serve as a tool for scouting, event information, volunteer coordination and more.
+> ### Vexbot Public Release
 
-## Features
+> `vexbot` is now available on any discord server! For more information, and to add it to your server, go to https://vexbot.bren.app
 
-- [x] Automatic Verification Tool with Moderator Approval
-- [x] Event Volunteer board with integration to Google Forms
-- [x] Eliza conversation algorithm
-- [x] Automatic Update system on recieved push
-- [x] Custom Command System
-- [x] Message and Event tracking
-- [x] `team` command to get information about teams
-- [x] `events` command to get information about events
+`vexbot` is a discord bot for vex robotics discord servers.
+
+# Commands
+
+### META
+
+- `/ping`
+- `/help` Lists all commands and usage
+- `/config` Utilites for managing the server configuration /config
+  - `/config list` Shows this server's configuration
+  - `/config set` Set a configuration for this server /config set server-log true
+    leaderboard Lists people by their number of messages posted /leaderboard
+    tally Tallies the leaderboard /tally
+
+### ADMIN
+
+- `/probate` or `/dq` Puts listed members on probation
+- `/grant` Grants the user a role
+- `/vanity` Creates a vanity role
+- `/purge` Mass delete messages in a channel
+- `/lock` Locks the channel
+- `/unlock` Unlocks the channel
+- `/disable` Disables vexbot commands in your server
+- `/enable`/ Enables vexbot commands in your server
+
+### VEX
+
+- `/events` Lists events in a given region
+- `/team` Lists team record for this season /team 3796B
+- `/winrates` Calcuates winrates leaderboard for the given region
+  `/qna` Utilites to manage official Q&A questions
+  - `/qna ask` Links to the form to ask a Q&A
+  - `/qna search` Searches the Q&A for the specified search term
+  - `/qna moniter` or `/qna sub` Notifies you when the specified qna gets answered
+
+### HELPER
+
+- `/poll` or `/question` Simple reaction polls
+- `/roll` Rolls dice using 3d6+2 format
+- `/latex` or `/math` Outputs latex images from the given input
+
+and more!
+
+# Behaviors
+
+- Automatic Verification System
+- Message / Event Logging
+- Probation
+- Continous Deployment
+
+### Documentation
+
+If you need help setting up vexbot for your server, please refer to https://vexbot.bren.app/docs/
