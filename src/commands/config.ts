@@ -138,7 +138,9 @@ export const ConfigCommand = Command({
   },
 
   check,
-  exec: Group(subcommands),
+
+  // Group command, listing the current config when nothing else matches
+  exec: Group(subcommands, ConfigListCommand.exec),
   subcommands,
 
   fail(message: Message) {

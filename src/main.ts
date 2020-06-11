@@ -48,3 +48,17 @@ process.on("uncaughtException", (e) => (DEBUG ? reporter(e) : null));
 process.on("unhandledRejection", (e) => (DEBUG ? reporter(e) : null));
 
 client.on("message", handleMessage);
+
+// When the bot is added, message the owner with a link on how to set me up
+client.on("guildCreate", async (guild) => {
+  if (!guild.available) return;
+
+  const owner = guild.owner;
+  if (!owner) return;
+
+  const dm = await owner.createDM();
+
+  dm.send(
+    `Hi! I just got added onto ${guild.name}! You can use the \`/config\` command to set me up. For more information, refer to https://vexbot.bren.app/docs/ `
+  );
+});
