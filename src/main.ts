@@ -58,6 +58,8 @@ client.on("guildCreate", async (guild) => {
 
   const dm = await owner.createDM();
 
+  information(client)(`Added to ${guild.name}`);
+
   dm.send(
     `Hi! I just got added onto ${guild.name}! You can use the \`/config\` command to set me up. For more information, refer to https://vexbot.bren.app/docs/ `
   );
