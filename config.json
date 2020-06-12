@@ -4,6 +4,9 @@
     "dev": ["."],
     "prod": ["/", "!", "-", "[", "]", "?", ":", "*", "^", "&", "$", "#"]
   },
+  "memory": {
+    "cleanInterval": 300000
+  },
   "leaderboard": {
     "titles": {
       "Secret Top Tier": "messages",
