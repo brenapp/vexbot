@@ -15,3 +15,4 @@ import "./roll";
 import "./latex";
 import "./qna";
 import "./config";
+import "./skills";
