@@ -92,8 +92,6 @@ async function teamRecord(
 
   embed.setDescription(body);
 
-  console.log(body);
-
   return embed;
 }
 
