@@ -18,7 +18,7 @@ export const PREFIX = (process.env["DEV"]
  * @param message
  */
 export function isCommand(message: Message): boolean {
-  return PREFIX.includes(message.content[0]);
+  return PREFIX.includes(message.content[0]) && message.content.length > 1;
 }
 
 export type CommandResult = Promise<Message | Message[] | void> | void;
