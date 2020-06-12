@@ -65,11 +65,10 @@ client.on("guildCreate", async (guild) => {
   );
 });
 
-// Memory Management (sweep old messages out)
-
+// Don't store messages for longer than the cleanInterval
 const cleanInterval = config("memory.cleanInterval") as number;
 setInterval(() => {
-  const cleaned = client.sweepMessages();
+  const cleaned = client.sweepMessages(cleanInterval);
   console.log(`Cleared ${cleaned} messages from cache`);
 }, cleanInterval);
 
