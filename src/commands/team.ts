@@ -1,6 +1,9 @@
 import { Message } from "discord.js";
 import * as vexdb from "vexdb";
-import { MatchesResponseObject } from "vexdb/out/constants/ResponseObjects";
+import {
+  MatchesResponseObject,
+  TeamsResponseObject,
+} from "vexdb/out/constants/ResponseObjects";
 import Command, { Permissions } from "../lib/command";
 import { makeEmbed } from "../lib/util";
 import { Seasons } from "vexdb/out/constants/RequestObjects";
@@ -168,16 +171,26 @@ export const WinRateRankingCommand = Command({
       { split: false }
     );
 
-    // Get all their matches
-    const teamMatches = await Promise.all(
-      teams.map(async (team) => ({
-        team,
-        matches: await vexdb.get("matches", {
-          team: team.number,
-          season: "current",
-        }),
-      }))
-    );
+    let teamMatches: {
+      team: TeamsResponseObject;
+      matches: MatchesResponseObject[];
+    }[];
+    try {
+      // Get all their matches
+      teamMatches = await Promise.all(
+        teams.map(async (team) => ({
+          team,
+          matches: await vexdb.get("matches", {
+            team: team.number,
+            season: "current",
+          }),
+        }))
+      );
+    } catch (e) {
+      return message.channel.send(
+        "Could not get all team data. Perhaps this region is too large?"
+      );
+    }
 
     const records = teamMatches
       .map(({ team, matches }) => buildRecord(team.number, matches))
