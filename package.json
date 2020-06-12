@@ -43,8 +43,9 @@
     "typescript": "^3.9.2"
   },
   "scripts": {
-    "start": "tsc && yarn eslint ./src --fix --ext .ts && node out/main.js",
+    "start": "tsc && node out/main.js",
     "build": "tsc",
+    "lint": "yarn eslint ./src --fix --ext .ts",
     "dev": "node ./node_modules/nodemon/bin/nodemon.js",
     "snyk-protect": "snyk protect",
     "prepublish": "npm run snyk-protect"
