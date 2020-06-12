@@ -1,4 +1,5 @@
 import { handleMessage } from "./lib/message";
+import { config } from "./lib/access";
 import report, { information } from "./lib/report";
 import { client } from "./client";
 
@@ -64,3 +65,13 @@ client.on("guildCreate", async (guild) => {
     `Hi! I just got added onto ${guild.name}! You can use the \`/config\` command to set me up, and \`/help\` to see what I can do. For more information, refer to https://vexbot.bren.app/docs/ `
   );
 });
+
+// Memory Management (sweep old messages out)
+
+const cleanInterval = config("memory.cleanInterval") as number;
+setInterval(() => {
+  const cleaned = client.sweepMessages();
+  console.log(`Cleared ${cleaned} messages from cache`);
+}, cleanInterval);
+
+console.log(`Cleaning up cache every ${cleanInterval / 1000}s`);
