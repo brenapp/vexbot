@@ -1,5 +1,5 @@
 import Command, { Permissions, Subcommand, Group } from "../lib/command";
-import { Message } from "discord.js";
+import { Message, Guild } from "discord.js";
 import {
   behavior,
   setBehavior,
@@ -7,11 +7,9 @@ import {
   config,
 } from "../lib/access";
 import { makeEmbed } from "../lib/util";
+import { client } from "../client";
 
-const check = Permissions.any(
-  Permissions.admin,
-  Permissions.compose(Permissions.owner, Permissions.guild)
-);
+const check = Permissions.any(Permissions.admin, Permissions.owner);
 
 export const ConfigListCommand = Subcommand({
   names: ["list"],
@@ -23,12 +21,24 @@ export const ConfigListCommand = Subcommand({
     group: "META",
   },
 
-  async exec(message: Message) {
-    if (!message.guild) {
+  async exec(message: Message, [passedGuild]: string[]) {
+    let guild: Guild;
+
+    if (passedGuild) {
+      if (!Permissions.owner(message))
+        return message.channel.send(
+          "Cannot access other guild configuration files"
+        );
+
+      const g = client.guilds.cache.get(passedGuild);
+
+      if (!g) return message.channel.send("Cannot access that guild");
+      guild = g;
+    } else if (message.guild) {
+      guild = message.guild;
+    } else {
       return;
     }
-
-    const guild = message.guild;
 
     const server = await behavior(guild.id);
 
@@ -137,7 +147,27 @@ export const ConfigSetCommand = Subcommand({
   },
 });
 
-const subcommands = [ConfigListCommand, ConfigSetCommand];
+export const ConfigAllCommand = Subcommand({
+  names: ["all"],
+  check,
+
+  documentation: {
+    description: "Shows all server configurations",
+    usage: "list",
+    group: "META",
+    hidden: true,
+  },
+
+  async exec(message: Message) {
+    const guilds = client.guilds.cache.values();
+
+    for (const guild of guilds) {
+      ConfigListCommand.exec(message, [guild.id]);
+    }
+  },
+});
+
+const subcommands = [ConfigListCommand, ConfigSetCommand, ConfigAllCommand];
 
 export const ConfigCommand = Command({
   names: ["config"],
