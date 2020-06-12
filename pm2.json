@@ -3,7 +3,8 @@
     {
       "name": "vexbot",
       "script": "yarn",
-      "args": "start"
+      "args": "start",
+      "max_memory_restart": "150M"
     }
   ]
 }
