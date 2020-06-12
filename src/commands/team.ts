@@ -160,33 +160,13 @@ export const WinRateRankingCommand = Command({
   check: Permissions.all,
   async exec(message: Message, args: string[]) {
     // Get all the teams in the region
-    const region = args[0] || "South Carolina";
-    const season = (args[1] || "current") as Seasons;
+    const region = args.join(" ");
     const teams = await vexdb.get("teams", { region });
 
-    const seasons = [
-      "CHANGE UP",
-      "TOWER TAKEOVER",
-      "TURNING POINT",
-      "IN THE ZONE",
-      "STARSTRUCK",
-      "NOTHING BUT NET",
-      "SKYRISE",
-      "TOSS UP",
-      "SACK ATTACK",
-      "GATEWAY",
-      "ROUND UP",
-      "CLEAN SWEEP",
-      "ELEVATION",
-      "BRIDGE BATTLE",
-      "CURRENT",
-    ];
-
-    if (!season.includes(season.toUpperCase())) {
-      return message.channel.send(
-        `Unknown season ${season}. Valid seasons are ${seasons.join(", ")}`
-      );
-    }
+    const waiting = await message.channel.send(
+      `Calculating winrates for ${region}...`,
+      { split: false }
+    );
 
     // Get all their matches
     const teamMatches = await Promise.all(
@@ -194,7 +174,7 @@ export const WinRateRankingCommand = Command({
         team,
         matches: await vexdb.get("matches", {
           team: team.number,
-          season,
+          season: "current",
         }),
       }))
     );
@@ -224,6 +204,6 @@ export const WinRateRankingCommand = Command({
       );
     }
 
-    return message.channel.send({ embed });
+    return waiting.edit({ embed });
   },
 });
