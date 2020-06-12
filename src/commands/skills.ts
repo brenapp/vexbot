@@ -60,7 +60,7 @@ async function teamRecord(
   let body = `**Records** (May not include VEXU skills runs at VRC events)\n`;
 
   const skills = await vexdb.get("skills", {
-    season: "Tower Takeover",
+    season: "current",
     team: team.number,
   });
 
@@ -187,7 +187,7 @@ export const SkillsCommand = Command({
 
       const events = await vexdb.get("events", {
         program: "VEXU",
-        season: "Tower Takeover",
+        season: "current",
       });
       const skillsData = await getSkillsAtEvents(events.map((r) => r.sku));
 
@@ -200,7 +200,7 @@ export const SkillsCommand = Command({
 
       const events = await vexdb.get("events", {
         region: teamOrRegion,
-        season: "Tower Takeover",
+        season: "current",
       });
 
       if (events.length < 1) {
