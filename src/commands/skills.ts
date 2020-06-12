@@ -156,7 +156,7 @@ export const SkillsCommand = Command({
 
   documentation: {
     description: "Gets skills rankings for teams or regions",
-    usage: `skills BCUZ or ${PREFIX[0]}skills South Carolina`,
+    usage: `skills BCUZ or ${PREFIX[0]}skills South Carolina or ${PREFIX[0]}skills VEXU`,
     group: "VEX",
   },
 
