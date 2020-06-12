@@ -13,7 +13,6 @@ import "./behaviors/random";
 import "./behaviors/eliza";
 import "./behaviors/restart";
 import "./behaviors/elo";
-import "./behaviors/nickname";
 import * as probation from "./behaviors/probation";
 
 // Commands and message handlers
