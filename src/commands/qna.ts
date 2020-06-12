@@ -243,6 +243,9 @@ export const MoniterQNACommand = Subcommand({
 });
 
 setInterval(async () => {
+  // Don't check for Q&A in dev mode
+  if (process.env["DEV"]) return;
+
   console.log("Checking for Q&A answers");
 
   const store = await getStore();
