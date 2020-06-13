@@ -17,6 +17,17 @@
       "env": {
         "DEV": "true"
       }
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Start Bot (PRODUCTION)",
+      "program": "${workspaceFolder}\\src\\main.ts",
+      "preLaunchTask": "npm: build",
+      "sourceMaps": true,
+      "smartStep": true,
+      "internalConsoleOptions": "openOnSessionStart",
+      "outFiles": ["${workspaceFolder}/out/**/*.js"]
     }
   ]
 }
