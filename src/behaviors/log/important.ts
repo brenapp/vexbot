@@ -18,8 +18,10 @@ import listen from "../../lib/reactions";
 import { behavior } from "../../lib/access";
 
 // Notify #event-log about important events
-function serverlog(guild: Guild): TextChannel {
-  return guild.channels.resolve("event-log") as TextChannel;
+function eventlog(guild: Guild): TextChannel | undefined {
+  return guild.channels.cache.find(
+    (channel) => channel.name === "event-log" && channel.type === "text"
+  ) as TextChannel | undefined;
 }
 
 async function enabled(guild: string) {
@@ -69,7 +71,7 @@ async function handleVeto(
 }
 
 // Administrative
-client.on("guildBanAdd", async (guild: Guild, user: User | PartialUser) => {
+client.on("guildBanAdd", async (guild, user) => {
   if (process.env["DEV"]) return;
   if (!(await enabled(guild.id))) return;
 
@@ -77,9 +79,11 @@ client.on("guildBanAdd", async (guild: Guild, user: User | PartialUser) => {
     user = await user.fetch();
   }
 
-  user = user as User;
+  const log = eventlog(guild);
 
-  const log = serverlog(guild);
+  if (!log) {
+    return;
+  }
 
   const embed = makeEmbed();
 
@@ -114,7 +118,11 @@ client.on("guildBanRemove", async (guild: Guild, user: User | PartialUser) => {
     user = await user.fetch();
   }
 
-  const log = serverlog(guild);
+  const log = eventlog(guild);
+
+  if (!log) {
+    return;
+  }
 
   const embed = makeEmbed();
 
@@ -151,7 +159,11 @@ client.on(
 
     if (!(await enabled(member.guild.id))) return;
 
-    const log = serverlog(member.guild);
+    const log = eventlog(member.guild);
+
+    if (!log) {
+      return;
+    }
 
     const embed = makeEmbed();
 
@@ -167,7 +179,11 @@ client.on(
 // User changes/actions
 client.on("guildMemberUpdate", async (old, current) => {
   if (process.env["DEV"]) return;
-  const log = serverlog(old.guild);
+  const log = eventlog(old.guild);
+
+  if (!log) {
+    return;
+  }
 
   if (old.partial) {
     old = await old.fetch();
