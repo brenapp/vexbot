@@ -1,7 +1,7 @@
 import { addMessageHandler } from "../lib/message";
 import { client } from "../client";
 
-import { isCommand, PREFIX } from "../lib/command";
+import { PREFIX } from "../lib/command";
 import { TextChannel, ClientUser } from "discord.js";
 import { config } from "../lib/access";
 
