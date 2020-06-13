@@ -103,6 +103,6 @@ client.on("messageUpdate", async (old, current) => {
   log.send(
     `${old.author.username}#${
       old.author.discriminator
-    } in ${old.channel.toString()}: ${old.content.toString()} => ${current.content.toString()}`
+    } in ${old.channel.toString()}: ${old.content.toString()} → ${current.content.toString()}`
   );
 });
