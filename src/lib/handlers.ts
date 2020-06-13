@@ -8,16 +8,16 @@ import { config } from "./access";
 
 const prod = config("prefix.prod") as string[];
 
+// Dismiss messages from a bot, we don't take their kind around here!
+addMessageHandler((message) => message.author.bot);
+
 // Dismiss production commands when in DEV mode
 addMessageHandler(
   (message) =>
     process.env["DEV"] !== undefined && prod.includes(message.content[0])
 );
 
-// Dismiss messages from a bot, we don't take their kind around here!
-addMessageHandler((message) => message.author.bot);
-
-// Commands
+// Handle all commands (using own function)
 addMessageHandler(handle);
 
 // Command editing
