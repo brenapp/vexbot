@@ -92,7 +92,6 @@ export const EventsCommand = Command({
 
     let params: EventsRequestObject = {
       season: "current",
-      status: ["future", "current"],
     };
 
     // Special cases
