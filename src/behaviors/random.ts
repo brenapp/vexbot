@@ -1,7 +1,7 @@
 import { addMessageHandler } from "../lib/message";
 import { client } from "../client";
 
-import { isCommand } from "../lib/command";
+import { isCommand, PREFIX } from "../lib/command";
 import { TextChannel, ClientUser } from "discord.js";
 import { config } from "../lib/access";
 
@@ -49,7 +49,7 @@ addMessageHandler((message) => {
 
 // Rename #regret to something random
 addMessageHandler(async (message) => {
-  if (!isCommand(message)) return false;
+  if (!PREFIX.includes(message.content)) return false;
 
   if (!message.guild) return false;
   if (message.guild.id != "310820885240217600") return false;
