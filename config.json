@@ -9,17 +9,7 @@
   },
   "leaderboard": {
     "titles": {
-      "Secret Top Tier": "messages",
-      "People With No Lives": "hours on VTOSC",
-      "VEX Gods": "red trophies",
-      "Banhammer Incoming": "illegal messages",
-      "IQ Scores": "points",
-      "Programming Wizards": "pt autonomous",
-      "Highest Build Quality": "halfcuts",
-      "Best Head Refs": "dqs",
-      "Poking the Beehive": "posts on VF",
-      "Tournaments 'Won'": "bo1'd matches",
-      "People Annoying Zach": "illegal mentions"
+      "Leaderboard": "messages"
     }
   },
   "regret": {
