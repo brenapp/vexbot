@@ -21,8 +21,8 @@ export const PollCommand = Command({
   names: ["poll", "question"],
 
   documentation: {
-    usage: `poll "What Should I Name My Dog" Spot, Murphy, Alice, "I don't care"`,
-    description: "Simple Option Polling",
+    usage: `poll 5m "What Should I Name My Dog" Spot Murphy Alice "I don't care"`,
+    description: "Reaction based poll.",
     group: "HELPER",
   },
 
@@ -43,7 +43,9 @@ export const PollCommand = Command({
       .setAuthor(invoker, message.author.avatarURL() ?? undefined)
       .setTitle(`Poll: ${question}`);
 
-    let description = `This poll ends at ${ends.toLocaleString()}. \n`;
+    let description = `This poll ends at ${
+      ends.toTimeString().split(" ")[0]
+    }. \n`;
     description += `*${invoker} can end the poll immediately by reacting with ✅* \n\n`;
 
     for (const [i, option] of Object.entries(options)) {
