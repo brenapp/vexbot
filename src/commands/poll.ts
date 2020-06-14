@@ -6,13 +6,14 @@
  *
  */
 
-import { Message, MessageReaction, MessageEmbed, Guild } from "discord.js";
+import { Message, MessageReaction, User } from "discord.js";
 import Command, { Permissions } from "../lib/command";
 import { makeEmbed } from "../lib/util";
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import parse from "parse-duration";
+import { client } from "../client";
 
 // Reactions
 const emoji = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"];
@@ -33,20 +34,30 @@ export const PollCommand = Command({
       return message.channel.send("You cannot have more than 10 options!");
     }
 
+    // Only accept unique results
+    if (options.some((value, index, array) => array.indexOf(value) !== index)) {
+      return message.channel.send(
+        `All options must be unique! Current options are \`${options.join(
+          "`, `"
+        )}\``
+      );
+    }
+
     // Poll duration
     const time = parse(duration);
     const ends = new Date(Date.now() + time);
 
-    const invoker = message.member.nickname || message.author.username;
-
     const embed = makeEmbed(message)
-      .setAuthor(invoker, message.author.avatarURL() ?? undefined)
+      .setAuthor(
+        message.member.nickname,
+        message.author.avatarURL() ?? undefined
+      )
       .setTitle(`Poll: ${question}`);
 
     let description = `This poll ends at ${
       ends.toTimeString().split(" ")[0]
-    }. \n`;
-    description += `*${invoker} can end the poll immediately by reacting with ✅* \n\n`;
+    }. Vote by clicking one of the reactions below.\n`;
+    description += `*${message.member} (and moderators) can end this poll by reacting with ✅*\n\n`;
 
     for (const [i, option] of Object.entries(options)) {
       description += `${emoji[+i]} — ${option}\n\n`;
@@ -64,63 +75,74 @@ export const PollCommand = Command({
 
     await poll.react("✅");
 
-    // Custom listener
-    const collector = poll.createReactionCollector(
-      (reaction: MessageReaction) =>
-        emoji.includes(reaction.emoji.toString()) ||
-        reaction.emoji.toString() === "✅",
-      { time }
-    );
+    // Collect Reactions
+    const filter = (reaction: MessageReaction, user: User) =>
+      [...emoji.slice(0, options.length), "✅"].includes(
+        reaction.emoji.toString()
+      ) && !user.bot;
+
+    // Record the votes User => index
+    const votes = new Map<User, number>();
+
+    const collector = poll.createReactionCollector(filter, { time });
 
     collector.on("collect", async (reaction, user) => {
-      // If the poll is being ended early, either by the originator, or an admin
-      if (
-        reaction.emoji.toString() === "✅" &&
-        (user.id === message.author.id ||
-          (reaction.message.guild as Guild)
-            .member(user)
-            ?.hasPermission("ADMINISTRATOR"))
-      ) {
+      // Whether the person reacting has privledged access to this poll
+      const priveledged =
+        user.id === message.author.id ||
+        (message.guild?.members
+          .resolve(user)
+          ?.hasPermission("MANAGE_MESSAGES") ??
+          false);
+
+      // Immediately end the poll if a priveledged user reacts to end it
+      if (reaction.emoji.toString() === "✅" && priveledged) {
         collector.emit("end");
+        return;
       }
 
-      const voter = reaction.users.cache.last();
-      const votes = collector.collected;
+      // Set the vote
+      const index = emoji.indexOf(reaction.emoji.toString());
+      votes.set(user, index);
 
-      if (!voter) return;
+      // Delete votes
+      const collection = await reaction.users.fetch();
 
-      // Get all their other votes and delete them
-      const otherVotes = votes.filter(
-        (choice) =>
-          choice.users.cache.has(voter.id) && choice.emoji !== reaction.emoji
-      );
-
-      // Remove all their other votes
-      for (const choice of otherVotes.values()) {
-        choice.users.remove(voter);
+      for (const user of collection.values()) {
+        if (user.id === client.user?.id) continue;
+        reaction.users.remove(user);
       }
     });
 
-    collector.on("end", (collected) => {
-      const embed = poll.embeds[0];
+    collector.on("end", async () => {
+      await poll.reactions.removeAll();
 
-      description += "**Time's Up!** \nThe winner of the poll is...\n";
+      // Count all the votes
+      const tally: { [option: string]: number } = {};
 
-      let winner: MessageReaction = collected.first() as MessageReaction;
-      for (const reaction of collected.values()) {
-        if (reaction.partial) continue;
-        if ((reaction.count as number) > (winner.count as number)) {
-          winner = reaction;
+      for (const index of votes.values()) {
+        const option = options[index];
+
+        if (tally[option]) {
+          tally[option]++;
+        } else {
+          tally[option] = 1;
         }
       }
 
-      const opt = options[emoji.indexOf(winner.emoji.toString())];
-      description += opt;
+      const results = options.sort((b, a) => (tally[a] || 0) - (tally[b] || 0));
 
-      const replacement = new MessageEmbed(embed);
-      replacement.setDescription(description);
+      // Edit the message to show times up
+      let description = "**Time's Up!**\n";
+      description += `The results are in!\n\n`;
 
-      poll.edit({ embed: replacement });
+      for (const result of results) {
+        description += `**${result}** — ${tally[result] || 0} votes\n\n`;
+      }
+
+      embed.setDescription(description);
+
+      await poll.edit({ embed });
     });
 
     return poll;
