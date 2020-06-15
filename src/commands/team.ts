@@ -58,7 +58,7 @@ function buildRecord(team: string, matches: MatchesResponseObject[]) {
 }
 
 export const TeamCommand = Command({
-  names: ["team"],
+  names: ["team", "awards", "record"],
 
   documentation: {
     description: "Lists team record for this season",
