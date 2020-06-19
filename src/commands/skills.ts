@@ -25,7 +25,10 @@ async function getSkillsAtEvents(events: string[]) {
   return runs;
 }
 
-function findBest(type: number, skills: SkillsResponseObject[]) {
+export function findBest(
+  type: number,
+  skills: SkillsResponseObject[]
+): SkillsResponseObject | null {
   let best: SkillsResponseObject | null = null;
 
   for (const run of skills) {
@@ -43,11 +46,11 @@ function findBest(type: number, skills: SkillsResponseObject[]) {
   return best;
 }
 
-function href(sku: string) {
+export function href(sku: string): string {
   return `https://www.robotevents.com/robot-competitions/vex-robotics-competition/${sku}.html`;
 }
 
-async function teamRecord(
+export async function teamRecord(
   team: TeamsResponseObject,
   message: Message
 ): Promise<MessageEmbed> {
@@ -57,7 +60,7 @@ async function teamRecord(
     `${team.number} - ${decodeURIComponent(team.team_name)} (${team.region})`
   );
 
-  let body = `**Records** (May not include VEXU skills runs at VRC events)\n`;
+  let body = `**Skills Records** (May not include VEXU skills runs at VRC events)\n`;
 
   const skills = await vexdb.get("skills", {
     season: "current",
