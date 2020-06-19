@@ -150,7 +150,9 @@ interface LeaderboardRecord {
 
         ...leaderboard.map(
           (k, i) =>
-            `${min + i + 1}. ${k} — ${top[i].value.total} ${titles[title]}`
+            `${min + i + 1}. ${k} — ${top[i + min].value.total} ${
+              titles[title]
+            }`
         ),
       ].join("\n");
 
