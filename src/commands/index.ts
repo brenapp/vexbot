@@ -16,3 +16,4 @@ import "./latex";
 import "./qna";
 import "./config";
 import "./skills";
+import "./videos";
