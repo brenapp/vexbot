@@ -30,6 +30,7 @@
     "markov": "^0.0.7",
     "node-fetch": "^2.6.0",
     "parse-duration": "^0.1.1",
+    "robotevents": "1.0.1",
     "snyk": "^1.316.1",
     "sqlite": "^3.0.3",
     "vexdb": "3.1.1"
