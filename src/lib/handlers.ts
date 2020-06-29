@@ -31,10 +31,10 @@ client.on("messageUpdate", async (old, current) => {
     return false;
   }
 
-  // If the old message was a command, delete the old response
-  if (isCommand(old) && RESPONSES.has(old)) {
-    const response = RESPONSES.get(old) as Message;
-    response.delete();
+  // If the old message was a command, delete the old responses
+  if (isCommand(old) && RESPONSES.has(old.id)) {
+    const resp = RESPONSES.get(old.id) as Message[];
+    resp.forEach((m) => m.delete());
   }
 
   return handle(current);

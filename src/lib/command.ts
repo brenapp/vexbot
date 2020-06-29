@@ -132,7 +132,7 @@ export function Group(
 
 // Handles all of the commands we've already executed
 // Command (from user) => Response (from vexbot)
-export const RESPONSES = new Map<Message, Message>();
+export const RESPONSES = new Map<string, Message[]>();
 
 // Commands that are disabled go here
 export const DISABLED = new Map<Guild, Set<CommandConfiguration>>();
@@ -225,34 +225,36 @@ export async function handle(
 
   // If the command gave us a response to track
   if (response) {
-    const main = response instanceof Array ? response[0] : response;
+    const resp = response instanceof Array ? response : [response];
 
     // Archive that resposne
-    RESPONSES.set(message, main);
+    RESPONSES.set(message.id, resp);
 
-    // Add time to execute on the bottom of the message
-    // If there isn't any attached embeds, then edit the message itself
-    if (main.embeds.length < 1) {
-      main.edit(
-        main.content +
-          ` *(took ${Date.now() - start}ms${
-            process.env["DEV"] ? " — DEV MODE" : ""
-          })*`
-      );
+    for (const message of resp) {
+      // Add time to execute on the bottom of the message
+      // If there isn't any attached embeds, then edit the message itself
+      if (message.embeds.length < 1) {
+        message.edit(
+          message.content +
+            ` *(took ${Date.now() - start}ms${
+              process.env["DEV"] ? " — DEV MODE" : ""
+            })*`
+        );
 
-      // Otherwise get the last embed and edit it;
-    } else {
-      const embed = main.embeds[0];
-      const replacement = new MessageEmbed(embed);
+        // Otherwise get the last embed and edit it;
+      } else {
+        const embed = message.embeds[0];
+        const replacement = new MessageEmbed(embed);
 
-      replacement.setFooter(
-        embed.footer?.text +
-          `\n(took ${Date.now() - start}ms${
-            process.env["DEV"] ? " — DEV MODE" : ""
-          })`
-      );
+        replacement.setFooter(
+          embed.footer?.text +
+            `\n(took ${Date.now() - start}ms${
+              process.env["DEV"] ? " — DEV MODE" : ""
+            })`
+        );
 
-      main.edit({ embed: replacement });
+        message.edit({ embed: replacement });
+      }
     }
   }
 
