@@ -34,10 +34,10 @@ client.on("ready", () => {
 
   probation.initalize();
 
+  debug("Online!");
+
   if (DEBUG || !process.env["DEV"]) {
-    information(client)(
-      `${process.env["DEV"] ? "DEV MODE" : "PRODUCTION"} online!`
-    );
+    information(client)("PRODUCTION Online!");
   }
 });
 
