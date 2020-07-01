@@ -140,7 +140,7 @@ export const BeepBeepCommand = Command({
 
   check: Permissions.all,
   async exec(message: Message, args: string[]) {
-    const m = args.join(" ") || "I am #BCUZBUILT";
+    const m = args.join(" ");
 
     return message.channel.send(
       [
