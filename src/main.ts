@@ -11,7 +11,6 @@ import "./lib/handlers";
 import "./behaviors/log";
 import "./behaviors/random";
 import "./behaviors/eliza";
-import "./behaviors/restart";
 import * as probation from "./behaviors/probation";
 
 // Commands and message handlers
