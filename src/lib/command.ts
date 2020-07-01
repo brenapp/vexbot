@@ -247,10 +247,11 @@ export async function handle(
         const replacement = new MessageEmbed(embed);
 
         replacement.setFooter(
-          embed.footer?.text +
-            `\n(took ${Date.now() - start}ms${
-              process.env["DEV"] ? " — DEV MODE" : ""
-            })`
+          embed.footer?.text ??
+            "" +
+              `\n(took ${Date.now() - start}ms${
+                process.env["DEV"] ? " — DEV MODE" : ""
+              })`
         );
 
         message.edit({ embed: replacement });
