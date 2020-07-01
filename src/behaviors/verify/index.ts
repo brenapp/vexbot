@@ -2,7 +2,7 @@ import { Guild, GuildMember, PartialGuildMember, Role } from "discord.js";
 import { client } from "../../client";
 import { askString, choose, questionValidate } from "../../lib/prompt";
 
-import * as vexdb from "vexdb";
+import * as robotevents from "robotevents";
 import approve from "./approve";
 import { behavior } from "../../lib/access";
 
@@ -49,7 +49,7 @@ export default async function verify(
         return true;
       }
 
-      const data = await vexdb.get("teams", { team });
+      const data = await robotevents.teams.search({ number: [team] });
 
       return data.length > 0;
     },
@@ -95,12 +95,15 @@ export default async function verify(
   const roles = [await findOrMakeRole("Verified", member.guild)]; // Verified
 
   if (!override) {
-    const teaminfo = (await vexdb.get("teams", { team }))[0];
+    const teamData = (await robotevents.teams.get(
+      team
+    )) as robotevents.teams.Team;
+
     if (roleString !== "ALUMNI") {
       // Program
-      if (teaminfo.program == "VEXU") {
+      if (teamData.program.code == "VEXU") {
         roles.push(await findOrMakeRole("VEXU", member.guild)); // VEXU
-      } else if (teaminfo.grade == "Middle School") {
+      } else if (teamData.grade == "Middle School") {
         roles.push(await findOrMakeRole("Middle School", member.guild)); // Middle School
       } else {
         roles.push(await findOrMakeRole("High School", member.guild)); // High School
@@ -109,7 +112,7 @@ export default async function verify(
 
     // Team Roles (VTOSC specific)
     if (member.guild.id === "310820885240217600" && server["team-roles"]) {
-      if (teaminfo.region === "South Carolina") {
+      if (teamData.location.region === "South Carolina") {
         const teamRole = await findOrMakeRole(team.toUpperCase(), member.guild);
         roles.push(teamRole); // Team Role
       } else {
