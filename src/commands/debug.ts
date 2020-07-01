@@ -1,4 +1,4 @@
-import { Message, TextChannel } from "discord.js";
+import { Message, TextChannel, Guild } from "discord.js";
 import Command, { Permissions } from "../lib/command";
 import { information } from "../lib/report";
 
@@ -19,6 +19,36 @@ const getCommit = () =>
   });
 
 export let DEBUG = false;
+
+const info = information(client);
+export const debug = (m: string, context?: Message | Guild): void => {
+  let location: string | null = null;
+  let author: string | null = null;
+  let content: string | null = null;
+
+  if (context && context instanceof Message) {
+    location =
+      context.channel.type === "text"
+        ? `${context.channel.name}$${context.guild?.name}`
+        : context.channel.type === "dm"
+        ? `${context.channel.recipient.username}#${context.channel.recipient.discriminator}`
+        : "News Channel";
+
+    author = `${context.author.username}#${context.author.discriminator}`;
+
+    content = context.content;
+  } else if (content && context instanceof Guild) {
+    location = `${context.name} (${context.id})`;
+  }
+
+  const log = `[${new Date().toISOString()}] [${
+    process.env["DEV"] ? "DEV" : "PROD"
+  }] ${m}${location ? ` I: ${location}` : ""}${author ? ` A: ${author}` : ""}${
+    content ? ` "${content}"` : ""
+  }`;
+
+  DEBUG ? info(log) : console.log(log);
+};
 
 export const DebugCommand = Command({
   names: ["debug"],

@@ -3,7 +3,7 @@ import { config } from "./lib/access";
 import report, { information } from "./lib/report";
 import { client } from "./client";
 
-import { DEBUG } from "./commands/debug";
+import { DEBUG, debug } from "./commands/debug";
 
 import "./lib/handlers";
 
@@ -19,7 +19,7 @@ import * as probation from "./behaviors/probation";
 import "./commands";
 
 client.on("ready", () => {
-  console.log("vexbot#0599 is online!");
+  debug("Client Ready");
 
   if (!client.user) {
     console.error("Could not access client user");
@@ -27,7 +27,6 @@ client.on("ready", () => {
   }
 
   if (process.env["DEV"]) {
-    console.log("DEV MODE ENABLED");
     client.user.setActivity("for changes", { type: "WATCHING" });
   } else {
     client.user.setActivity("for /help", { type: "WATCHING" });
@@ -68,7 +67,7 @@ client.on("guildCreate", async (guild) => {
 const cleanInterval = config("memory.cleanInterval") as number;
 setInterval(() => {
   const cleaned = client.sweepMessages(cleanInterval);
-  console.log(`Cleared ${cleaned} messages from cache`);
+  debug(`Cleaned ${cleaned} Messages From Cache`);
 }, cleanInterval);
 
-console.log(`Cleaning up cache every ${cleanInterval / 1000}s`);
+debug(`Set Cache Clear Interval: ${cleanInterval}ms`);

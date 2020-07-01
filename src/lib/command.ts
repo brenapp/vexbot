@@ -6,7 +6,7 @@ import {
   Guild,
 } from "discord.js";
 import { authorization, config, behavior } from "./access";
-import report from "./report";
+import { debug } from "../commands/debug";
 
 const owner = authorization("discord.owner");
 export const PREFIX = (process.env["DEV"]
@@ -169,6 +169,8 @@ export async function handle(
   // Get the appropriate command, if it exists
   const command = matchCommand(message);
   if (!command) {
+    debug(`Command Not Found`, message);
+
     message.channel.send(
       `No such command \`${message.content.slice(1).split(" ")[0]}\`. Use \`${
         PREFIX[0]
@@ -180,6 +182,8 @@ export async function handle(
   if (message.guild) {
     const disabledCommands = DISABLED.get(message.guild);
 
+    debug(`Command Disabled`, message);
+
     if (disabledCommands && disabledCommands.has(command)) {
       return false;
     }
@@ -188,6 +192,7 @@ export async function handle(
   // See if the command is allowed to be used by the permission system
   const allowed = await command.check.call(command, message);
   if (!allowed && command.fail) {
+    debug(`Command Disallowed`, message);
     command.fail.call(command, message);
 
     return true;
@@ -205,14 +210,17 @@ export async function handle(
     argv = [];
   }
 
+  debug(`Command Invoke: ${command.names[0]}: ${argv.join(" | ")} `, message);
+
   // Start the timer (for when we edit the message later to indicate how long the command takes)
   const start = Date.now();
 
   let response: void | Message[] | Message;
   try {
     response = await command.exec.call(command, message, argv);
+    debug(`Command Success: ${command.names[0]}: ${argv.join(" | ")}`, message);
   } catch (e) {
-    report(message.client)(e);
+    debug(`Command Error: ${command.names[0]}: ${argv.join(" | ")} `, message);
 
     if (command.error) {
       command.error(e, message, argv);

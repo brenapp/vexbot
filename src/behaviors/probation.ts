@@ -7,6 +7,7 @@ import { GuildMember, Guild } from "discord.js";
 import parse from "parse-duration";
 import report from "../lib/report";
 import { behavior } from "../lib/access";
+import { debug } from "../commands/debug";
 
 export const TIMEOUTS: { [key: string]: NodeJS.Timeout } = {};
 
@@ -23,16 +24,20 @@ export async function initalize(): Promise<void> {
   // Get all active probations (covers for bot shutdowns), note shutdown parameters looks like { start: timestamp, end: timestamp, reason: string }
   const probations = await store.all();
 
-  console.log(`Restoring ${probations.length} probations...`);
+  debug(`Loading ${probations.length} Probations...`);
 
   for (const probation of probations) {
     const { end, guild } = probation.value;
+
+    debug(`Load Probation: ${probation.key}`);
 
     TIMEOUTS[`${guild}:${probation.key}`] = setTimeout(
       free(probation.key, guild),
       end - Date.now()
     );
   }
+
+  debug("All Probations Loaded");
 }
 
 export const free = (memberid: string, guildid: string) => async (): Promise<
@@ -55,7 +60,7 @@ export const free = (memberid: string, guildid: string) => async (): Promise<
     return;
   }
 
-  console.log(`Free ${member}`);
+  debug(`Probation End: ${member}`, member.guild);
 
   const store = await keya.store<Probation>("probations");
 
@@ -84,8 +89,9 @@ export default async function probate(
     return;
   }
 
-  console.log(
-    `Probate ${member} by ${by} for ${parse(time)}ms with reason ${reason}`
+  debug(
+    `Probate ${member} By ${by} For ${parse(time)}ms With Reason ${reason}`,
+    member.guild
   );
 
   // Create record in keya

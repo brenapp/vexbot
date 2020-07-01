@@ -137,8 +137,6 @@ export const EventsCommand = Command({
       (resp = async (reaction: MessageReaction) => {
         await response.reactions.removeAll();
 
-        console.log(reaction);
-
         if (reaction.emoji.name === "⬆" && page > 0) {
           page--;
         } else if (reaction.emoji.name === "⬇" && page < lastPage) {

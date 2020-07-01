@@ -16,6 +16,7 @@ import * as keya from "keya";
 import "node-fetch";
 import { User } from "discord.js";
 import { client } from "../client";
+import { debug } from "./debug";
 
 const programs = ["VIQC", "VRC", "VEXU", "JUDGING"];
 const year = "2020-2021";
@@ -246,7 +247,7 @@ setInterval(async () => {
   // Don't check for Q&A in dev mode
   if (process.env["DEV"]) return;
 
-  console.log("Checking for Q&A answers");
+  debug("Check Q&A");
 
   const store = await getStore();
   const records = await store.all();

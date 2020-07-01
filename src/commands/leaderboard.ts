@@ -6,13 +6,12 @@ import SQLiteStore from "keya/out/node/sqlite";
 import { client } from "../client";
 import { addMessageHandler } from "../lib/message";
 import { config } from "../lib/access";
+import { debug } from "./debug";
 
 async function fetchAll(channel: TextChannel) {
   let messages = await channel.messages.fetch({ limit: 100 });
   let pointer = messages.lastKey();
   let batch;
-
-  process.stdout.write(" fetching");
 
   do {
     batch = (
@@ -25,10 +24,8 @@ async function fetchAll(channel: TextChannel) {
     pointer = batch.lastKey();
     messages = messages.concat(batch);
 
-    process.stdout.write(".");
+    debug(`Tally Channel ${channel.name}: Batch Processed`);
   } while (batch.size > 0);
-
-  console.log("");
 
   return messages;
 }
@@ -49,7 +46,7 @@ async function getTotals(store: SQLiteStore<MessageTotals>, message: Message) {
   const oofs: { [key: string]: number } = {};
 
   for (const [, channel] of text) {
-    console.log(`Tallying #${channel.name}...`);
+    debug(`Tally Channel: ${channel.name}`, message);
     const messages = await fetchAll(channel);
     messages.forEach((message) => {
       if (totals[message.author.id]) {
@@ -66,7 +63,7 @@ async function getTotals(store: SQLiteStore<MessageTotals>, message: Message) {
         }
       }
     });
-    console.log(`Done! Got ${messages.size} messages`);
+    debug(`Tally Channel Complete: ${channel.name}`, message);
 
     message.edit(
       (message.content += `\n${channel}: ${messages.size} messages`)
