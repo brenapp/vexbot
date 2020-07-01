@@ -83,3 +83,7 @@ export const HelpCommand = Command({
     }
   },
 });
+
+export function invokeHelp(message: Message, config: CommandConfiguration) {
+  return message.channel.send(commandDocumentation(config));
+}
