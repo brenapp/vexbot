@@ -6,6 +6,7 @@ import { client } from "./client";
 import { DEBUG, debug } from "./commands/debug";
 
 import "./lib/handlers";
+import "./metrics";
 
 // Behaviors
 import "./behaviors/log";

@@ -7,6 +7,7 @@ import {
 } from "discord.js";
 import { authorization, config, behavior } from "./access";
 import { debug } from "../commands/debug";
+import { CommandSuccess, CommandFailure } from "../metrics";
 
 const owner = authorization("discord.owner");
 export const PREFIX = (process.env["DEV"]
@@ -219,9 +220,10 @@ export async function handle(
   try {
     response = await command.exec.call(command, message, argv);
     debug(`Command Success: ${command.names[0]}: ${argv.join(" | ")}`, message);
+    CommandSuccess.set(CommandSuccess.val() + 1);
   } catch (e) {
     debug(`Command Error: ${command.names[0]}: ${argv.join(" | ")} `, message);
-
+    CommandFailure.set(CommandFailure.val() + 1);
     if (command.error) {
       command.error(e, message, argv);
     } else {
