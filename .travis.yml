@@ -1,0 +1,18 @@
+language: nodejs
+cache:
+  yarn: true
+  directories:
+    - node_modules
+
+before_script:
+  - yarn run setup
+
+script:
+  - yarn run build
+  - yarn pack --out vexbot.tgz
+
+deploy:
+  provider: script
+  script: bash deploy.sh
+  on:
+    branch: master

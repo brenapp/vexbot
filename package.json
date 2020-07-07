@@ -45,6 +45,7 @@
     "typescript": "^3.9.2"
   },
   "scripts": {
+    "setup": "yarn",
     "start": "tsc && node out/main.js",
     "build": "tsc",
     "lint": "yarn eslint ./src --fix --ext .ts",
