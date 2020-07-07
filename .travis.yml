@@ -13,7 +13,7 @@ before_script:
 
 script:
   - yarn run build
-  - yarn pack --out vexbot.tgz
+  - yarn pack --filename vexbot.tgz
 
 deploy:
   provider: script
