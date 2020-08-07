@@ -29,7 +29,10 @@ client.on("ready", () => {
   if (process.env["DEV"]) {
     client.user.setActivity("for changes", { type: "WATCHING" });
   } else {
-    client.user.setActivity("for /help", { type: "WATCHING" });
+    client.user.setPresence({
+      activity: { name: "https://vexbot.bren.app" },
+      status: "online",
+    });
   }
 
   probation.initalize();
