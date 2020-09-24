@@ -7,7 +7,6 @@ import {
 } from "discord.js";
 import { authorization, config, behavior } from "./access";
 import { debug } from "../commands/debug";
-import { CommandSuccess, CommandFailure } from "../metrics";
 
 const owner = authorization("discord.owner");
 export const PREFIX = (process.env["DEV"]
@@ -200,15 +199,14 @@ export async function handle(
   }
 
   // Get the arguments
-  const argstring = message.content
-    .split(" ")
-    .slice(1)
-    .join(" ");
+  const argstring = message.content.split(" ").slice(1).join(" ");
   let argv = argstring.match(/“([^“”]+)”|"([^"]+)"|'([^']+)'|([^\s]+)/g);
 
   // If we didn't get passed any, make argv just an empty array
   if (!argv) {
     argv = [];
+  } else {
+    argv = argv.map((i) => i.replace(/“”"'/g, ""));
   }
 
   debug(`Command Invoke: ${command.names[0]}: ${argv.join(" | ")} `, message);
@@ -220,10 +218,14 @@ export async function handle(
   try {
     response = await command.exec.call(command, message, argv);
     debug(`Command Success: ${command.names[0]}: ${argv.join(" | ")}`, message);
-    CommandSuccess.set(CommandSuccess.val() + 1);
   } catch (e) {
     debug(`Command Error: ${command.names[0]}: ${argv.join(" | ")} `, message);
-    CommandFailure.set(CommandFailure.val() + 1);
+    debug(`Command Error Stack Trace: \n${e}`);
+
+    if (process.env["DEV"]) {
+      throw e;
+    }
+
     if (command.error) {
       command.error(e, message, argv);
     } else {
