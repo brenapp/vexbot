@@ -99,3 +99,19 @@ addMessageHandler(async (message) => {
 
   return false;
 });
+
+addMessageHandler(async (message) => {
+  if (!message.guild) return false;
+  if (message.guild.id != "310820885240217600") return false;
+  if (message.member?.id != "348571731822247936") return false;
+
+  const content = message.content.toLowerCase();
+  const match = content.match(/(i'?m) ([^\n.,;()]+)/gi);
+
+  if (match) {
+    await message.channel.send(`Hi ${match[2]}! I'm vexbot!`);
+    return true;
+  }
+
+  return false;
+});
