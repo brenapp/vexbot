@@ -1,10 +1,4 @@
-import {
-  Message,
-  MessageEmbed,
-  TextChannel,
-  PartialMessage,
-  Guild,
-} from "discord.js";
+import { Message, TextChannel, PartialMessage, Guild } from "discord.js";
 import { authorization, config, behavior } from "./access";
 import { debug } from "../commands/debug";
 
@@ -243,30 +237,21 @@ export async function handle(
     RESPONSES.set(message.id, resp);
 
     for (const message of resp) {
-      // Add time to execute on the bottom of the message
-      // If there isn't any attached embeds, then edit the message itself
       if (message.embeds.length < 1) {
-        message.edit(
+        await message.edit(
           message.content +
             ` *(took ${Date.now() - start}ms${
               process.env["DEV"] ? " — DEV MODE" : ""
             })*`
         );
-
-        // Otherwise get the last embed and edit it;
       } else {
         const embed = message.embeds[0];
-        const replacement = new MessageEmbed(embed);
-
-        replacement.setFooter(
-          embed.footer?.text ??
-            "" +
-              `\n(took ${Date.now() - start}ms${
-                process.env["DEV"] ? " — DEV MODE" : ""
-              })`
+        await embed.setFooter(
+          embed.footer +
+            ` *(took ${Date.now() - start}ms${
+              process.env["DEV"] ? " — DEV MODE" : ""
+            })*`
         );
-
-        message.edit({ embed: replacement });
       }
     }
   }
