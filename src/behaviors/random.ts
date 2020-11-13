@@ -106,7 +106,9 @@ addMessageHandler(async (message) => {
   if (message.member?.id != "348571731822247936") return false;
 
   const content = message.content.toLowerCase();
-  const match = content.match(/(i'?m) ([^\n.,;()]+)/gi);
+  const match = content.match(/(i'?m) ([^\n.,;()]+)/);
+
+  console.log(match);
 
   if (match) {
     await message.channel.send(`Hi ${match[2]}! I'm vexbot!`);
