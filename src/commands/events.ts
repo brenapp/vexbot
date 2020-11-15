@@ -1,14 +1,15 @@
 import { Message, MessageEmbed, MessageReaction } from "discord.js";
 import Command, { Permissions } from "../lib/command";
 import { makeEmbed } from "../lib/util";
-import * as vexdb from "vexdb";
 import * as keya from "keya";
+
+import * as robotevents from "robotevents";
 
 import fetch from "isomorphic-fetch";
 import cheerio from "cheerio";
-import { EventsRequestObject } from "vexdb/out/constants/RequestObjects";
-import { EventsResponseObject } from "vexdb/out/constants/ResponseObjects";
 import listen from "../lib/reactions";
+import { Event } from "robotevents/out/endpoints/events";
+import { CURRENT_SEASONS } from "./skills";
 
 export async function html(url: string): Promise<string> {
   const store = await keya.store("fetched");
@@ -27,13 +28,17 @@ export async function html(url: string): Promise<string> {
 }
 
 function constructFields(
-  events: { capacity: string; open: string; event: EventsResponseObject }[],
+  events: { capacity: string; open: string; event: Event }[],
   embed: MessageEmbed
 ) {
   events.forEach(({ event, open, capacity }) => {
     embed.addField(
-      `[${new Date(Date.parse(event.end)).toLocaleDateString()}] ${event.name}`,
-      `${open} open / ${capacity} teams @ ${event.loc_venue} (${event.loc_city}, ${event.loc_region})\n[RobotEvents](https://www.robotevents.com/robot-competitions/vex-robotics-competition/${event.sku}.html)`
+      `[${new Date(event.end.split("T")[0]).toLocaleDateString()}] ${
+        event.name
+      }`,
+      `${open} open / ${capacity} teams @ ${event.location.venue} (${
+        event.location.city
+      }, ${event.location.region})\n[RobotEvents](${event.getURL()})`
     );
   });
 
@@ -41,9 +46,10 @@ function constructFields(
 }
 
 function makeEmbedFromPage(
-  events: { capacity: string; open: string; event: EventsResponseObject }[],
+  events: { capacity: string; open: string; event: Event }[],
   message: Message,
-  page: number
+  page: number,
+  maxPage: number
 ) {
   const start = page * 5,
     end = start + 5;
@@ -51,7 +57,7 @@ function makeEmbedFromPage(
   const subset = events.slice(start, end);
   const embed = makeEmbed(message);
 
-  embed.setTitle(`Events (Page ${page})`);
+  embed.setTitle(`Events (Page ${page} / ${maxPage})`);
   embed.setDescription(`For the current season`);
 
   constructFields(subset, embed);
@@ -60,11 +66,9 @@ function makeEmbedFromPage(
 }
 
 async function getCapacityInformation(
-  sku: string
+  event: Event
 ): Promise<{ capacity: string; open: string }> {
-  return html(
-    `https://www.robotevents.com/robot-competitions/vex-robotics-competition/${sku}.html`
-  )
+  return html(event.getURL())
     .then((html) => cheerio.load(html))
     .then(($) =>
       $(
@@ -90,50 +94,32 @@ export const EventsCommand = Command({
       .map((word) => `${word[0].toUpperCase()}${word.slice(1).toLowerCase()}`)
       .join(" ");
 
-    let params: EventsRequestObject = {
-      season: "current",
-    };
+    // Get events for the given region, sorted into chronological order
+    const listings = await robotevents.events
+      .search({ season: CURRENT_SEASONS }, 24 * 60 * 60 * 1000)
+      .then((events) => events.filter((ev) => ev.location.region === region));
 
-    // Special cases
-    switch (region) {
-      case "All":
-        break;
-      case "Signature":
-        params = {
-          ...params,
-          name: (name) => name.includes("Signature Event"),
-        };
-        break;
-      default:
-        params = { ...params, region };
-        break;
-    }
-
-    const events = await Promise.all(
-      (await vexdb.get("events", params))
-        .sort((a, b) => Date.parse(a.start) - Date.parse(b.start))
-        .map(async (event) => ({
-          event,
-          ...(await getCapacityInformation(event.sku)),
-        }))
+    // Get event capacity from the HTML
+    const capacity = await Promise.all(
+      listings.map((ev) => getCapacityInformation(ev))
     );
 
-    const embed = makeEmbedFromPage(events, message, 0);
+    const events = listings.map((event, i) => ({ event, ...capacity[i] }));
 
-    if (!events.length) {
-      embed.addField("Empty", "No events have been listed!");
-    }
+    // Pagination (ironic because robotevents module flattens the API's
+    // pagination)
+    let page = 0;
+    const lastPage = Math.ceil(events.length / 5) - 1;
+    const embed = makeEmbedFromPage(events, message, page, lastPage);
 
     const response = (await message.channel.send({ embed })) as Message;
     await response.react("⬇");
-
-    let page = 0;
-    const lastPage = Math.ceil(events.length / 5);
+    await response.react("⏬")
 
     let resp: (reaction: MessageReaction) => void;
     listen(
       response,
-      ["⬇", "⬆"],
+      ["⬇", "⬆", "⏬", "⏫"],
       (resp = async (reaction: MessageReaction) => {
         await response.reactions.removeAll();
 
@@ -143,17 +129,26 @@ export const EventsCommand = Command({
           page++;
         }
 
-        const embed = makeEmbedFromPage(events, message, page);
+        if (reaction.emoji.name === "⏫") {
+          page = 0;
+        } else if (reaction.emoji.name === "⏬") {
+          page = lastPage;
+        }
+
+        const embed = makeEmbedFromPage(events, message, page, lastPage);
         await response.edit({ embed });
-        listen(response, ["⬇", "⬆"], resp);
+        listen(response, ["⬇", "⬆", "⏫", "⏬"], resp);
 
         if (page > 0) {
-          response.react("⬆");
+          await response.react("⬆");
+          await response.react("⏫")
         }
 
         if (page < lastPage) {
-          response.react("⬇");
+          await response.react("⬇");
+          await response.react("⏬")
         }
+
       })
     );
 
