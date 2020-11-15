@@ -1,6 +1,6 @@
 import "./verify";
 import "./debug";
-import "./event";
+import "./events";
 import "./team";
 import "./probate";
 import "./leaderboard";
