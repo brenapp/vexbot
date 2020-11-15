@@ -8,157 +8,180 @@
 
 import Command, { Permissions, PREFIX } from "../lib/command";
 import { Message, MessageEmbed } from "discord.js";
-import * as vexdb from "vexdb";
 import { makeEmbed } from "../lib/util";
+
+import * as robotevents from "robotevents";
+import { ProgramAbbr } from "robotevents/out/endpoints/programs";
+import { Grade, Team } from "robotevents/out/endpoints/teams";
 import {
-  TeamsResponseObject,
-  SkillsResponseObject,
-} from "vexdb/out/constants/ResponseObjects";
+  SkillsLeaderboardOptions,
+  SkillsLeaderboardSpot,
+} from "robotevents/out/v1/skills";
+import { Season } from "robotevents/out/endpoints/seasons";
+import { HelpCommand } from "./help";
+import { Skill } from "robotevents/out/endpoints/skills";
 
-async function getSkillsAtEvents(events: string[]) {
-  const runs: SkillsResponseObject[] = [];
+export const CURRENT_SEASONS = [
+  robotevents.seasons.current("VRC") as number,
+  robotevents.seasons.current("VEXU") as number,
+  robotevents.seasons.current("VAIC-HS") as number,
+  robotevents.seasons.current("VAIC-U") as number,
+  robotevents.seasons.current("VIQC") as number,
+];
 
-  for (const sku of events) {
-    runs.push(...(await vexdb.get("skills", { sku })));
-  }
+const PROGRAMS: robotevents.programs.ProgramAbbr[] = [
+  "VRC",
+  "VEXU",
+  "WORKSHOP",
+  "CREATE",
+  "VIQC",
+  "DIS",
+  "NRL",
+  "RAD",
+  "TVCR",
+  "TIQC",
+  "VAIC-HS",
+  "VAIC-U",
+];
 
-  return runs;
-}
+function defaultGradeLevel(grade: string, program: ProgramAbbr): Grade {
+  switch (grade) {
+    case "ES":
+      // robotevents is typed incorrectly
+      return "Elementary" as "Elementary School";
 
-export function findBest(
-  type: number,
-  skills: SkillsResponseObject[]
-): SkillsResponseObject | null {
-  let best: SkillsResponseObject | null = null;
+    case "MS":
+      return "Middle School";
 
-  for (const run of skills) {
-    if (run.type !== type) continue;
+    case "HS":
+      return "High School";
 
-    if (!best) {
-      best = run;
-    } else if (best.score === run.score && run.attempts < best.attempts) {
-      best = run;
-    } else if (run.score > best.score) {
-      best = run;
+    default: {
+      if (program === "VAIC-U" || program === "VEXU") {
+        return "College";
+      } else if (program === "VIQC" || program === "TIQC") {
+        return "Middle School";
+      } else {
+        return "High School";
+      }
     }
   }
-
-  return best;
 }
 
-export function href(sku: string): string {
-  return `https://www.robotevents.com/robot-competitions/vex-robotics-competition/${sku}.html`;
+function rankingListing(rankings: SkillsLeaderboardSpot[]) {
+  let description = "";
+
+  for (const [i, rank] of Object.entries(rankings.slice(0, 20))) {
+    description += `${+i + 1}. ${rank.team.team} - ${rank.scores.score} (${
+      rank.scores.driver
+    } + ${rank.scores.programming}) \n`;
+  }
+
+  return description;
 }
 
-export async function teamRecord(
-  team: TeamsResponseObject,
-  message: Message
+async function programLeaderboard(
+  message: Message,
+  season: Season,
+  options: SkillsLeaderboardOptions
 ): Promise<MessageEmbed> {
   const embed = makeEmbed(message);
 
-  embed.setAuthor(
-    `${team.number} - ${decodeURIComponent(team.team_name)} (${team.region})`
+  embed.setTitle(
+    `${season.program.code} Skills Leaderboard (${options.grade_level})`
+  );
+  let description = "";
+
+  const rankings = await robotevents.v1.getSkillsLeaderboard(
+    season.id,
+    options
   );
 
-  let body = `**Skills Records** (May not include VEXU skills runs at VRC events)\n`;
+  description += rankingListing(rankings);
 
-  const skills = await vexdb.get("skills", {
-    season: "current",
-    team: team.number,
-  });
-
-  // Find the best in each category
-  const best = [0, 1, 2].map((type) => findBest(type, skills));
-
-  for (let type = 0; type <= 2; type++) {
-    const challenge = ["Driver Skills", "Programming Skills", "Robot Skills"][
-      type
-    ];
-    const run = best[type];
-    if (!run) continue;
-
-    const event = await vexdb
-      .get("events", { sku: run.sku })
-      .then((ev) => ev[0]);
-
-    body += `🥇 ${challenge} — ${run.score} @ [${event.name}](${href(
-      event.sku
-    )})\n`;
-  }
-
-  body += "\n**Recent Events:**\n";
-
-  // Now, include summaries for the most recent few runs
-  const runs = skills.filter((run) => run.type === 2).slice(0, 5);
-
-  for (const run of runs) {
-    const event = await vexdb
-      .get("events", { sku: run.sku })
-      .then((ev) => ev[0]);
-
-    const date = new Date(Date.parse(event.start));
-
-    body += `${run.score} on ${date.toLocaleDateString()} @ [${
-      event.name
-    }](${href(event.sku)}) (Ranked ${run.rank})\n\n`;
-  }
-
-  embed.setDescription(body);
+  embed.setDescription(description);
 
   return embed;
 }
 
-async function groupRecord(
-  skillsData: SkillsResponseObject[],
-  label: string,
-  message: Message
-): Promise<MessageEmbed> {
+async function regionalLeaderboard(
+  message: Message,
+  region: string,
+  program: ProgramAbbr,
+  grade_level: Grade
+): Promise<MessageEmbed | null> {
+  const season = await robotevents.seasons.fetch(
+    robotevents.seasons.current(program) as number
+  );
+
   const embed = makeEmbed(message);
 
-  const skills: {
-    [team: string]: (SkillsResponseObject | null)[];
-  } = {};
+  embed.setTitle(
+    `${season.program.code} ${region} Skills Leaderboard (${grade_level})`
+  );
+  let description = "";
 
-  for (const run of skillsData) {
-    // Create the skills object if it doesn't exist
-    if (!skills[run.team]) {
-      skills[run.team] = [null, null, null];
-    }
+  const rankings = await robotevents.v1.getSkillsLeaderboard(season.id, {
+    region,
+    grade_level,
+  });
 
-    // Update it if it's greater
-    if (
-      !skills[run.team][run.type] ||
-      (skills[run.team][run.type] as SkillsResponseObject).score < run.score
-    ) {
-      skills[run.team][run.type] = run;
-      continue;
-    }
+  if (
+    Object.prototype.hasOwnProperty.call(rankings, "error") ||
+    rankings.length < 1
+  ) {
+    return null;
   }
 
-  // Get the top teams
-  const top = Object.keys(skills)
-    .filter((team) => skills[team][2]) // Only consider teams who have Robot Skills Score
-    .sort((a, b) => (skills[b][2]?.score || 0) - (skills[a][2]?.score || 0)); // Sort by highest score
-
-  let body = "";
-
-  for (const [index, team] of Object.entries(top.slice(0, 10))) {
-    const [driver, programming, robot] = skills[team];
-
-    body += `${+index + 1}. ${team} — ${robot?.score} (${driver?.score ||
-      0} + ${programming?.score || 0})\n`;
-  }
-
-  embed.setAuthor(`${label} Skills Leaderboard`).setDescription(body);
+  description += rankingListing(rankings);
+  embed.setDescription(description);
 
   return embed;
+}
+
+async function teamLeaderboard(message: Message, team: Team) {
+  const embed = makeEmbed(message);
+
+  embed.setTitle(`${team.program.code} ${team.number} Skills`);
+
+  const runs = await team.skills({ season: CURRENT_SEASONS });
+  let description = "";
+
+  const bestRuns: { [key: string]: Skill } = {};
+
+  for (const [, run] of runs) {
+    if (bestRuns[run.type]) {
+      const compare = bestRuns[run.type] as Skill;
+
+      if (run.score > compare.score) {
+        bestRuns[run.type] = run;
+      }
+    } else {
+      bestRuns[run.type] = run;
+    }
+  }
+
+  description = Object.entries(bestRuns)
+    .map(([t, s]) => `${t}: ${s.score}`)
+    .join(" ");
+
+  embed.setDescription(description || "No Skills Data Available");
+
+  return embed;
+}
+
+function toTitleCase(string: string) {
+  return string
+    .split(" ")
+    .map((word) => `${word[0].toUpperCase()}${word.slice(1).toLowerCase()}`)
+    .join(" ");
 }
 
 export const SkillsCommand = Command({
   names: ["skills"],
 
   documentation: {
-    description: "Gets skills rankings for teams or regions",
+    description: "Gets skills rankings for teams, regions, or programs",
     usage: `skills BCUZ or ${PREFIX[0]}skills South Carolina or ${PREFIX[0]}skills VEXU`,
     group: "VEX",
   },
@@ -166,59 +189,69 @@ export const SkillsCommand = Command({
   check: Permissions.all,
 
   async exec(message: Message, args: string[]) {
-    const teamOrRegion = args.join(" ");
-
-    let embed: MessageEmbed;
-
-    // First see if there is a team
-    const team = await vexdb.get("teams", { team: teamOrRegion });
-
-    let intermediate: Message | undefined = undefined;
-
-    if (team.length > 0) {
-      intermediate = await message.channel.send(
-        `Getting skills data for ${teamOrRegion}...`,
-        { split: false }
-      );
-
-      embed = await teamRecord(team[0], message);
-    } else if (teamOrRegion.toUpperCase() === "VEXU") {
-      intermediate = await message.channel.send(
-        `Getting skills data for ${teamOrRegion}...`,
-        { split: false }
-      );
-
-      const events = await vexdb.get("events", {
-        program: "VEXU",
-        season: "current",
-      });
-      const skillsData = await getSkillsAtEvents(events.map((r) => r.sku));
-
-      embed = await groupRecord(skillsData, "VEXU", message);
-    } else {
-      intermediate = await message.channel.send(
-        `Getting skills data for ${teamOrRegion}...`,
-        { split: false }
-      );
-
-      const events = await vexdb.get("events", {
-        region: teamOrRegion,
-        season: "current",
-      });
-
-      if (events.length < 1) {
-        return message.channel.send(
-          "No team or region `" + teamOrRegion + "`."
-        );
-      }
-
-      const skillsData = await getSkillsAtEvents(events.map((r) => r.sku));
-
-      embed = await groupRecord(skillsData, teamOrRegion, message);
+    // All of the options require at least one parameter, so display the help
+    // if they don't specify anything
+    if (args.length < 1) {
+      return HelpCommand.exec(message, ["skills"]);
     }
 
-    intermediate.delete();
+    const loadingMessage = await message.channel.send(
+      `Retriving skills data...`
+    );
 
-    return message.channel.send({ embed });
+    // Handle Program Declaractions
+    if (PROGRAMS.includes(args[0] as ProgramAbbr)) {
+      const abbr = args[0] as ProgramAbbr;
+      const grade = (args[1] || "").toUpperCase();
+
+      const season = await robotevents.seasons.fetch(
+        robotevents.seasons.current(abbr) as number
+      );
+
+      // Decode the Grade Level, or find sensible defaults
+      const grade_level: Grade = defaultGradeLevel(grade, abbr);
+
+      // Return the Embed
+      const embed = await programLeaderboard(message, season, { grade_level });
+      return message.channel.send(embed);
+
+      // Otherwise, check to see if there is a team
+    } else {
+      const team = await robotevents.teams.get(
+        args[0],
+        args[1] as ProgramAbbr | undefined
+      );
+
+      // Display skills rankings for a team
+      if (team) {
+        const embed = await teamLeaderboard(message, team);
+
+        loadingMessage.delete();
+        return message.channel.send(embed);
+
+        // Handle regional rankings
+      } else {
+        const region = toTitleCase(args[0]);
+        const program = (args[1] as ProgramAbbr) || "VRC";
+        const grade = defaultGradeLevel(args[2] || "", program);
+
+        const embed = await regionalLeaderboard(
+          message,
+          region,
+          program,
+          grade
+        );
+
+        if (embed) {
+          loadingMessage.delete();
+          return message.channel.send(embed);
+        } else {
+          loadingMessage.delete();
+          return message.channel.send(
+            `Could not skills data about \`${args[0]}\``
+          );
+        }
+      }
+    }
   },
 });

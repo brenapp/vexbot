@@ -1,12 +1,11 @@
 import { Message } from "discord.js";
-import * as vexdb from "vexdb";
-import {
-  MatchesResponseObject,
-  TeamsResponseObject,
-} from "vexdb/out/constants/ResponseObjects";
+import * as robotevents from "robotevents";
+import { Alliance, Match } from "robotevents/out/endpoints/matches";
+import { ProgramAbbr } from "robotevents/out/endpoints/programs";
 import Command, { Permissions } from "../lib/command";
 import { makeEmbed } from "../lib/util";
-import { Seasons } from "vexdb/out/constants/RequestObjects";
+import { HelpCommand } from "./help";
+import { debug } from "./debug";
 
 enum MatchOutcome {
   WIN,
@@ -14,16 +13,20 @@ enum MatchOutcome {
   LOSS,
 }
 
-function outcome(team: string, match: MatchesResponseObject) {
-  if (match.redscore === match.bluescore) {
+function outcome(team: number, match: Match) {
+  const red = match.alliances.find((a) => a.color == "red") as Alliance;
+  const blue = match.alliances.find((a) => a.color == "blue") as Alliance;
+
+  if (red.score === blue.score) {
     return MatchOutcome.TIE;
   }
 
+  const redteams = red.teams.map((t) => t.team.id);
+  const blueteams = red.teams.map((t) => t.team.id);
+
   if (
-    (match.redscore > match.bluescore &&
-      [match.red1, match.red2, match.red3].includes(team)) ||
-    (match.bluescore > match.redscore &&
-      [match.blue1, match.blue2, match.blue3].includes(team))
+    (red.score > blue.score && redteams.includes(team)) ||
+    (blue.score > red.score && blueteams.includes(team))
   ) {
     return MatchOutcome.WIN;
   }
@@ -31,7 +34,7 @@ function outcome(team: string, match: MatchesResponseObject) {
   return MatchOutcome.LOSS;
 }
 
-function buildRecord(team: string, matches: MatchesResponseObject[]) {
+function buildRecord(team: number, matches: Match[]) {
   const record = {
     team,
     wins: 0,
@@ -62,161 +65,57 @@ export const TeamCommand = Command({
 
   documentation: {
     description: "Lists team record for this season",
-    usage: "team 3796B",
+    usage: "team 3796B VRC",
     group: "VEX",
   },
 
   check: Permissions.all,
   async exec(message: Message, args: string[]) {
-    if (!args[0]) {
-      message.reply(
-        "You didn't specify a team! Usage: `!team BCUZ` or `!team 3796B`. Optionally list a season after to get records for that season."
+    if (args.length < 1) {
+      return HelpCommand.exec(message, ["team"]);
+    }
+
+    const number = args[0].toUpperCase();
+    const program = args.slice(1).join(" ").toUpperCase();
+
+    const team = await robotevents.teams.get(number, program as ProgramAbbr);
+
+    if (!team) {
+      return message.channel.send(
+        `Cannot find data about ${program || "Team"} \`${number}\``
       );
-      return;
     }
+    debug(`${team.team_name} loaded`, message);
 
-    const team = args[0].toUpperCase();
-    const season = (args.slice(1).join(" ") as Seasons) || "current";
+    const season = [robotevents.seasons.current(team.program.code) as number];
 
-    const record = await vexdb.get("teams", { team }).then((res) => res[0]);
+    // Get match records
+    const matches = await team
+      .matches({ season })
+      .then((collection) => collection.array());
 
-    if (!record) {
-      message.reply("There doesn't appear to be a team with that number!");
-      return;
-    }
+    debug(`${matches.length} loaded`, message);
 
-    const events = await vexdb.get("events", { team, season });
-    const matches = await vexdb.get("matches", {
-      team,
-      season,
-      scored: 1,
-    });
-    const awards = await vexdb.get("awards", { team, season });
-    const rankings = await vexdb.get("rankings", { team, season });
+    const record = buildRecord(team.id, matches);
+    const winrate = (100 * record.wins) / record.matches;
 
-    // Make the season record
-    const seasonRecord = buildRecord(team, matches);
+    debug(
+      `Record Built: ${record.wins}-${record.losses}-${record.ties}`,
+      message
+    );
 
     const embed = makeEmbed(message);
     embed
-      .setColor(3447003)
-      .setTitle(
-        `${record.team_name} (${record.number}) — ${
-          season === "current" ? "Change Up" : season
-        }`
-      )
-      .setURL(`https://vexdb.io/teams/view/${record.number}`)
+      .setTitle(`${team.team_name} (${team.program.code} ${team.number})`)
       .setDescription(
-        `${record.program == "VEXU" ? "VEXU" : record.grade} Team @ ${
-          record.organisation
-        } (${record.city}, ${record.region})\nSeason Record: ${
-          seasonRecord.wins
-        }-${seasonRecord.losses}-${seasonRecord.ties} (${(
-          (100 * seasonRecord.wins) /
-          matches.length
-        ).toFixed(2)}% WR)`
+        [
+          `${team.grade} Team @ ${team.organization} (${team.location.region}, ${team.location.country})`,
+          `${record.wins}-${record.losses}-${record.ties} (${winrate.toFixed(
+            2
+          )}% WR)`,
+        ].join("\n")
       );
 
-    for (const event of events) {
-      const localAwards = awards.filter((award) => award.sku === event.sku);
-      const ranking = rankings.find((rank) => rank.sku === event.sku);
-      const eventRecord = buildRecord(
-        team,
-        matches.filter((match) => match.sku === event.sku)
-      );
-
-      let output = "";
-
-      if (ranking) {
-        output += `Ranked #${ranking.rank} (${ranking.wins}-${ranking.losses}-${ranking.ties} in quals and ${eventRecord.wins}-${eventRecord.losses}-${eventRecord.ties} total)\n`;
-      }
-
-      if (localAwards.length > 0) {
-        output +=
-          localAwards.map((award) => award.name.split("(")[0]).join(", ") +
-          "\n";
-      }
-
-      if (!output || new Date(event.start).getTime() > Date.now()) {
-        output = "No Data Available";
-      }
-
-      embed.addField(
-        `${new Date(event.end).toLocaleDateString()} ${event.name}`,
-        output
-      );
-    }
-
-    return message.channel.send(embed);
-  },
-});
-
-export const WinRateRankingCommand = Command({
-  names: ["winrates"],
-
-  documentation: {
-    group: "VEX",
-    description: "Calcuates winrates for the given region",
-    usage: "winrates South Carolina",
-  },
-
-  check: Permissions.all,
-  async exec(message: Message, args: string[]) {
-    // Get all the teams in the region
-    const region = args.join(" ");
-    const teams = await vexdb.get("teams", { region });
-
-    const waiting = await message.channel.send(
-      `Calculating winrates for ${region}...`,
-      { split: false }
-    );
-
-    let teamMatches: {
-      team: TeamsResponseObject;
-      matches: MatchesResponseObject[];
-    }[];
-    try {
-      // Get all their matches
-      teamMatches = await Promise.all(
-        teams.map(async (team) => ({
-          team,
-          matches: await vexdb.get("matches", {
-            team: team.number,
-            season: "current",
-          }),
-        }))
-      );
-    } catch (e) {
-      return message.channel.send(
-        "Could not get all team data. Perhaps this region is too large?"
-      );
-    }
-
-    const records = teamMatches
-      .map(({ team, matches }) => buildRecord(team.number, matches))
-      .filter((record) => record.matches > 0);
-
-    // Sort the records by winrate
-    const rankings = records.sort(
-      (b, a) => a.wins / a.matches - b.wins / b.matches
-    );
-
-    const embed = makeEmbed(message)
-      .setTitle(`${region} Season Record Leaderboard`)
-      .setDescription("Ranking by Win Rate");
-
-    for (let rank = 0; rank < Math.min(25, rankings.length); rank++) {
-      const ranking = rankings[rank];
-
-      embed.addField(
-        `${rank + 1}. ${ranking.team} — ${(
-          (100 * ranking.wins) /
-          ranking.matches
-        ).toFixed(2)}%`,
-        `${ranking.wins}-${ranking.losses}-${ranking.ties}`
-      );
-    }
-
-    return waiting.edit({ embed });
+    return message.channel.send({ embed });
   },
 });
