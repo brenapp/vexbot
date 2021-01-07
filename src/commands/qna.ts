@@ -92,7 +92,7 @@ async function parseQNA(link: string) {
     .text()
     .trim();
 
-  const tags: CheerioElement[] = element.find(".tags a.label").get();
+  const tags = element.find(".tags a.label").get();
   question.tags = tags.map((tag) =>
     $(tag)
       .text()

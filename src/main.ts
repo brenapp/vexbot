@@ -45,7 +45,7 @@ client.on("ready", () => {
 
 const reporter = report(client);
 process.on("uncaughtException", (e) => (DEBUG ? reporter(e) : null));
-process.on("unhandledRejection", (e) => (DEBUG ? reporter(e) : null));
+// process.on("unhandledRejection", (e) => (DEBUG ? reporter(e) : null));
 
 client.on("message", handleMessage);
 
