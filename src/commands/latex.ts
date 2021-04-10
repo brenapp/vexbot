@@ -3,6 +3,8 @@
  */
 
 import Command, { Permissions } from "../lib/command";
+import fetch from "node-fetch"
+import { MessageAttachment } from "discord.js";
 
 export const LatexCommand = Command({
   names: ["latex", "math"],
@@ -19,6 +21,9 @@ export const LatexCommand = Command({
       `https://latex.codecogs.com/png.latex?\\inline&space;\\dpi{300}&space;\\tiny&space;{\\color{White}&space;${equation}}`
     );
 
-    return message.channel.send(url);
+    const response = await fetch(url);
+    const attachment = new MessageAttachment(await response.buffer());
+
+    return message.channel.send(attachment);
   },
 });
