@@ -14,6 +14,12 @@
 
 `vexbot` is a discord bot for vex robotics discord servers.
 
+# COMING SOON
+- Full implementation of discord.js v13.x.x
+- Increased modularity and customizability
+- Additional bug fixes
+- Some new fun features...
+
 # Commands
 
 ### META
