@@ -8,9 +8,11 @@
   </p>
 </div>
 
-> ### Vexbot Public Release
+# NOT FOR DEPLOYMENT/RELEASE - SEE /MASTER/ BRANCH FOR STABLE
 
-> `vexbot` is now available on any discord server! For more information, and to add it to your server, go to https://vexbot.bren.app
+> ### Vexbot 2.0 Upgrade Branch
+
+> `vexbot` is now available on any discord server! For more information, and to add it to your server, go to https://vexbot.bren.app. See active source code in branch /master/.
 
 `vexbot` is a discord bot for vex robotics discord servers.
 

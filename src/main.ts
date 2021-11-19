@@ -1,75 +1,159 @@
+//
+// UNTESTED - DO NOT DEPLOY
+//
+
 import { handleMessage } from "./lib/message";
 import { config } from "./lib/access";
 import report, { information } from "./lib/report";
 import { client } from "./client";
-
 import { DEBUG, debug } from "./commands/debug";
-
+import * as probation from "./behaviors/probation";
+import { Guild, GuildMember, Message, MessageReaction, PartialMessage, PartialUser, User } from "discord.js";
+import "./commands";
 import "./lib/handlers";
-
-// Behaviors
 import "./behaviors/log";
 import "./behaviors/random";
 import "./behaviors/eliza";
-import * as probation from "./behaviors/probation";
 
-// Commands and message handlers
+// array of statuses for random generation
+const statuses:string[] = [
+    "over the server",
+    "y'all",
+    "quali highlights",
+    "Clembot 👀",
+    "<ERROR>",
+    "Brendan",
+    "Clemson football",
+    "Carolina football",
+    "a tournament",
+    "3796 tip in finals"
+];
 
-import "./commands";
-
-client.on("ready", () => {
-  debug("Client Ready");
-
-  if (!client.user) {
-    console.error("Could not access client user");
-    process.exit(1);
-  }
-
-  if (process.env["DEV"]) {
-    client.user.setActivity("for changes", { type: "WATCHING" });
-  } else {
-    client.user.setPresence({
-      activity: { name: "https://vexbot.bren.app" },
-      status: "online",
-    });
-  }
-
-  probation.initalize();
-
-  debug("Online!");
-
-  if (DEBUG || !process.env["DEV"]) {
-    information(client)("PRODUCTION Online!");
-  }
-});
-
+/* ERROR HANDLING
+ *   Creates a custom reporter and submits debug console reports for unhandled
+ *    errors.
+ */
 const reporter = report(client);
-process.on("uncaughtException", (e) => (DEBUG ? reporter(e) : null));
-// process.on("unhandledRejection", (e) => (DEBUG ? reporter(e) : null));
+process.on("uncaughtException",  (error:Error) => reporter(error));
+process.on("unhandledRejection", (error:Error) => reporter(error));
 
-client.on("message", handleMessage);
+/* CACHE/MEMORY CLEARING
+ * A function to clear vexbot's cache of messages at specified intervals.
+ *  Helps with runtime smoothness and processing speed.
+ */
 
-// When the bot is added, message the owner with a link on how to set me up
-client.on("guildCreate", async (guild) => {
-  if (!guild.available) return;
+const cleanInterval:number = config("memory.cleanInterval") as number;
+setInterval( () => {
+    const numCleaned:number = client.sweepMessages(cleanInterval);
+    debug(`Cleaned ${numCleaned} messages from cache`);
 
-  const owner = guild.owner;
-  if (!owner) return;
+}, cleanInterval);
+debug(`Cache Clearing Interval: ${cleanInterval} ms`);
 
-  const dm = await owner.createDM();
+/* EVENT HANDLERS
+ *   Explicitly defined handlers for different events the bot will encounter.
+ *   See header comment before each client.on() statement for which event that
+ *    specific block of code handles.
+ */ 
 
-  information(client)(`Added to ${guild.name}`);
+// startup handler
+client.on('ready', () => {
 
-  dm.send(
-    `Hi! I just got added onto ${guild.name}! You can use the \`/config\` command to set me up, and \`/help\` to see what I can do. For more information, refer to https://vexbot.bren.app/docs/ `
-  );
+    debug("Client initializing");
+
+    // handle login/auth error
+    if(!client.user){
+
+        console.error("Error: client credential/login error");
+        process.exit(1);
+    
+    }
+
+    // set status
+    if(process.env["DEV"]){
+
+        // dev status
+        client.user.setActivity("for changes", {type: "WATCHING"});
+    
+    } else {
+        
+        // update status every 10 mins
+        setInterval( () => {
+            const index:number = Math.floor(Math.random() * (statuses.length - 1));
+            client.user.setActivity(statuses[index], {type: "WATCHING"});
+        }, 600000);
+    }
+
+    // initialize probation records
+    probation.initalize();
+
+    // client launched successfully
+    debug(`${client.user.tag} is online!`);
+
+    // additional dev mode output
+    if(DEBUG || !process.env["DEV"]){
+        information(client)("PRODUCTION Online!");
+    }
 });
 
-// Don't store messages for longer than the cleanInterval
-const cleanInterval = config("memory.cleanInterval") as number;
-setInterval(() => {
-  const cleaned = client.sweepMessages(cleanInterval);
-  debug(`Cleaned ${cleaned} Messages From Cache`);
-}, cleanInterval);
+// handle messages - logging, commands, etc.
+client.on("message", (msg:Message) => {
 
-debug(`Set Cache Clear Interval: ${cleanInterval}ms`);
+    // TODO: re-assess message handling protocol
+    handleMessage(msg);
+});
+
+// handle edited messages, updates commands as well
+client.on("messageUpdate", async (
+    old:PartialMessage,
+    current:PartialMessage
+) => {
+        // TODO: implmement BLBot message updater
+});
+
+// handle message deletions
+// AUDIT LOG
+client.on("messageDelete", (msg:Message) => {
+    // TODO: implement delete message entry
+});
+
+// handle new guild members - auto-start verification process
+// AUDIT LOG
+client.on("guildMemberAdd", (member:GuildMember) => {
+    // TODO: auto-verification implementation
+});
+
+// handle member leave/kick/ban
+// AUDIT LOG
+client.on("guildMemberLeave", (member:GuildMember) => {
+    // TODO: implement member leave log
+})
+
+// handle the banhammer swing
+// AUDIT LOG
+client.on("guildBanAdd", (guild:Guild, user:User) => {
+    // TODO: implement banhammer add
+});
+
+// handle the banhammer un-swing
+// AUDIT LOG
+client.on("guildBanRemove", (guild:Guild, user:User) => {
+    // TODO: implement banhammer remove
+});
+
+// STARBOARD FUNCTIONS
+client.on("messageReactionAdd", async (
+    reaction:MessageReaction,
+    user:(User | PartialUser)
+) => {
+    // TODO - start reaction check and update starboard entry
+});
+
+client.on("messageReactionRemove", async (
+    reaction:MessageReaction,
+    user:(User | PartialUser)
+) => {
+    // TODO - check star reaction and update starboard entry
+});
+
+client.on("")
