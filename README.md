@@ -22,6 +22,14 @@
 - Additional bug fixes
 - Some new fun features...
 
+# TODO
+- Remove /eliza, /log, probation, control, dumb, latex, leaderboard, poll, probate, purge, role, roll, rps
+- Re-evaluate random.ts and other easter eggs
+- Calibrate and refine framework
+- Redo "under the hood" and separations
+- Add functionality to automatically post event results, show qualifications, and skills leaderboards
+- More TBD
+
 # Commands
 
 ### META

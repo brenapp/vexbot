@@ -2,13 +2,28 @@
 // UNTESTED - DO NOT DEPLOY
 //
 
+import {
+    Guild,
+    GuildMember,
+    Message,
+    MessageReaction,
+    PartialMessage,
+    PartialUser,
+    User
+} from "discord.js";
+import {
+    handleBanAdd,
+    handleBanRemove,
+    handleLeave,
+    handleMessageDelete,
+    handleMessageUpdate
+} from "./behaviors/events";
 import { handleMessage } from "./lib/message";
 import { config } from "./lib/access";
 import report, { information } from "./lib/report";
 import { client } from "./client";
 import { DEBUG, debug } from "./commands/debug";
 import * as probation from "./behaviors/probation";
-import { Guild, GuildMember, Message, MessageReaction, PartialMessage, PartialUser, User } from "discord.js";
 import "./commands";
 import "./lib/handlers";
 import "./behaviors/log";
