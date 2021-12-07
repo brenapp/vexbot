@@ -37,11 +37,11 @@ const statuses:string[] = [
     "quali highlights",
     "Clembot 👀",
     "<ERROR>",
-    "Brendan",
-    "Clemson football",
-    "Carolina football",
+    "the devs",
+    "for tourney updates",
+    "worlds highlights",
     "a tournament",
-    "3796 tip in finals"
+    "you tip in finals"
 ];
 
 /* ERROR HANDLING
