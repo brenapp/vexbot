@@ -1,4 +1,4 @@
-import { Message, User, MessageReaction, Collector } from "discord.js";
+import { Message, User, MessageReaction, ReactionCollector } from "discord.js";
 
 /**
  * Reaction utilites
@@ -9,12 +9,12 @@ export default async function listen(
   emojis: string[],
   callback: (
     vote: MessageReaction,
-    collector: Collector<string, MessageReaction>
+    collector: ReactionCollector
   ) => boolean | void | Promise<boolean> | Promise<void>
 ): Promise<void> {
   const collector = message.createReactionCollector(
-    (reaction: MessageReaction, user: User) =>
-      emojis.includes(reaction.emoji.name) && !user.bot
+    { filter: (reaction: MessageReaction, user: User) =>
+      emojis.includes(reaction.emoji?.name ?? "") && !user.bot }
   );
   let handler: (element: MessageReaction) => void;
   collector.on(
@@ -23,8 +23,7 @@ export default async function listen(
       const response = callback(element, collector);
 
       if (response) {
-        collector.emit("end");
-        collector.off("collect", handler);
+        collector.stop();
         collector.stop();
       }
     })
