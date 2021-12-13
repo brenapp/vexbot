@@ -1,6 +1,6 @@
 {
   "ignore": ["**/*.test.ts", "**/*.spec.ts", ".git", "node_modules"],
   "watch": ["src"],
-  "exec": "cross-env DEV=true npm start",
+  "exec": "npx cross-env DEV=true npm start",
   "ext": "ts"
 }

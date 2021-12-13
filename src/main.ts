@@ -11,7 +11,6 @@ import "./lib/handlers";
 import "./behaviors/log";
 import "./behaviors/random";
 import "./behaviors/eliza";
-import * as probation from "./behaviors/probation";
 
 // Commands and message handlers
 
@@ -33,8 +32,6 @@ client.on("ready", () => {
       status: "online",
     });
   }
-
-  probation.initalize();
 
   debug("Online!");
 
