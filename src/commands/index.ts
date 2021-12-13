@@ -1,0 +1,1 @@
+export { PingCommand } from "./ping";

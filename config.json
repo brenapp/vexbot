@@ -3,46 +3,5 @@
   "prefix": {
     "dev": ["."],
     "prod": ["/", "!", "-", "[", "]", "?", ":", "*", "^", "&", "$", "#"]
-  },
-  "memory": {
-    "cleanInterval": 300000
-  },
-  "leaderboard": {
-    "titles": {
-      "Leaderboard": "messages"
-    }
-  },
-  "regret": {
-    "id": "546890655398625286",
-    "names": [
-      "regret",
-      "thanos-cube",
-      "gaytanoman",
-      "zach-for-head-ref",
-      "bradley-for-head-ref",
-      "serious-chat",
-      "drow-for-gdc",
-      "bradleys-snoring",
-      "admin-chat",
-      "zach-for-gdc",
-      "important-studying-chat",
-      "drink-water",
-      "omar-needs-to-hydrate",
-      "joels-autons",
-      "bradleys-hoes",
-      "library",
-      "vtotw-3",
-      "vtotw-2",
-      "a-professional-frat",
-      "a-social-frat",
-      "ding-dong",
-      "tip-in-finals",
-      "averys-cloud-juice",
-      "drink-soup",
-      "guys-tiktok",
-      "giub",
-      "change-down",
-      "im-braden"
-      ]
   }
 }
