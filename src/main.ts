@@ -1,7 +1,7 @@
 import report, { information } from "./lib/report";
 import { client } from "./client";
 import { debug, DEBUG } from "./lib/debug";
-import { register } from "./lib/command";
+import { handle, register } from "./lib/command";
 import "./commands";
 
 client.once("ready", () => {
@@ -29,3 +29,4 @@ const reporter = report(client);
 process.on("uncaughtException", (e) => (DEBUG ? reporter(e) : null));
 
 register();
+client.on("interactionCreate", handle);

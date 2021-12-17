@@ -16,7 +16,7 @@ export const PingCommand = Command({
     },
 
     check: () => true,
-    exec(message) {
-        return message.channel.send("Pong!");
+    exec(interaction) {
+        return interaction.reply("Pong!");
     },
 });

@@ -1,9 +1,10 @@
-import { Message, TextChannel, PartialMessage, Guild, Interaction } from "discord.js";
+import { Message, TextChannel, PartialMessage, Guild, Interaction, CacheType, CommandInteraction } from "discord.js";
 import { authorization, config, behavior } from "./access";
 import { REST } from "@discordjs/rest"
 import { Routes } from "discord-api-types/v9"
 import { debug } from "./debug";
 import { SlashCommandBuilder } from "@discordjs/builders";
+import { client } from "../client";
 
 const owner = authorization("discord.owner");
 export const PREFIX = (process.env["DEV"]
@@ -27,19 +28,13 @@ export interface CommandConfiguration {
   // Lifecycle methods
 
   // See if it's valid to use the command (see the Permissions object below)
-  check: (message: Message) => boolean | Promise<boolean>;
+  check: (interaction: CommandInteraction<CacheType>) => boolean | Promise<boolean>;
 
   // If the check fails
-  fail?: (message: Message) => void;
+  fail?: (interaction: CommandInteraction<CacheType>) => void;
 
   // Execute the command
-  exec(message: Message, args: string[]): CommandResult;
-
-  // Error handling
-  error?(error: string, message: Message, args: string[]): void;
-
-  // Holds subcommands (for help configuration)
-  subcommands?: CommandConfiguration[];
+  exec: (interaction: CommandInteraction<CacheType>) => void;
 }
 
 // Holds all the registered commands (with each name being mapped)
@@ -69,63 +64,12 @@ export default function registerCommand(
   return config;
 }
 
-/**
- * Subcommand registration
- * @param config
- */
-export function Subcommand(config: CommandConfiguration): CommandConfiguration {
-  config.documentation.subcommand = true;
-
-  return config;
-}
-
-/**
- * Function to replace (or compose with) CommandConfiguration.exec() for when commands need to be grouped together
- * @param commands
- */
-export function Group(
-  commands: CommandConfiguration[],
-  defaultMatch?: (message: Message, argv: string[]) => CommandResult
-) {
-  return async (
-    message: Message,
-    args: string[]
-  ): Promise<Message | Message[] | void> => {
-    const [subcommand, ...arg] = args;
-
-    for (const command of commands) {
-      if (command.names.includes(subcommand)) {
-        // See if permissions valid
-        const valid = await command.check(message);
-        if (!valid) {
-          if (command.fail) {
-            command.fail(message);
-          }
-          return;
-        }
-
-        return command.exec(message, arg);
-      }
-    }
-
-    // If we couldn't find a subcommand, use the default match
-    if (defaultMatch) {
-      return defaultMatch(message, args);
-    } else {
-      return message.channel.send(
-        `Unknown subcommand \`${subcommand}\`. Use \`help\` for list of valid commands`
-      );
-    }
-  };
-}
-
 // Handles all of the commands we've already executed
 // Command (from user) => Response (from vexbot)
 export const RESPONSES = new Map<string, Message[]>();
 
 // Commands that are disabled go here
 export const DISABLED = new Map<Guild, Set<CommandConfiguration>>();
-
 
 /**
  * Registers slash commands with discord
@@ -144,6 +88,31 @@ export async function register() {
       
       return builder.toJSON();
   });
+  const guilds = await client.guilds.fetch();
+  guilds.forEach(async (guild) => {
+    await rest.put(
+      Routes.applicationGuildCommands(clientID, guild.id),
+      { body: commands }
+    );
+  });
+};
 
+export async function handle(interaction: Interaction<CacheType>) {
+  if (!interaction.isCommand()) return;
 
+  const { commandName } = interaction;
+  const command = REGISTRY.get(commandName);
+  if (!command) {
+    return interaction.reply(`Unknown command \`${commandName}\``);
+  };
+
+  const valid = await command.check(interaction);
+  if (!valid) {
+    if (command.fail) {
+      return command.fail(interaction);
+    }
+    return;
+  };
+
+  await command.exec(interaction);
 };
