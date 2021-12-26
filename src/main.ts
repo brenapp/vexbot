@@ -2,6 +2,8 @@ import report, { information } from "./lib/report";
 import { client } from "./client";
 import { debug, DEBUG } from "./lib/debug";
 import { handle, register } from "./lib/command";
+import { authentication } from "robotevents";
+import { authorization } from "./lib/access";
 import "./commands";
 
 client.once("ready", () => {
@@ -23,6 +25,10 @@ client.once("ready", () => {
   if (DEBUG || !process.env["DEV"]) {
     information(client)("PRODUCTION Online!");
   }
+
+  const token = authorization("robotevents.token") as string;
+  authentication.setBearer(token);
+
 });
 
 const reporter = report(client);
