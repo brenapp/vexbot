@@ -14,9 +14,8 @@ export const PingCommand = Command({
         group: "General",
         usage: "ping"
     },
-
     check: () => true,
     exec(interaction) {
-        return interaction.reply("Pong!");
+        return interaction.reply({ content: "Pong!", ephemeral: true });
     },
 });

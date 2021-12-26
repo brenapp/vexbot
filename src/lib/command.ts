@@ -1,7 +1,7 @@
 import { Message, TextChannel, PartialMessage, Guild, Interaction, CacheType, CommandInteraction } from "discord.js";
 import { authorization, config, behavior } from "./access";
 import { REST } from "@discordjs/rest"
-import { Routes } from "discord-api-types/v9"
+import { RESTPostAPIApplicationCommandsJSONBody, Routes } from "discord-api-types/v9"
 import { debug } from "./debug";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { client } from "../client";
@@ -25,7 +25,7 @@ export interface CommandConfiguration {
     subcommand?: boolean;
   };
 
-  // Lifecycle methods
+  json?: () => Promise<any> | any; 
 
   // See if it's valid to use the command (see the Permissions object below)
   check: (interaction: CommandInteraction<CacheType>) => boolean | Promise<boolean>;
@@ -79,18 +79,26 @@ export async function register() {
   const clientID = authorization("discord.id") as string;
   const rest = new REST({ version: '9' }).setToken(token);
 
+
   debug("Registering slash commands...");
-  const commands = Array.from(REGISTRY.values()).map(config => {
-    const builder = new SlashCommandBuilder()
-      .setName(config.names[0])
-      .setDescription(config.documentation.description)
-      .setDefaultPermission(true);
-      
-      return builder.toJSON();
-  });
+  const commands = await Promise.all(Array.from(REGISTRY.values()).map(async config => {
+    if (!config.json) {
+      const builder = new SlashCommandBuilder()
+        .setName(config.names[0])
+        .setDescription(config.documentation.description)
+        .setDefaultPermission(true);
+
+        return builder.toJSON();
+    }
+
+    return config.json();
+  }));
+
+  debug(`Registering ${commands.length} commands... ${JSON.stringify(commands)}`);
+
   const guilds = await client.guilds.fetch();
   guilds.forEach(async (guild) => {
-    await rest.put(
+    const result = await rest.put(
       Routes.applicationGuildCommands(clientID, guild.id),
       { body: commands }
     );
