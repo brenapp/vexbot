@@ -2,10 +2,13 @@
   "name": "liquid",
   "version": "0.0.0",
   "description": "A discord bot which allows organizations of all sizes to manage their expenses, right inside discord",
-  "main": "out/main.js",
+  "main": "out/bot/main.js",
   "scripts": {
     "build": "tsc",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "start": "node -r tsconfig-paths/register out/bot/main.js",
+    "dev": "node ./node_modules/nodemon/bin/nodemon.js",
+    "dev:build": "tsc && node -r tsconfig-paths/register out/bot/main.js"
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"
@@ -27,6 +30,7 @@
     "husky": "^8.0.1",
     "lint-staged": "^12.4.3",
     "nodemon": "^2.0.16",
-    "prettier": "^2.6.2"
+    "prettier": "^2.6.2",
+    "tsconfig-paths": "^4.0.0"
   }
 }
