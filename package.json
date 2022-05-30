@@ -4,7 +4,11 @@
   "description": "A discord bot which allows organizations of all sizes to manage their expenses, right inside discord",
   "main": "out/main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
   },
   "repository": {
     "type": "git",
@@ -18,5 +22,11 @@
   "homepage": "https://github.com/MayorMonty/liquid#readme",
   "dependencies": {
     "discord.js": "^13.7.0"
+  },
+  "devDependencies": {
+    "husky": "^8.0.1",
+    "lint-staged": "^12.4.3",
+    "nodemon": "^2.0.16",
+    "prettier": "^2.6.2"
   }
 }
