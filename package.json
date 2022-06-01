@@ -6,9 +6,9 @@
   "scripts": {
     "build": "tsc",
     "prepare": "husky install",
-    "start": "npx cross-env NODE_ENV=production node -r tsconfig-paths/register out/bot/main.js",
+    "start": "npx cross-env NODE_ENV=production TS_NODE_BASEURL=./out/bot node -r tsconfig-paths/register out/bot/main.js",
     "dev": "node ./node_modules/nodemon/bin/nodemon.js",
-    "dev:build": "tsc && node -r tsconfig-paths/register out/bot/main.js"
+    "dev:build": "tsc && npx cross-env NODE_ENV=development TS_NODE_BASEURL=./out/bot node -r tsconfig-paths/register out/bot/main.js"
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"
