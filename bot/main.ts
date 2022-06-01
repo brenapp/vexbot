@@ -1,5 +1,10 @@
 import { Client, Intents } from "discord.js";
-import { COMMANDS, deployGuildCommands, handleCommand } from "./lib/command";
+import {
+  COMMANDS,
+  deployApplicationCommands,
+  deployGuildCommands,
+  handleCommand,
+} from "~lib/command";
 import { token, developmentGuild } from "~secret/discord.json";
 import log from "./lib/log";
 
@@ -19,9 +24,11 @@ client.on("ready", () => {
   if (process.env.NODE_ENV === "development") {
     log("info", `deploying ${COMMANDS.size} commands to development guild...`);
     deployGuildCommands(developmentGuild);
+  } else {
+    log("info", `deploying ${COMMANDS.size} commands to GLOBAL list...`);
+    deployApplicationCommands();
   }
 });
 
 client.on("interactionCreate", handleCommand);
-
 client.login(token);

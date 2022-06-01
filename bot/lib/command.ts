@@ -80,6 +80,28 @@ export async function deployGuildCommands(guildID: string) {
   });
 }
 
+/**
+ * Deploy commands in production.
+ */
+export async function deployApplicationCommands() {
+  const commands = [];
+  for (const [name, config] of COMMANDS.entries()) {
+    let command = new SlashCommandBuilder()
+      .setName(name)
+      .setDescription(config.documentation.description);
+
+    if (config.documentation.options) {
+      command = config.documentation.options(command);
+    }
+
+    commands.push(command.toJSON());
+  }
+
+  return rest.put(Routes.applicationCommands(clientID), {
+    body: commands,
+  });
+}
+
 export async function handleCommand(interaction: Interaction<CacheType>) {
   if (!interaction.isCommand()) {
     return;
