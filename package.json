@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "prepare": "husky install",
-    "start": "node -r tsconfig-paths/register out/bot/main.js",
+    "start": "npx cross-env NODE_ENV=production node -r tsconfig-paths/register out/bot/main.js",
     "dev": "node ./node_modules/nodemon/bin/nodemon.js",
     "dev:build": "tsc && node -r tsconfig-paths/register out/bot/main.js"
   },
@@ -24,9 +24,13 @@
   },
   "homepage": "https://github.com/MayorMonty/liquid#readme",
   "dependencies": {
+    "@discordjs/builders": "^0.13.0",
+    "@discordjs/rest": "^0.4.1",
+    "discord-api-types": "^0.33.1",
     "discord.js": "^13.7.0"
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "husky": "^8.0.1",
     "lint-staged": "^12.4.3",
     "nodemon": "^2.0.16",
