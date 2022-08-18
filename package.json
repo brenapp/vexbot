@@ -1,7 +1,7 @@
 {
   "name": "liquid",
   "version": "0.0.0",
-  "description": "A discord bot which allows organizations of all sizes to manage their expenses, right inside discord",
+  "description": "A discord bot template, with default support for slash commands",
   "main": "out/bot/main.js",
   "scripts": {
     "build": "tsc",
