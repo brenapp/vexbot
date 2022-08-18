@@ -16,7 +16,7 @@ export interface CommandConfiguration {
 
   documentation: {
     description: string;
-    options?(builder: SlashCommandBuilder): SlashCommandBuilder;
+    options?(builder: SlashCommandBuilder): Partial<SlashCommandBuilder>;
   };
 
   // See if it's valid to use the command (see the Permissions object below)
@@ -64,15 +64,15 @@ const rest = new REST({ version: "9" }).setToken(token);
 export async function deployGuildCommands(guildID: string) {
   const commands = [];
   for (const [name, config] of COMMANDS.entries()) {
-    let command = new SlashCommandBuilder()
+    let command: Partial<SlashCommandBuilder> = new SlashCommandBuilder()
       .setName(name)
       .setDescription(config.documentation.description);
 
     if (config.documentation.options) {
-      command = config.documentation.options(command);
+      command = config.documentation.options(command as SlashCommandBuilder);
     }
 
-    commands.push(command.toJSON());
+    commands.push(command.toJSON!());
   }
 
   return rest.put(Routes.applicationGuildCommands(clientID, guildID), {
@@ -86,15 +86,15 @@ export async function deployGuildCommands(guildID: string) {
 export async function deployApplicationCommands() {
   const commands = [];
   for (const [name, config] of COMMANDS.entries()) {
-    let command = new SlashCommandBuilder()
+    let command: Partial<SlashCommandBuilder> = new SlashCommandBuilder()
       .setName(name)
       .setDescription(config.documentation.description);
 
     if (config.documentation.options) {
-      command = config.documentation.options(command);
+      command = config.documentation.options(command as SlashCommandBuilder);
     }
 
-    commands.push(command.toJSON());
+    commands.push(command.toJSON!());
   }
 
   return rest.put(Routes.applicationCommands(clientID), {
