@@ -8,6 +8,10 @@ import {
 import { token, developmentGuild } from "~secret/discord.json";
 import log from "./lib/log";
 
+import * as robotevents from "robotevents";
+import { bearer } from "~secret/robotevents.json";
+robotevents.authentication.setBearer(bearer);
+
 // Register all of the commands
 import "./command";
 
