@@ -1,11 +1,11 @@
-import Command, { Permissions } from "../lib/command";
+import Command, { Permissions } from "~lib/command";
 
 const PingCommand = Command({
   names: ["ping"],
   documentation: {
     description: "Pong!",
   },
-  check: Permissions.all,
+  check: Permissions.always,
 
   async exec(interaction) {
     interaction.reply("Pong!");

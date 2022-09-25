@@ -20,9 +20,7 @@ export interface CommandConfiguration {
   };
 
   // See if it's valid to use the command (see the Permissions object below)
-  check: (
-    interaction: CommandInteraction<CacheType>
-  ) => boolean | Promise<boolean>;
+  check: PermissionFunction;
 
   // If the check fails
   fail?: (interaction: CommandInteraction<CacheType>) => void;
@@ -129,6 +127,48 @@ export async function handleCommand(interaction: Interaction<CacheType>) {
   }
 }
 
+type PermissionFunction = (
+  interaction: CommandInteraction<CacheType>
+) => boolean | Promise<boolean>;
+
 export const Permissions = {
-  all: () => true,
+  always: () => true,
+
+  user: (id: string) => {
+    return (interaction: CommandInteraction<CacheType>) =>
+      interaction.user.id === id;
+  },
+
+  channel: (id: string) => {
+    return (interaction: CommandInteraction<CacheType>) =>
+      interaction.channelId === id;
+  },
+
+  dm: (interaction: CommandInteraction<CacheType>) => {
+    return interaction.channel?.type === "DM";
+  },
+
+  guild: (id: string) => {
+    return (interaction: CommandInteraction<CacheType>) =>
+      interaction.guildId === id;
+  },
+
+  not: (fn: PermissionFunction) => {
+    return async (interaction: CommandInteraction<CacheType>) =>
+      !(await fn(interaction));
+  },
+
+  all:
+    (...permissions: PermissionFunction[]) =>
+    async (interaction: CommandInteraction<CacheType>) => {
+      const all = await Promise.all(permissions.map((p) => p(interaction)));
+      return all.every((p) => p);
+    },
+
+  any:
+    (...permissions: PermissionFunction[]) =>
+    async (interaction: CommandInteraction<CacheType>) => {
+      const all = await Promise.all(permissions.map((p) => p(interaction)));
+      return all.some((p) => p);
+    },
 };
