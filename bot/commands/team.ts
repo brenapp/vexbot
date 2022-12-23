@@ -48,7 +48,7 @@ function getAwardEmoji(title: string) {
   const awards = {
     Excellence: "⭐️",
     "Tournament Champions": "🏆",
-    "Design Award": "⚜️",
+    "Design Award": "📒",
     "Robot Skills Champion": "👩‍💻",
     "Robot Skills 2nd Place": "🥈",
     "Robot Skills 3rd Place": "🥉",
@@ -71,12 +71,12 @@ function getAwardEmoji(title: string) {
     title.includes(shortName)
   );
 
-  return award ? award : [title, ""];
+  return award ?? [title, ""];
 }
 
 async function getEmbed(team: Team, interaction: CommandInteraction) {
   const events = await team.events({
-    season: [robotevents.seasons.get(team.program.code, "2019-2020")!],
+    season: [robotevents.seasons.get(team.program.code, "2022-2023")!],
   });
 
   const eventIds = events.array().map((event) => event.id);
@@ -87,42 +87,54 @@ async function getEmbed(team: Team, interaction: CommandInteraction) {
   const matchesBySku = matches.group((match) => match.event.code);
   const awardsBySku = awards.group((award) => award.event.code);
 
-  console.log(matches, awards);
+  // Get team overall information
+  const record = getOutcomes(team.id, matches.array());
+  let winRate =
+    (record.wins / (record.wins + record.losses + record.ties)) * 100;
 
+  if (isNaN(winRate)) {
+    winRate = 0;
+  }
+
+  let description = `${team.location.city}, ${team.location.region}\n`;
+  description += `Record: ${record.wins}-${record.losses}-${
+    record.ties
+  } (${winRate.toFixed(2)}% WR)`;
+
+  // General event records
   const fields: APIEmbedField[] = events
     .array()
     .map((event) => {
       let value = "";
       const start = new Date(event.start);
 
-      if (start.getTime() > Date.now()) {
-        value += `*${start.toLocaleDateString()}*`;
-      } else {
-        const matches = matchesBySku[event.sku] ?? [];
-        const awards = awardsBySku[event.sku] ?? [];
-        const { wins, losses, ties } = getOutcomes(team.id, matches);
+      value += `*${start.toLocaleDateString()}*\n`;
+      const matches = matchesBySku[event.sku] ?? [];
+      const awards = awardsBySku[event.sku] ?? [];
+      const { wins, losses, ties } = getOutcomes(team.id, matches);
 
-        if (matches.length > 0) {
-          value += `Event Record: ${wins}-${losses}-${ties}\n`;
-        }
+      if (matches.length > 0) {
+        value += `Event Record: ${wins}-${losses}-${ties}\n`;
+      }
 
-        if (awards.length > 0) {
-          for (const award of awards) {
-            value += `${getAwardEmoji(award.title).join(" ")}\n`;
-          }
+      if (awards.length > 0) {
+        for (const award of awards) {
+          const [name, emoji] = getAwardEmoji(award.title);
+          value += `${emoji} ${name}\n`;
         }
       }
 
-      return { name: event.name, value };
+      const field = { name: event.name, value };
+
+      return field;
     })
     .slice(0, 25);
 
+  console.log(JSON.stringify(fields));
+
   const builder = new EmbedBuilder()
     .setTitle(`${team.program.code} ${team.number} ${team.team_name}`)
-    .setAuthor({
-      name: interaction.user.username,
-      iconURL: interaction.user.avatarURL({ dynamic: true }) ?? undefined,
-    })
+    .setDescription(description)
     .addFields(...fields);
 
   return builder.data;
@@ -152,11 +164,11 @@ const TeamCommand = Command({
             )
         ),
   },
-  check: Permissions.all,
+  check: Permissions.always,
 
   async exec(interaction) {
     const number = interaction.options.getString("number", true);
-    const team = await robotevents.teams.get(number);
+    const team = await robotevents.teams.get(number, "VRC");
 
     if (!team) {
       return interaction.reply(`Team \`${number}\` cannot be found.`);
@@ -164,7 +176,11 @@ const TeamCommand = Command({
 
     const embed = await getEmbed(team, interaction);
 
-    interaction.reply({ embeds: [embed] });
+    try {
+      interaction.reply({ embeds: [embed] });
+    } catch (e) {
+      interaction.reply("Could not create embed.");
+    }
   },
 });
 
