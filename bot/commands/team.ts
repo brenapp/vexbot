@@ -130,8 +130,6 @@ async function getEmbed(team: Team, interaction: CommandInteraction) {
     })
     .slice(0, 25);
 
-  console.log(JSON.stringify(fields));
-
   const builder = new EmbedBuilder()
     .setTitle(`${team.program.code} ${team.number} ${team.team_name}`)
     .setDescription(description)
