@@ -1,25 +1,18 @@
-![liquid (3)](https://user-images.githubusercontent.com/8839926/188060669-8d4fa711-d978-443c-a558-9e5aa2b11443.png)
+# vexbot
 
-Liquid is a discord bot template desigened to get you going on the fun parts of bot development fast! It was created after I had noticed myself creating the same basic code structure over and over again. It includes built in support for:
-
-- Slash Commands
-- Command Permissions System
-- Hot Module Reloading
-- Secrets Management
-- Standardized Logging
-- Good TypeScript configuration
-- Bot Structure
+vexbot is a custom discord bot designed for communities that participate in the VEX Robotics
+Competition.
 
 ## Getting Started
 
 To get started, clone this repository with your project name:
 
 ```
-git clone https://github.com/MayorMonty/liquid -o BotName
+git clone https://github.com/MayorMonty/vexbot
 ```
 
 ```
-cd BotName
+cd vexbot
 ```
 
 Create the secrets JSON object from the `secret.templates` folder. This folder is hidden and gitignore and can be used to store tokens and secrets. The benefit of this approach is the strong typescript support out of the box due to JSON imports.
