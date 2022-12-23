@@ -5,6 +5,7 @@ import { EmbedBuilder } from "@discordjs/builders";
 import { CommandInteraction } from "discord.js";
 import { APIEmbedField } from "discord-api-types/v9";
 import { Match } from "robotevents/out/endpoints/matches";
+import { ProgramAbbr } from "robotevents/out/endpoints/programs";
 
 function getOutcomes(id: number, matches: Match[]) {
   let wins = 0;
@@ -166,11 +167,27 @@ const TeamCommand = Command({
 
   async exec(interaction) {
     const number = interaction.options.getString("number", true);
-    const team = await robotevents.teams.get(number, "VRC");
+    let program = [
+      interaction.options.getString("program", false) as ProgramAbbr | null,
+    ];
 
-    if (!team) {
+    if (!program[0]) {
+      program = ["VRC", "VEXU", "VAIC"];
+    }
+
+    let programIds = program.map(
+      (program) => robotevents.programs.get(program as ProgramAbbr)!
+    );
+    const teams = await robotevents.teams.search({
+      number: [number],
+      program: programIds,
+    });
+
+    if (teams.length < 1) {
       return interaction.reply(`Team \`${number}\` cannot be found.`);
     }
+
+    const team = teams[0];
 
     const embed = await getEmbed(team, interaction);
 

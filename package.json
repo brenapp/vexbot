@@ -1,7 +1,7 @@
 {
-  "name": "liquid",
-  "version": "0.0.0",
-  "description": "A discord bot template, with default support for slash commands",
+  "name": "vexbot",
+  "version": "2.0.0",
+  "description": "Custom discord for SC Robotics",
   "main": "out/bot/main.js",
   "scripts": {
     "build": "tsc",

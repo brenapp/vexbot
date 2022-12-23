@@ -158,6 +158,11 @@ export const Permissions = {
       !(await fn(interaction));
   },
 
+  admin: async (interaction: CommandInteraction<CacheType>) => {
+    const member = await interaction.guild?.members.fetch(interaction.user.id);
+    return member?.permissions.has("ADMINISTRATOR") ?? false;
+  },
+
   all:
     (...permissions: PermissionFunction[]) =>
     async (interaction: CommandInteraction<CacheType>) => {
