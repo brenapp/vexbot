@@ -6,8 +6,9 @@ import { CommandInteraction } from "discord.js";
 import { APIEmbedField } from "discord-api-types/v9";
 import { Match } from "robotevents/out/endpoints/matches";
 import { ProgramAbbr } from "robotevents/out/endpoints/programs";
+import log from "~lib/log";
 
-function getOutcomes(id: number, matches: Match[]) {
+export function getOutcomes(id: number, matches: Match[]) {
   let wins = 0;
   let losses = 0;
   let ties = 0;
@@ -188,6 +189,10 @@ const TeamCommand = Command({
     }
 
     const team = teams[0];
+    log(
+      "info",
+      `team: lookup ${team.number} initiated by ${interaction.user.username}#${interaction.user.discriminator} (${interaction.user.id}) in ${interaction.guild?.name} (${interaction.guild?.id}) `
+    );
 
     const embed = await getEmbed(team, interaction);
 
