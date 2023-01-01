@@ -26,7 +26,12 @@ client.on("ready", () => {
   );
 
   if (process.env.NODE_ENV === "development") {
-    log("info", `deploying ${COMMANDS.size} commands to development guild...`);
+    log(
+      "info",
+      `deploying ${COMMANDS.size} commands (${[...COMMANDS.keys()].join(
+        ", "
+      )}) to development guild...`
+    );
     deployGuildCommands(developmentGuild);
   } else {
     log("info", `deploying ${COMMANDS.size} commands to GLOBAL list...`);
