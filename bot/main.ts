@@ -1,11 +1,11 @@
-import { Client, Intents } from "discord.js";
+import { Client, Intents, TextChannel } from "discord.js";
 import {
   COMMANDS,
   deployApplicationCommands,
   deployGuildCommands,
   handleCommand,
 } from "~lib/command";
-import { token, developmentGuild } from "~secret/discord.json";
+import { token, developmentGuild, owner } from "~secret/discord.json";
 import log from "~lib/log";
 
 import * as robotevents from "robotevents";
@@ -19,7 +19,7 @@ const client = new Client({
   intents: [Intents.FLAGS.GUILDS],
 });
 
-client.on("ready", () => {
+client.on("ready", async () => {
   log(
     "info",
     `${client.user?.username}#${client.user?.discriminator} is ready!`
@@ -41,3 +41,5 @@ client.on("ready", () => {
 
 client.on("interactionCreate", handleCommand);
 client.login(token);
+
+export { client };
