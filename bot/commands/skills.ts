@@ -24,7 +24,7 @@ const SkillsLeaderboard = Command({
   },
   check: Permissions.always,
   exec: async (message) => {
-    const grade = message.options.getString("grade", true) as
+    const grade = message.options.get("grade", true).value as
       | "High School"
       | "Middle School";
 

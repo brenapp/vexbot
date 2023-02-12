@@ -1,4 +1,4 @@
-import { Client, Intents, TextChannel } from "discord.js";
+import { Client, GatewayIntentBits } from "discord.js";
 import {
   COMMANDS,
   deployApplicationCommands,
@@ -16,7 +16,11 @@ robotevents.authentication.setBearer(bearer);
 import "./commands";
 
 const client = new Client({
-  intents: [Intents.FLAGS.GUILDS],
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildModeration,
+  ],
 });
 
 client.on("ready", async () => {

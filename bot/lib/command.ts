@@ -2,6 +2,7 @@ import { SlashCommandBuilder } from "@discordjs/builders";
 import { REST } from "@discordjs/rest";
 import {
   CacheType,
+  ChannelType,
   CommandInteraction,
   Interaction,
   Message,
@@ -116,14 +117,19 @@ export async function handleCommand(interaction: Interaction<CacheType>) {
   // Check permissions
   const authorized = await config.check(interaction);
 
-  if (authorized) {
-    config.exec(interaction);
-  } else {
-    if (config.fail) {
-      config.fail(interaction);
+  try {
+    if (authorized) {
+      config.exec(interaction);
     } else {
-      interaction.reply("You don't have permission to use that command!");
+      if (config.fail) {
+        config.fail(interaction);
+      } else {
+        interaction.reply("You don't have permission to use that command!");
+      }
     }
+  } catch (e) {
+    console.error(e);
+    interaction.reply("Something went wrong!");
   }
 }
 
@@ -145,7 +151,7 @@ export const Permissions = {
   },
 
   dm: (interaction: CommandInteraction<CacheType>) => {
-    return interaction.channel?.type === "DM";
+    return interaction.channel?.type === ChannelType.DM;
   },
 
   guild: (id: string) => {
@@ -160,7 +166,16 @@ export const Permissions = {
 
   admin: async (interaction: CommandInteraction<CacheType>) => {
     const member = await interaction.guild?.members.fetch(interaction.user.id);
-    return member?.permissions.has("ADMINISTRATOR") ?? false;
+    return member?.permissions.has("Administrator") ?? false;
+  },
+
+  role: (name: string) => {
+    return async (interaction: CommandInteraction<CacheType>) => {
+      const member = await interaction.guild?.members.fetch(
+        interaction.user.id
+      );
+      return member?.roles.cache.some((r) => r.name === name) ?? false;
+    };
   },
 
   all:

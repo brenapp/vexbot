@@ -167,9 +167,10 @@ const TeamCommand = Command({
   check: Permissions.always,
 
   async exec(interaction) {
-    const number = interaction.options.getString("number", true);
+    const number = interaction.options.get("number", true).value as string;
     let program = [
-      interaction.options.getString("program", false) as ProgramAbbr | null,
+      (interaction.options.get("program", false)?.value ??
+        null) as ProgramAbbr | null,
     ];
 
     if (!program[0]) {

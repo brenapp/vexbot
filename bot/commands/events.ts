@@ -20,6 +20,6 @@ const EventsCommand = Command({
   check: Permissions.admin,
 
   async exec(interaction) {
-    const region = interaction.options.getString("region", true);
+    const region = interaction.options.get("region", true).value as string;
   },
 });
