@@ -115,7 +115,7 @@ async function getEmbed(team: Team, interaction: CommandInteraction) {
       const awards = awardsBySku[event.sku] ?? [];
       const { wins, losses, ties } = getOutcomes(team.id, matches);
 
-      if (matches.length > 0) {
+      if (matches.length > 0 && new Date(event.start).getTime() < Date.now()) {
         value += `Event Record: ${wins}-${losses}-${ties}\n`;
       }
 
