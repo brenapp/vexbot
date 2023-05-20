@@ -2,8 +2,8 @@ import { ActionRowBuilder, EmbedBuilder } from "@discordjs/builders";
 import {
   ButtonBuilder,
   ButtonStyle,
-  CreateRoleOptions,
   MessageComponentInteraction,
+  RoleCreateOptions,
   TextChannel,
 } from "discord.js";
 import * as robotevents from "robotevents";
@@ -70,7 +70,7 @@ const VerifyCommand = Command({
       | string
       | undefined;
 
-    async function findOrCreateRole(name: string, options?: CreateRoleOptions) {
+    async function findOrCreateRole(name: string, options?: RoleCreateOptions) {
       const role = interaction.guild!.roles.cache.find(
         (role) => role.name === name
       );
@@ -106,9 +106,7 @@ const VerifyCommand = Command({
 
     const embed = new EmbedBuilder()
       .setTitle(`Verification for ${nickname}`)
-      .setDescription(
-        `Welcome to the server, ${name}! A moderator will verify your information shortly. This verification request will expire in 24 hours.`
-      )
+      .setDescription(`This verification request will expire in 24 hours.`)
       .addFields(
         { name: "Team", value: number },
         { name: "Position", value: role },
@@ -122,6 +120,17 @@ const VerifyCommand = Command({
     const verified = await findOrCreateRole("Verified");
     const pronounRole = pronouns ? await findOrCreateRole(pronouns) : undefined;
 
+    const memberApprovalChannel = interaction.guild!.channels.cache.find(
+      (v) => v.name === "member-approval"
+    ) as TextChannel | undefined;
+    if (!memberApprovalChannel) {
+      await interaction.reply({
+        content:
+          "Cannot find member approval channel. Please contact a moderator.",
+      });
+      return;
+    }
+
     const approve = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
         .setCustomId("verify-approve")
@@ -133,7 +142,7 @@ const VerifyCommand = Command({
       i.customId === "verify-approve" &&
       (i.memberPermissions?.has("ManageRoles") ?? false);
 
-    const collector = interaction.channel!.createMessageComponentCollector({
+    const collector = memberApprovalChannel.createMessageComponentCollector({
       filter,
       time: 1000 * 60 * 60 * 24,
     });
@@ -167,9 +176,15 @@ const VerifyCommand = Command({
       }
     });
 
-    await interaction.reply({
+    await memberApprovalChannel.send({
+      content: `New Verification Request from ${member}`,
       embeds: [embed],
       components: [approve],
+    });
+
+    await interaction.reply({
+      content: `Verification request sent to moderators. Please wait for approval.`,
+      ephemeral: true,
     });
   },
 });

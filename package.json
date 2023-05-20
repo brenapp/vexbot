@@ -25,7 +25,7 @@
   "homepage": "https://github.com/MayorMonty/liquid#readme",
   "dependencies": {
     "discord-api-types": "^0.33.1",
-    "discord.js": "^14.7.1",
+    "discord.js": "^14.11.0",
     "robotevents": "^2.7.0"
   },
   "devDependencies": {
