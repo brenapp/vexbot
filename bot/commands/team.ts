@@ -77,14 +77,15 @@ function getAwardEmoji(title: string) {
 }
 
 async function getEmbed(team: Team, interaction: CommandInteraction) {
+  const season = [robotevents.seasons.current(team.program.code)!];
   const events = await team.events({
-    season: [robotevents.seasons.get(team.program.code, "2022-2023")!],
+    season,
   });
 
   const eventIds = events.array().map((event) => event.id);
 
-  const matches = await team.matches({ event: eventIds });
-  const awards = await team.awards({ event: eventIds });
+  const matches = await team.matches({ event: eventIds, season });
+  const awards = await team.awards({ event: eventIds, season });
 
   const matchesBySku = matches.group((match) => match.event.code);
   const awardsBySku = awards.group((award) => award.event.code);
