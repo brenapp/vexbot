@@ -105,15 +105,6 @@ const VerifyCommand = Command({
     const nickname = `${name} | ${team.number} ${roleNotation[role]}`.trim();
     const member = await interaction.guild!.members.fetch(user.id);
 
-    const embed = new EmbedBuilder()
-      .setTitle(`Verification for ${nickname}`)
-      .setDescription(`This verification request will expire in 24 hours.`)
-      .addFields(
-        { name: "Team", value: number },
-        { name: "Position", value: role },
-        { name: "Pronouns", value: pronouns ?? "Not Specified" }
-      );
-
     const teamRole = localTeam
       ? await findOrCreateRole(team.location.region)
       : await findOrCreateRole(team.location.region, { mentionable: true });
@@ -132,10 +123,18 @@ const VerifyCommand = Command({
       roles.push(notSC);
     }
 
-    embed.addFields({
-      name: "Roles",
-      value: roles.map((role) => role.toString()).join("\n"),
-    });
+    const embed = new EmbedBuilder()
+      .setTitle(`Verification for ${nickname}`)
+      .setDescription(`This verification request will expire in 24 hours.`)
+      .addFields(
+        { name: "Team", value: number },
+        { name: "Position", value: role },
+        { name: "Pronouns", value: pronouns ?? "Not Specified" },
+        {
+          name: "Roles",
+          value: roles.map((role) => role.toString()).join("\n"),
+        }
+      );
 
     const memberApprovalChannel = interaction.guild!.channels.cache.find(
       (v) => v.name === "member-approval"
