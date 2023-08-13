@@ -3,6 +3,7 @@ import {
   ButtonBuilder,
   ButtonStyle,
   MessageComponentInteraction,
+  Role,
   RoleCreateOptions,
   TextChannel,
 } from "discord.js";
@@ -120,6 +121,22 @@ const VerifyCommand = Command({
     const verified = await findOrCreateRole("Verified");
     const pronounRole = pronouns ? await findOrCreateRole(pronouns) : undefined;
 
+    const roles = [teamRole, gradeRole, verified];
+
+    if (pronounRole) {
+      roles.push(pronounRole);
+    }
+
+    if (!localTeam) {
+      const notSC = await findOrCreateRole("Not SC");
+      roles.push(notSC);
+    }
+
+    embed.addFields({
+      name: "Roles",
+      value: roles.map((role) => role.toString()).join("\n"),
+    });
+
     const memberApprovalChannel = interaction.guild!.channels.cache.find(
       (v) => v.name === "member-approval"
     ) as TextChannel | undefined;
@@ -152,8 +169,8 @@ const VerifyCommand = Command({
 
       try {
         await member.setNickname(nickname);
-        await member.roles.add([verified, teamRole, gradeRole]);
-        if (pronounRole) await member.roles.add(pronounRole);
+        await member.roles.add(roles);
+
         await i.editReply({
           content: `Successfully verified ${member}!`,
           components: [],
