@@ -83,18 +83,13 @@ const EventsCommand = Command({
         let scheduledEvents: GuildScheduledEvent[] = [];
 
         for (const event of events) {
-          const start = new Date(event.start).setHours(8);
-          const end = new Date(event.end).setHours(18);
+          const start = new Date(event.start);
+          const end = new Date(event.end);
 
-          if (discordEvents.cache.some((e) => e.name === event.name)) {
-            await i.followUp({
-              content: `Event ${event.name} already exists`,
-              ephemeral: true,
-            });
-            continue;
-          }
+          start.setHours(8);
+          end.setHours(20);
 
-          const scheduledEvent = await discordEvents.create({
+          const eventDetails = {
             name: event.name,
             scheduledStartTime: start,
             scheduledEndTime: end,
@@ -105,7 +100,17 @@ const EventsCommand = Command({
             entityMetadata: {
               location: `${event.location.venue}`,
             },
-          });
+          };
+
+          let scheduledEvent = discordEvents.cache.find(
+            (e) => e.name === event.name
+          );
+
+          if (scheduledEvent) {
+            await scheduledEvent.edit(eventDetails);
+          } else {
+            scheduledEvent = await discordEvents.create(eventDetails);
+          }
 
           await i.followUp({
             content: `Created event ${scheduledEvent} for ${event.name}`,
