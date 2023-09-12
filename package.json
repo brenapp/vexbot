@@ -10,7 +10,7 @@
   "dependencies": {
     "@discordjs/builders": "^0.9.0",
     "@discordjs/rest": "^0.1.0-canary.0",
-    "@pm2/io": "^4.3.5",
+    "@pm2/io": "^5.0.2",
     "@types/cheerio": "^0.22.18",
     "@types/dlv": "^1.1.2",
     "@types/isomorphic-fetch": "^0.0.35",
