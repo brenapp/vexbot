@@ -30,7 +30,7 @@
     "googleapis": "^52.1.0",
     "keya": "2.0.0",
     "markov": "^0.0.7",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "parse-duration": "^0.1.1",
     "robotevents": "^2.0.1",
     "snyk": "^1.360.0",
