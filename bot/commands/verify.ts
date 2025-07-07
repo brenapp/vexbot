@@ -171,7 +171,7 @@ const VerifyCommand = Command({
         await member.roles.add(roles);
 
         await i.editReply({
-          content: `Successfully verified ${member}!`,
+          content: `Successfully verified ${member} by ${i.member?.user}!`,
           components: [],
         });
       } catch (e) {
